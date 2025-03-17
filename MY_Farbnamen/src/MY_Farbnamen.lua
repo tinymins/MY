@@ -1050,103 +1050,85 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		szJoinWhere = ' WHERE PlayerInfo.time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
 	end
 	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
-		theme = X.UI.FRAME_THEME.SIMPLE, close = true,
+		theme = X.UI.FRAME_THEME.SIMPLE,
+		w = 640, h = 540,
 		text = szTitle,
+		close = true,
 	})
 	local nPaddingX = 20
 	local nX, nY = nPaddingX, 30
 	local nDeltaY = 30
-	ui:Append('Text', {
+
+	local uiTabs = ui:Append('WndTabs', {
+		x = 0, y = 0,
+		w = 640, h = 35,
+	})
+	local uiWndTotal = ui:Append('WndWindow', {
+		x = 0, y = 50,
+		w = 640, h = 480,
+		visible = true,
+	})
+	local uiWndCamp = ui:Append('WndWindow', {
+		x = 0, y = 50,
+		w = 640, h = 480,
+		visible = false,
+	})
+	local uiWndForce = ui:Append('WndWindow', {
+		x = 0, y = 50,
+		w = 640, h = 480,
+		visible = false,
+	})
+	local uiWndTong = ui:Append('WndWindow', {
+		x = 0, y = 50,
+		w = 640, h = 480,
+		visible = false,
+	})
+
+	uiTabs:Append('WndTab', {
+		w = 100, h = 35,
+		text = _L['Total'],
+		checked = true,
+		onCheck = function(bChecked)
+			uiWndTotal:Visible(bChecked)
+		end,
+	})
+	uiTabs:Append('WndTab', {
+		w = 100, h = 35,
+		text = _L['By Camp'],
+		onCheck = function(bChecked)
+			uiWndCamp:Visible(bChecked)
+		end,
+	})
+	uiTabs:Append('WndTab', {
+		w = 100, h = 35,
+		text = _L['By Force'],
+		onCheck = function(bChecked)
+			uiWndForce:Visible(bChecked)
+		end,
+	})
+	uiTabs:Append('WndTab', {
+		w = 100, h = 35,
+		text = _L['By Tong'],
+		onCheck = function(bChecked)
+			uiWndTong:Visible(bChecked)
+		end,
+	})
+
+	local nPlayerCount = X.Get(X.SQLiteGetAll(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)
+	local nTongCount = X.Get(X.SQLiteGetAll(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)
+
+	nY = 0
+	uiWndTotal:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total player count: %d', X.Get(X.SQLiteGetAll(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)),
+		text = _L('Total player count: %d', nPlayerCount),
 	})
 	nY = nY + nDeltaY
-	ui:Append('Text', {
+	uiWndTotal:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total tong count: %d', X.Get(X.SQLiteGetAll(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)),
+		text = _L('Total tong count: %d', nTongCount),
 	})
-	nY = nY + nDeltaY
-	nY = nY + nDeltaY
 
-	ui:Append('Text', {
-		x = nX, y = nY,
-		text = _L['Camp analysis:'],
-	})
-	nY = nY + nDeltaY
-
-	for _, v in ipairs(X.SQLiteGetAll(DB, [[SELECT camp, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY camp]]) or {}) do
-		ui:Append('Text', {
-			x = nX, y = nY,
-			text = g_tStrings.STR_CAMP_TITLE[v.camp] or _L('Unknown(%d)', v.camp),
-		})
-		ui:Append('Text', {
-			x = nX + 65, y = nY,
-			text = _L('%6d players', v.count),
-		})
-		nY = nY + nDeltaY
-	end
-	nY = nY + nDeltaY
-
-	ui:Append('Text', {
-		x = nX, y = nY,
-		text = _L['Force analysis:'],
-	})
-	nY = nY + nDeltaY
-
-	local aForce = X.SQLiteGetAll(DB, [[SELECT force, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY force]]) or {}
-	for i = 1, #aForce, 2 do
-		nX = nPaddingX
-		for j = 0, 1 do
-			local v = aForce[i + j]
-			if v then
-				ui:Append('Text', {
-					x = nX, y = nY,
-					text = g_tStrings.tForceTitle[v.force] or _L('Unknown(%d)', v.force),
-				})
-				ui:Append('Text', {
-					x = nX + 65, y = nY,
-					text = _L('%6d players', v.count),
-				})
-				nX = nX + 250
-			end
-		end
-		nY = nY + nDeltaY
-	end
-	nX = nPaddingX
-	nY = nY + nDeltaY
-
-	ui:Append('Text', {
-		x = nX, y = nY,
-		text = _L['Top 10 tong member count analysis:'],
-	})
-	nY = nY + nDeltaY
-
-	for _, v in ipairs(X.SQLiteGetAll(DB, [[
-		SELECT TongInfo.name, COUNT(PlayerInfo.id) AS count
-		FROM PlayerInfo
-		JOIN TongInfo ON PlayerInfo.tong = TongInfo.id
-		]] .. szJoinWhere .. [[
-		GROUP BY PlayerInfo.tong
-		ORDER BY count DESC
-		LIMIT 10;
-	]]) or {}) do
-		ui:Append('Text', {
-			x = nX, y = nY,
-			text = UTF8ToAnsi(v.name),
-		})
-		ui:Append('Text', {
-			x = nX + 250, y = nY,
-			text = _L('%6d players', v.count),
-		})
-		nY = nY + nDeltaY
-	end
-	nY = nY + nDeltaY
-
-	ui:Append('Text', {
-		x = nX, y = nY,
-		text = _L['---------------------------------------------'],
-	})
-	nY = nY + nDeltaY
+	nY = nY + 430
 
 	ui:Append('Text', {
 		x = nX, y = nY,
@@ -1154,7 +1136,110 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	})
 	nY = nY + nDeltaY
 
-	ui:Size(640, nY + 50)
+	uiWndCamp:Append('WndTable', {
+		x = 20, y = 0,
+		w = 600, h = 400,
+		columns = {
+			{
+				key = 'camp',
+				title = ' ' .. _L['Camp'],
+				width = 200,
+				alignHorizontal = 'left',
+				sorter = true,
+				render = function(value, record, index)
+					if record.summary then
+						return GetFormatText(' ' .. _L['Summary'], 162, 255, 255, 255)
+					end
+					return GetFormatText(' ' .. (g_tStrings.STR_CAMP_TITLE[value] or _L('Unknown(%d)', value)), 162, 255, 255, 255)
+				end,
+			},
+			{
+				key = 'count',
+				title = ' ' .. _L['Player Count'],
+				sorter = true,
+				render = function(value, record, index)
+					return GetFormatText(' ' .. _L('%d players', value), 162, 255, 255, 255)
+				end,
+			},
+		},
+		dataSource = X.SQLiteGetAll(DB, [[SELECT camp, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY camp]]) or {},
+		summary = { summary = true, count = nPlayerCount },
+		sort = 'camp',
+		sortOrder = 'asc',
+	})
+
+	uiWndForce:Append('WndTable', {
+		x = 20, y = 0,
+		w = 600, h = 400,
+		columns = {
+			{
+				key = 'force',
+				title = ' ' .. _L['Force'],
+				width = 200,
+				alignHorizontal = 'left',
+				sorter = true,
+				render = function(value, record, index)
+					if record.summary then
+						return GetFormatText(' ' .. _L['Summary'], 162, 255, 255, 255)
+					end
+					return GetFormatText(' ' .. (g_tStrings.tForceTitle[value] or _L('Unknown(%d)', value)), 162, 255, 255, 255)
+				end,
+			},
+			{
+				key = 'count',
+				title = ' ' .. _L['Player Count'],
+				sorter = true,
+				render = function(value, record, index)
+					return GetFormatText(' ' .. _L('%d players', value), 162, 255, 255, 255)
+				end,
+			},
+		},
+		dataSource = X.SQLiteGetAll(DB, [[SELECT force, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY force]]) or {},
+		summary = { summary = true, count = nPlayerCount },
+		sort = 'camp',
+		sortOrder = 'asc',
+	})
+
+	uiWndTong:Append('WndTable', {
+		x = 20, y = 0,
+		w = 600, h = 400,
+		columns = {
+			{
+				key = 'name',
+				title = ' ' .. _L['Tong'],
+				width = 200,
+				alignHorizontal = 'left',
+				sorter = true,
+				render = function(value, record, index)
+					if record.summary then
+						return GetFormatText(' ' .. _L['Summary'], 162, 255, 255, 255)
+					end
+					return GetFormatText(' ' .. value, 162, 255, 255, 255)
+				end,
+			},
+			{
+				key = 'count',
+				title = ' ' .. _L['Player Count'],
+				sorter = true,
+				render = function(value, record, index)
+					return GetFormatText(' ' .. _L('%d players', value), 162, 255, 255, 255)
+				end,
+			},
+		},
+		dataSource = X.SQLiteGetAllANSI(DB, [[
+			SELECT TongInfo.name, COUNT(PlayerInfo.id) AS count
+			FROM PlayerInfo
+			JOIN TongInfo ON PlayerInfo.tong = TongInfo.id
+			]] .. szJoinWhere .. [[
+			GROUP BY PlayerInfo.tong
+			ORDER BY count DESC
+			LIMIT 500;
+		]]) or {},
+		summary = { summary = true, count = nPlayerCount },
+		sort = 'count',
+		sortOrder = 'desc',
+	})
+
 	ui:Anchor('CENTER')
 end
 
