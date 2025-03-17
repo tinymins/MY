@@ -1082,6 +1082,11 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		w = 640, h = 480,
 		visible = false,
 	})
+	local uiWndServer = ui:Append('WndWindow', {
+		x = 0, y = 50,
+		w = 640, h = 480,
+		visible = false,
+	})
 	local uiWndTong = ui:Append('WndWindow', {
 		x = 0, y = 50,
 		w = 640, h = 480,
@@ -1113,6 +1118,13 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		text = _L['By Force'],
 		onCheck = function(bChecked)
 			uiWndForce:Visible(bChecked)
+		end,
+	})
+	uiTabs:Append('WndTab', {
+		w = 100, h = 35,
+		text = _L['By Server'],
+		onCheck = function(bChecked)
+			uiWndServer:Visible(bChecked)
 		end,
 	})
 	uiTabs:Append('WndTab', {
@@ -1226,6 +1238,38 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		summary = { summary = true, count = nPlayerCount },
 		sort = 'camp',
 		sortOrder = 'asc',
+	})
+
+	uiWndServer:Append('WndTable', {
+		x = 20, y = 0,
+		w = 600, h = 400,
+		columns = {
+			{
+				key = 'server',
+				title = ' ' .. _L['Server'],
+				width = 200,
+				alignHorizontal = 'left',
+				sorter = true,
+				render = function(value, record, index)
+					if record.summary then
+						return GetFormatText(' ' .. _L['Summary'], 162, 255, 255, 255)
+					end
+					return GetFormatText(' ' .. value, 162, 255, 255, 255)
+				end,
+			},
+			{
+				key = 'count',
+				title = ' ' .. _L['Player Count'],
+				sorter = true,
+				render = function(value, record, index)
+					return GetFormatText(' ' .. _L('%d players', value), 162, 255, 255, 255)
+				end,
+			},
+		},
+		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT server, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY server]]) or {},
+		summary = { summary = true, count = nAllPlayerCount },
+		sort = 'count',
+		sortOrder = 'desc',
 	})
 
 	uiWndTong:Append('WndTable', {
