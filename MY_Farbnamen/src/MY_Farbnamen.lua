@@ -1142,6 +1142,12 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		end,
 	})
 
+	nY = 460
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['Counts based on local cache, only players you met will be analyzed.'],
+	})
+
 	local nAllPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)
 	local nAllTongCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)
 	local nPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ AND server = ?]], szServer), {1, 'count'}, 0)
@@ -1167,14 +1173,6 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		x = nX, y = nY,
 		text = _L('Current server total tong count: %d', nTongCount),
 	})
-
-	nY = nY + 430
-
-	ui:Append('Text', {
-		x = nX, y = nY,
-		text = _L['Counts based on local cache, only players you met will be analyzed.'],
-	})
-	nY = nY + nDeltaY
 
 	uiWndCamp:Append('WndTable', {
 		x = 20, y = 0,
