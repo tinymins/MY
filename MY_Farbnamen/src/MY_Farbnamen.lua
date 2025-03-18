@@ -1040,16 +1040,30 @@ end
 -- 统计界面
 --------------------------------------------------------------------------------
 function D.ShowAnalysis(nTimeLimit, szSubTitle)
+	local function BuildWhere(...)
+		local szWhere = ''
+		for _, v in ipairs({...}) do
+			if X.IsString(v) then
+				v = {v}
+			end
+			for _, vv in ipairs(v) do
+				if szWhere == '' then
+					szWhere = ' WHERE ' .. vv .. ' '
+				else
+					szWhere = szWhere .. ' AND ' .. vv .. ' '
+				end
+			end
+		end
+		return szWhere
+	end
 	local szServer = X.GetServerOriginName()
 	local szTitle = _L['MY_Farbnamen__Analysis'] .. g_tStrings.STR_CONNECT .. szServer
 	if szSubTitle then
 		szTitle = szTitle .. g_tStrings.STR_CONNECT .. szSubTitle
 	end
-	local szWhere = ''
+	local aWhere = {}
 	if nTimeLimit then
-		szWhere = ' WHERE time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
-	else
-		szWhere = ' WHERE 1 = 1 '
+		table.insert(aWhere, 'time > ' .. (GetCurrentTime() - nTimeLimit))
 	end
 	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
 		theme = X.UI.FRAME_THEME.SIMPLE,
@@ -1146,10 +1160,10 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		text = _L['Counts based on local cache, only players you met will be analyzed.'],
 	})
 
-	local nAllPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)
-	local nAllTongCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)
-	local nPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ AND server = ?]], szServer), {1, 'count'}, 0)
-	local nTongCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere .. [[ AND server = ?]], szServer), {1, 'count'}, 0)
+	local nAllPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. BuildWhere(aWhere)), {1, 'count'}, 0)
+	local nAllTongCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. BuildWhere(aWhere)), {1, 'count'}, 0)
+	local nPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. BuildWhere(aWhere, [[server = ?]]), szServer), {1, 'count'}, 0)
+	local nTongCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. BuildWhere(aWhere, [[server = ?]]), szServer), {1, 'count'}, 0)
 
 	nY = 0
 	uiWndTotal:Append('Text', {
@@ -1186,7 +1200,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 					if record.summary then
 						return GetFormatText(' ' .. _L['Summary'], 162, 255, 255, 255)
 					end
-					return GetFormatText(' ' .. (g_tStrings.STR_CAMP_TITLE[value] or _L('Unknown(%d)', value)), 162, 255, 255, 255)
+					return GetFormatText(' ' .. (g_tStrings.STR_CAMP_TITLE[value] or _L('Unknown(%d)', value)), 162, X.GetCampColor(value or -1))
 				end,
 			},
 			{
@@ -1198,7 +1212,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 				end,
 			},
 		},
-		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT camp, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ AND server = ? GROUP BY camp]], szServer) or {},
+		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT camp, COUNT(*) AS count FROM PlayerInfo]] .. BuildWhere(aWhere, [[server = ?]]) .. [[ GROUP BY camp]], szServer) or {},
 		summary = { summary = true, count = nPlayerCount },
 		sort = 'camp',
 		sortOrder = 'asc',
@@ -1218,7 +1232,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 					if record.summary then
 						return GetFormatText(' ' .. _L['Summary'], 162, 255, 255, 255)
 					end
-					return GetFormatText(' ' .. (g_tStrings.tForceTitle[value] or _L('Unknown(%d)', value)), 162, 255, 255, 255)
+					return GetFormatText(' ' .. (g_tStrings.tForceTitle[value] or _L('Unknown(%d)', value)), 162, X.GetForceColor(value or -1, 'foreground'))
 				end,
 			},
 			{
@@ -1230,7 +1244,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 				end,
 			},
 		},
-		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT force, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ AND server = ? GROUP BY force]], szServer) or {},
+		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT force, COUNT(*) AS count FROM PlayerInfo]] .. BuildWhere(aWhere, [[server = ?]]) .. [[ GROUP BY force]], szServer) or {},
 		summary = { summary = true, count = nPlayerCount },
 		sort = 'camp',
 		sortOrder = 'asc',
@@ -1262,7 +1276,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 				end,
 			},
 		},
-		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT server, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY server]]) or {},
+		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT server, COUNT(*) AS count FROM PlayerInfo]] .. BuildWhere(aWhere) .. [[ GROUP BY server]]) or {},
 		summary = { summary = true, count = nAllPlayerCount },
 		sort = 'count',
 		sortOrder = 'desc',
@@ -1300,7 +1314,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 			JOIN (
 				SELECT tong, COUNT(id) AS count
 				FROM PlayerInfo
-				WHERE ]] .. szWhere .. [[ AND server = ?
+				]] .. BuildWhere(aWhere, [[server = ?]]) .. [[
 				GROUP BY tong
 			) p ON t.id = p.tong
 			ORDER BY p.count DESC
@@ -1335,7 +1349,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 				end,
 			},
 		},
-		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT name, times FROM PlayerInfo]] .. szWhere .. [[ AND server = ? ORDER BY times DESC LIMIT 500]], szServer) or {},
+		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT name, times FROM PlayerInfo]] .. BuildWhere(aWhere, [[server = ?]]) .. [[ ORDER BY times DESC LIMIT 500]], szServer) or {},
 		sort = 'times',
 		sortOrder = 'desc',
 	})
