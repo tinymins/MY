@@ -523,75 +523,69 @@ local CONSTANT = {
 		[3115] = '{$I5,11092}', -- 仙崖石花
 		[3116] = '{$I5,11093}', -- 顾渚紫笋
 	},
-	FORCE_FOREGROUND_COLOR = setmetatable(
-		KvpToObject({
-			{ FORCE_TYPE.JIANG_HU , { 255, 255, 255 } }, -- 江湖
-			{ FORCE_TYPE.SHAO_LIN , { 255, 178,  95 } }, -- 少林
-			{ FORCE_TYPE.WAN_HUA  , { 196, 152, 255 } }, -- 万花
-			{ FORCE_TYPE.TIAN_CE  , { 255, 111,  83 } }, -- 天策
-			{ FORCE_TYPE.CHUN_YANG, {  22, 216, 216 } }, -- 纯阳
-			{ FORCE_TYPE.QI_XIU   , { 255, 129, 176 } }, -- 七秀
-			{ FORCE_TYPE.WU_DU    , {  55, 147, 255 } }, -- 五毒
-			{ FORCE_TYPE.TANG_MEN , { 121, 183,  54 } }, -- 唐门
-			{ FORCE_TYPE.CANG_JIAN, { 214, 249,  93 } }, -- 藏剑
-			{ FORCE_TYPE.GAI_BANG , { 205, 133,  63 } }, -- 丐帮
-			{ FORCE_TYPE.MING_JIAO, { 240,  70,  96 } }, -- 明教
-			{ FORCE_TYPE.CANG_YUN , X.IS_REMOTE and { 255, 143, 80 } or { 180, 60, 0 } }, -- 苍云
-			{ FORCE_TYPE.CHANG_GE , { 100, 250, 180 } }, -- 长歌
-			{ FORCE_TYPE.BA_DAO   , { 106, 108, 189 } }, -- 霸刀
-			{ FORCE_TYPE.PENG_LAI , { 171, 227, 250 } }, -- 蓬莱
-			{ FORCE_TYPE.LING_XUE , X.IS_REMOTE and { 253, 86, 86 } or { 161,   9,  34 } }, -- 凌雪
-			{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- 衍天
-			{ FORCE_TYPE.YAO_ZONG , {   0, 172, 153 } }, -- 药宗
-			{ FORCE_TYPE.DAO_ZONG , { 107, 183, 242 } }, -- 刀宗
-			{ FORCE_TYPE.WAN_LING , { 235, 215, 115 } }, -- 万灵
-		}),
-		{
-			__index = function(t, k)
+	FORCE_FOREGROUND_COLOR = (function()
+		local OFFICIAL_COLOR = {}
+		local function GetOfficialForceColor(k)
+			if not OFFICIAL_COLOR[k] then
 				local tColor
 				if GetKungfuSchoolColor and Table_ForceToSchool then
-					local bSuccess, dwSchoolID = X.SafeCall(Table_ForceToSchool, k)
+					local bSuccess, dwSchoolID = X.SafeXpCall(Table_ForceToSchool, k)
 					if bSuccess and dwSchoolID then
-						local bSuccess, nR, nG, nB = X.SafeCall(GetKungfuSchoolColor, dwSchoolID)
+						local bSuccess, nR, nG, nB = X.SafeXpCall(GetKungfuSchoolColor, dwSchoolID)
 						if bSuccess and nR and nG and nB then
 							tColor = { nR, nG, nB }
 						end
 					end
 				end
-				-- NPC 以及未知门派
-				if not tColor then
-					tColor = { 225, 225, 225 }
-				end
-				t[k] = tColor
-				return tColor
-			end,
-			__metatable = true,
-		}),
-	FORCE_BACKGROUND_COLOR = setmetatable(
-		KvpToObject({
-			{ FORCE_TYPE.JIANG_HU , { 220, 220, 220 } }, -- 江湖
-			{ FORCE_TYPE.SHAO_LIN , { 125, 112,  10 } }, -- 少林
-			{ FORCE_TYPE.WAN_HUA  , {  47,  14,  70 } }, -- 万花
-			{ FORCE_TYPE.TIAN_CE  , { 105,  14,  14 } }, -- 天策
-			{ FORCE_TYPE.CHUN_YANG, {   8,  90, 113 } }, -- 纯阳 56,175,255,232
-			{ FORCE_TYPE.QI_XIU   , { 162,  74, 129 } }, -- 七秀
-			{ FORCE_TYPE.WU_DU    , {   7,  82, 154 } }, -- 五毒
-			{ FORCE_TYPE.TANG_MEN , {  75, 113,  40 } }, -- 唐门
-			{ FORCE_TYPE.CANG_JIAN, { 148, 152,  27 } }, -- 藏剑
-			{ FORCE_TYPE.GAI_BANG , { 159, 102,  37 } }, -- 丐帮
-			{ FORCE_TYPE.MING_JIAO, { 145,  80,  17 } }, -- 明教
-			{ FORCE_TYPE.CANG_YUN , { 157,  47,   2 } }, -- 苍云
-			{ FORCE_TYPE.CHANG_GE , {  31, 120, 103 } }, -- 长歌
-			{ FORCE_TYPE.BA_DAO   , {  49,  39, 110 } }, -- 霸刀
-			{ FORCE_TYPE.PENG_LAI , {  93,  97, 126 } }, -- 蓬莱
-			{ FORCE_TYPE.LING_XUE , { 161,   9,  34 } }, -- 凌雪
-			{ FORCE_TYPE.YAN_TIAN , {  96,  45, 148 } }, -- 衍天
-			{ FORCE_TYPE.YAO_ZONG , {  10,  81,  87 } }, -- 药宗
-			{ FORCE_TYPE.DAO_ZONG , {  64, 101, 169 } }, -- 刀宗
-			{ FORCE_TYPE.WAN_LING , { 160, 135,  75 } }, -- 万灵
-		}),
-		{
-			__index = function(t, k)
+				OFFICIAL_COLOR[k] = tColor or {}
+			end
+			return X.Unpack(OFFICIAL_COLOR[k])
+		end
+		return setmetatable(
+			KvpToObject({
+				{ FORCE_TYPE.JIANG_HU , { 255, 255, 255 } }, -- 江湖
+				{ FORCE_TYPE.SHAO_LIN , { 255, 178,  95 } }, -- 少林
+				{ FORCE_TYPE.WAN_HUA  , { 196, 152, 255 } }, -- 万花
+				{ FORCE_TYPE.TIAN_CE  , { 255, 111,  83 } }, -- 天策
+				{ FORCE_TYPE.CHUN_YANG, {  22, 216, 216 } }, -- 纯阳
+				{ FORCE_TYPE.QI_XIU   , { 255, 129, 176 } }, -- 七秀
+				{ FORCE_TYPE.WU_DU    , {  55, 147, 255 } }, -- 五毒
+				{ FORCE_TYPE.TANG_MEN , { 121, 183,  54 } }, -- 唐门
+				{ FORCE_TYPE.CANG_JIAN, { 214, 249,  93 } }, -- 藏剑
+				{ FORCE_TYPE.GAI_BANG , { 205, 133,  63 } }, -- 丐帮
+				{ FORCE_TYPE.MING_JIAO, { 240,  70,  96 } }, -- 明教
+				{ FORCE_TYPE.CANG_YUN , X.IS_REMOTE and { 255, 143, 80 } or { 180, 60, 0 } }, -- 苍云
+				{ FORCE_TYPE.CHANG_GE , { 100, 250, 180 } }, -- 长歌
+				{ FORCE_TYPE.BA_DAO   , { 106, 108, 189 } }, -- 霸刀
+				{ FORCE_TYPE.PENG_LAI , { 171, 227, 250 } }, -- 蓬莱
+				{ FORCE_TYPE.LING_XUE , X.IS_REMOTE and { 253, 86, 86 } or { 161,   9,  34 } }, -- 凌雪
+				{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- 衍天
+				{ FORCE_TYPE.YAO_ZONG , {   0, 172, 153 } }, -- 药宗
+				{ FORCE_TYPE.DAO_ZONG , { 107, 183, 242 } }, -- 刀宗
+				{ FORCE_TYPE.WAN_LING , { 235, 215, 115 } }, -- 万灵
+			}),
+			{
+				__index = function(t, k)
+					local tColor
+					local nR, nG, nB = GetOfficialForceColor(k)
+					if nR and nG and nB then
+						tColor = { nR, nG, nB }
+					end
+					-- NPC 以及未知门派
+					if not tColor then
+						tColor = { 225, 225, 225 }
+					end
+					t[k] = tColor
+					return tColor
+				end,
+				__metatable = true,
+			}
+		)
+	end)(),
+	FORCE_BACKGROUND_COLOR = (function()
+		local OFFICIAL_COLOR = {}
+		local function GetOfficialForceColor(k)
+			if not OFFICIAL_COLOR[k] then
 				local tColor
 				if ForceUI_GetFightColor then
 					local bSuccess, tRetColor = X.SafeCall(ForceUI_GetFightColor, k)
@@ -599,15 +593,51 @@ local CONSTANT = {
 						tColor = tRetColor
 					end
 				end
-				-- NPC 以及未知门派
-				if not tColor then
-					tColor = { 200, 200, 200 }
-				end
-				t[k] = tColor
-				return tColor
-			end,
-			__metatable = true,
-		}),
+				OFFICIAL_COLOR[k] = tColor or {}
+			end
+			return X.Unpack(OFFICIAL_COLOR[k])
+		end
+		return setmetatable(
+			KvpToObject({
+				{ FORCE_TYPE.JIANG_HU , { 220, 220, 220 } }, -- 江湖
+				{ FORCE_TYPE.SHAO_LIN , { 125, 112,  10 } }, -- 少林
+				{ FORCE_TYPE.WAN_HUA  , {  47,  14,  70 } }, -- 万花
+				{ FORCE_TYPE.TIAN_CE  , { 105,  14,  14 } }, -- 天策
+				{ FORCE_TYPE.CHUN_YANG, {   8,  90, 113 } }, -- 纯阳 56,175,255,232
+				{ FORCE_TYPE.QI_XIU   , { 162,  74, 129 } }, -- 七秀
+				{ FORCE_TYPE.WU_DU    , {   7,  82, 154 } }, -- 五毒
+				{ FORCE_TYPE.TANG_MEN , {  75, 113,  40 } }, -- 唐门
+				{ FORCE_TYPE.CANG_JIAN, { 148, 152,  27 } }, -- 藏剑
+				{ FORCE_TYPE.GAI_BANG , { 159, 102,  37 } }, -- 丐帮
+				{ FORCE_TYPE.MING_JIAO, { 145,  80,  17 } }, -- 明教
+				{ FORCE_TYPE.CANG_YUN , { 157,  47,   2 } }, -- 苍云
+				{ FORCE_TYPE.CHANG_GE , {  31, 120, 103 } }, -- 长歌
+				{ FORCE_TYPE.BA_DAO   , {  49,  39, 110 } }, -- 霸刀
+				{ FORCE_TYPE.PENG_LAI , {  93,  97, 126 } }, -- 蓬莱
+				{ FORCE_TYPE.LING_XUE , { 161,   9,  34 } }, -- 凌雪
+				{ FORCE_TYPE.YAN_TIAN , {  96,  45, 148 } }, -- 衍天
+				{ FORCE_TYPE.YAO_ZONG , {  10,  81,  87 } }, -- 药宗
+				{ FORCE_TYPE.DAO_ZONG , {  64, 101, 169 } }, -- 刀宗
+				{ FORCE_TYPE.WAN_LING , { 160, 135,  75 } }, -- 万灵
+			}),
+			{
+				__index = function(t, k)
+					local tColor
+					local nR, nG, nB = GetOfficialForceColor(k)
+					if nR and nG and nB then
+						tColor = { nR, nG, nB }
+					end
+					-- NPC 以及未知门派
+					if not tColor then
+						tColor = { 200, 200, 200 }
+					end
+					t[k] = tColor
+					return tColor
+				end,
+				__metatable = true,
+			}
+		)
+	end)(),
 	CAMP_FOREGROUND_COLOR = setmetatable(
 		KvpToObject({
 			{ CAMP.NEUTRAL, { 255, 255, 255 } }, -- 中立
