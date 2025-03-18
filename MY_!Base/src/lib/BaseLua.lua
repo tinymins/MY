@@ -988,6 +988,17 @@ function X.SafeCall(fnAction, ...)
 	return X.Call(fnAction, ...)
 end
 
+-- 预检查调用对象是否为函数的安全调用，不输出错误日志
+---@param fnAction fun(...) @调用函数
+---@param ... any @调用参数
+---@return boolean, any @调用结果
+function X.SafeXpCall(fnAction, ...)
+	if not X.IsFunction(fnAction) then
+		return false, 'NOT CALLABLE'
+	end
+	return X.XpCall(fnAction, ...)
+end
+
 -- 设置上下文的安全调用，常规输出错误日志
 ---@param fnAction fun(...) @调用函数
 ---@param ... any @调用参数
