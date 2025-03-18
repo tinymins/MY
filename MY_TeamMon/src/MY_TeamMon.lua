@@ -1093,6 +1093,8 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 		end
 	end
 	if data then
+		local tar = X.GetTargetHandle(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
+		local buff = tar and X.GetBuff(tar, dwBuffID, nBuffLevel)
 		local cfg, nClass
 		if data.nScrutinyType and not D.CheckScrutinyType(data.nScrutinyType, dwOwner) then -- ¼à¿Ø¶ÔÏó¼ì²é
 			return
@@ -1126,9 +1128,23 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 			if nClass == MY_TEAM_MON_TYPE.BUFF_GET then
 				ConstructSpeech(aText, aXml, _L['Get buff'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, szName .. ' x' .. nCount, 44, 255, 255, 0)
-				if data.szNote and not X.IsRestricted('MY_TeamMon.Note') then
-					ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
+				if buff then
+					local nTime = X.GetEndTime(buff.nEndFrame)
+					if nTime < 31536000 then
+						local szTime
+						if nTime > 600 then
+							szTime = X.FormatDuration(nTime, 'CHINESE')
+						else
+							szTime = _L('%ds', nTime)
+						end
+						ConstructSpeech(aText, aXml, _L(', remain time %s', szTime), 44, 255, 255, 255)
+					end
 				end
+				if data.szNote and not X.IsRestricted('MY_TeamMon.Note') then
+					ConstructSpeech(aText, aXml, _L[','], 44, 255, 255, 255)
+					ConstructSpeech(aText, aXml, FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
+				end
+				ConstructSpeech(aText, aXml, _L['.'], 44, 255, 255, 255)
 			else
 				ConstructSpeech(aText, aXml, _L['Lose buff'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
