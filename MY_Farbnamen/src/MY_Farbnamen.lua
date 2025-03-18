@@ -1045,13 +1045,11 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	if szSubTitle then
 		szTitle = szTitle .. g_tStrings.STR_CONNECT .. szSubTitle
 	end
-	local szWhere, szJoinWhere = '', ''
+	local szWhere = ''
 	if nTimeLimit then
 		szWhere = ' WHERE time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
-		szJoinWhere = ' WHERE PlayerInfo.time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
 	else
 		szWhere = ' WHERE 1 = 1 '
-		szJoinWhere = ' WHERE 1 = 1 '
 	end
 	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
 		theme = X.UI.FRAME_THEME.SIMPLE,
@@ -1297,13 +1295,15 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 			},
 		},
 		dataSource = X.SQLiteGetAllANSI(DB, [[
-			SELECT TongInfo.name, COUNT(PlayerInfo.id) AS count
-			FROM PlayerInfo
-			JOIN TongInfo ON PlayerInfo.tong = TongInfo.id
-			]] .. szJoinWhere .. [[
-			AND PlayerInfo.server = ?
-			GROUP BY PlayerInfo.tong
-			ORDER BY count DESC
+			SELECT t.name, p.count
+			FROM TongInfo t
+			JOIN (
+				SELECT tong, COUNT(id) AS count
+				FROM PlayerInfo
+				WHERE ]] .. szWhere .. [[ AND server = ?
+				GROUP BY tong
+			) p ON t.id = p.tong
+			ORDER BY p.count DESC
 			LIMIT 500;
 		]], szServer) or {},
 		summary = { summary = true, count = nPlayerCount },
