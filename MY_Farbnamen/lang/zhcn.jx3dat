@@ -30,6 +30,7 @@ return {
     ['Met stat: never met'] = '偶遇统计：尚未偶遇',
     ['Met count: %s'] = '偶遇次数：%s次',
     ['Last met time: %s'] = '最后偶遇时间：%s',
+    ['Last met map: %s'] = '最后偶遇地点：%s',
     ['Copy debug information'] = '复制角色调试信息',
 
     ['Ancient database detected, do you want to migrate data from it?'] = '发现旧版染色数据，是否立即转换数据？',

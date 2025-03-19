@@ -697,6 +697,10 @@ function D.GetTip(szName)
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 				table.insert(tTip, GetFormatText(_L('Last met time: %s', X.FormatTime(tInfo.dwUpdateTime, '%yyyy/%MM/%dd %hh:%mm:%ss')), 136))
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
+				if not X.IsEmpty(tInfo.dwMetMapID) then
+					table.insert(tTip,  GetFormatText(_L('Last met map: %s', X.GetMapName(tInfo.dwMetMapID) or tInfo.dwMetMapID or ''), 136))
+					table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
+				end
 			end
 		end
 		-- 随身便笺
@@ -771,7 +775,9 @@ function D.Flush()
 				p.dwTongID,
 				p.dwTime,
 				p.nTimes,
-				''
+				X.EncodeLUAData({
+					m = p.dwMetMapID,
+				})
 			)
 		end
 		X.SQLiteEndTransaction(DB)
@@ -843,6 +849,13 @@ function D.GetPlayerInfo(xKey)
 	end
 	-- 更新内存缓存
 	if tPlayer then
+		if X.IsEmpty(tPlayer.szExtra) then
+			tPlayer.dwMetMapID = tPlayer.dwMetMapID or 0
+		else
+			local tExtra = X.DecodeLUAData(tPlayer.szExtra) or {}
+			tPlayer.dwMetMapID = tExtra.m or 0
+			tPlayer.szExtra = nil
+		end
 		if tPlayer.dwID and tPlayer.dwID ~= 0 and tPlayer.szServerName == X.GetServerOriginName() then
 			PLAYER_INFO[tPlayer.dwID] = tPlayer
 		end
@@ -928,9 +941,9 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	tPlayer.szTitle = szTitle or tPlayer.szTitle or ''
 	tPlayer.nCamp = nCamp or tPlayer.nCamp or -1
 	tPlayer.dwTongID = dwTongID or tPlayer.dwTongID or -1
-	tPlayer.szExtra = tPlayer.szExtra or ''
 	tPlayer.dwTime = bTimes and GetCurrentTime() or tPlayer.dwTime or 0
 	tPlayer.nTimes = (tPlayer.nTimes or 0) + (bTimes and 1 or 0)
+	tPlayer.dwMetMapID = bTimes and X.GetMapID() or tPlayer.dwMetMapID or 0
 	if X.IsGlobalID(tPlayer.szGlobalID) then
 		PLAYER_INFO[tPlayer.szGlobalID] = tPlayer
 	end
@@ -1020,6 +1033,7 @@ function D.Get(xKey)
 			szTitle      = tPlayer.szTitle,
 			nCamp        = tPlayer.nCamp,
 			nMetCount    = tPlayer.nTimes,
+			dwMetMapID   = tPlayer.dwMetMapID,
 			dwUpdateTime = tPlayer.dwTime,
 			dwTongID     = tPlayer.dwTongID,
 			szTongName   = tTong and tTong.szName or '',
