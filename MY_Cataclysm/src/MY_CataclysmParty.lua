@@ -1467,7 +1467,7 @@ function D.UpdateCharaterBuffBox(hItem, tBuff, tRule)
 	if tRule.colReminder or tRule.col then
 		r, g, b, a = X.HumanColor2RGB(tRule.colReminder or tRule.col)
 	end
-	local szName, icon = X.GetBuffName(tRule.dwID, tRule.nLevelEx)
+	local szName, icon = X.GetBuffName(tRule.dwID, tRule.nLevelEx or tBuff.nLevel)
 	if tRule.nIcon and tonumber(tRule.nIcon) then
 		icon = tRule.nIcon
 	end
