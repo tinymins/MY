@@ -391,10 +391,24 @@ end
 ---@param t T 想要设为只读的表
 ---@return T 设为只读的表
 function X.FreezeTable(t)
+	return setmetatable({}, {
+		__index     = t,
+		__newindex  = function() assert(false, 'table is readonly\n') end,
+		__metatable = {
+			const_table = t,
+		},
+	})
+end
+
+-- 表数据递归设为只读
+---@generic T
+---@param t T 想要设为只读的表
+---@return T 设为只读的表
+function X.RecursiveFreezeTable(t)
 	local p = setmetatable({}, { __index = t })
 	for k, v in pairs(t) do
 		if type(v) == 'table' then
-			p[k] = X.FreezeTable(v)
+			p[k] = X.RecursiveFreezeTable(v)
 		else
 			p[k] = v
 		end

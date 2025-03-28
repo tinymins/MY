@@ -90,7 +90,7 @@ function X.GetFurnitureInfo(szKey, oVal)
 			for i = 2, HomelandFurnitureInfo:GetRowCount() do
 				local tLine = HomelandFurnitureInfo:GetRow(i)
 				if tLine and tLine[szKey] then
-					CACHE[szKey][tLine[szKey]] = X.FreezeTable(tLine)
+					CACHE[szKey][tLine[szKey]] = X.RecursiveFreezeTable(tLine)
 				end
 			end
 		end
