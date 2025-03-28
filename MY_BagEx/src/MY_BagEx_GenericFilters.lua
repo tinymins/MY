@@ -205,36 +205,42 @@ end
 local function OnFrameKeyDown()
 	local szKey = GetKeyName(Station.GetMessageKey())
 	if IsCtrlKeyDown() and szKey == 'F' then
-		Station.SetFocusWindow('Normal/BigBagPanel/WndEditBox_KeyWord/WndEdit_Default')
-		return 1
+		local el = this:Lookup('WndEditBox_KeyWord/WndEdit_Default')
+			or this:Lookup('WndContainer_Other/Wnd_Search/Edit_Search')
+		if el then
+			Station.SetFocusWindow(el:GetTreePath())
+			return 1
+		end
 	end
 	return 0
 end
 
 local function Hook()
 	local frame = Station.Lookup('Normal/BigBagPanel')
-	if frame and not frame.bMYBagExHook and not frame:Lookup('WndContainer_Other/Wnd_Search/') then
+	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
 		local nX, nY, nH = 60, 30, 21
 		if X.UI.IS_GLASSMORPHISM then
 			nX, nY, nH = 45, 7, 25
 		end
-		X.UI(frame):Append('WndEditBox', {
-			name = 'WndEditBox_KeyWord',
-			w = 80 + nH, h = nH, x = nX, y = nY,
-			appearance = 'SEARCH_LEFT',
-			text = l_szBagFilter,
-			placeholder = _L['Search'],
-			alignVertical = X.UI.ALIGN_VERTICAL.MIDDLE,
-			onChange = function(txt)
-				local nLen = txt:len()
-				nLen = math.max(nLen, 8)
-				nLen = math.min(nLen, 16)
-				X.UI(this):Width(nLen * 10 + nH)
-				l_szBagFilter = txt
-				DoFilterBag()
-			end,
-		})
+		if not frame:Lookup('WndContainer_Other/Wnd_Search') then
+			X.UI(frame):Append('WndEditBox', {
+				name = 'WndEditBox_KeyWord',
+				w = 80 + nH, h = nH, x = nX, y = nY,
+				appearance = 'SEARCH_LEFT',
+				text = l_szBagFilter,
+				placeholder = _L['Search'],
+				alignVertical = X.UI.ALIGN_VERTICAL.MIDDLE,
+				onChange = function(txt)
+					local nLen = txt:len()
+					nLen = math.max(nLen, 8)
+					nLen = math.min(nLen, 16)
+					X.UI(this):Width(nLen * 10 + nH)
+					l_szBagFilter = txt
+					DoFilterBag()
+				end,
+			})
+		end
 
 		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
@@ -283,20 +289,22 @@ local function Hook()
 		local nW = nX - nPaddingX
 		nX = nPaddingX
 
-		ui:Append('WndEditBox', {
-			name = 'WndEditBox_KeyWord',
-			x = nX + 3, y = 80, w = nW, h = 21,
-			text = l_szBankFilter,
-			placeholder = _L['Search'],
-			onChange = function(txt)
-				local nLen = txt:len()
-				nLen = math.max(nLen, 15)
-				nLen = math.min(nLen, 25)
-				X.UI(this):Width(nLen * 10)
-				l_szBankFilter = txt
-				DoFilterBank(true)
-			end,
-		})
+		if not frame:Lookup('WndContainer_Other/Wnd_Search') then
+			ui:Append('WndEditBox', {
+				name = 'WndEditBox_KeyWord',
+				x = nX + 3, y = 80, w = nW, h = 21,
+				text = l_szBankFilter,
+				placeholder = _L['Search'],
+				onChange = function(txt)
+					local nLen = txt:len()
+					nLen = math.max(nLen, 15)
+					nLen = math.min(nLen, 25)
+					X.UI(this):Width(nLen * 10)
+					l_szBankFilter = txt
+					DoFilterBank(true)
+				end,
+			})
+		end
 
 		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
