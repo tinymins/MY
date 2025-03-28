@@ -278,6 +278,22 @@ function X.GetClientPlayerGlobalID()
 	return CLIENT_PLAYER_GLOBAL_ID
 end
 
+do
+local PLAYER_NAME
+---获取玩家自身角色名
+---@return string @玩家的自身角色名
+function X.GetClientPlayerName()
+	if X.IsFunction(GetUserRoleName) then
+		return GetUserRoleName()
+	end
+	local me = X.GetClientPlayer()
+	if me and not X.IsPlayerCrossServer(me.dwID) then
+		PLAYER_NAME = me.szName
+	end
+	return PLAYER_NAME
+end
+end
+
 -- 获取好友卡片管理器对象
 ---@return userdata | nil @好友卡片管理器对象，获取失败返回空
 function X.GetFellowshipCardClient()
