@@ -213,7 +213,7 @@ end
 
 local function Hook()
 	local frame = Station.Lookup('Normal/BigBagPanel')
-	if frame and not frame.bMYBagExHook then
+	if frame and not frame.bMYBagExHook and not frame:Lookup('WndContainer_Other/Wnd_Search/') then
 		frame.bMYBagExHook = true
 		local nX, nY, nH = 60, 30, 21
 		if X.UI.IS_GLASSMORPHISM then
