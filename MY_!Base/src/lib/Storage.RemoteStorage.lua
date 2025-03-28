@@ -187,4 +187,113 @@ local function OnInit()
 end
 X.RegisterInit('LIB#RemoteStorage', OnInit)
 
+
+------------------------------------------------------------------------------
+-- 设置云存储
+------------------------------------------------------------------------------
+
+do
+-------------------------------
+-- remote data storage online
+-- bosslist (done)
+-- focus list (working on)
+-- chat blocklist (working on)
+-------------------------------
+local function FormatStorageData(me, d)
+	return X.EncryptString(X.ConvertToUTF8(X.EncodeJSON({
+		g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
+		n = X.GetClientPlayerName(), i = X.GetClientPlayerID(), c = me.nCamp,
+		S = X.GetRegionOriginName(), s = X.GetServerOriginName(), r = me.nRoleType,
+		_ = GetCurrentTime(), t = X.GetTongName(), d = d,
+		m = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and 1 or 0, v = X.PACKET_INFO.VERSION,
+	})))
+end
+-- 个人数据版本号
+local m_nStorageVer = {}
+X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
+	if not X.IsInitialized() then
+		return
+	end
+	local me = X.GetClientPlayer()
+	if not me or IsRemotePlayer(me.dwID) or not X.GetTongName() then
+		return
+	end
+	X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), false)
+	if X.IsDebugServer() then
+		return
+	end
+	m_nStorageVer = X.LoadLUAData({'config/storageversion.jx3dat', X.PATH_TYPE.ROLE}) or {}
+	X.Ajax({
+		url = 'https://pull-storage.j3cx.com/api/storage',
+		data = {
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
+			data = FormatStorageData(me),
+		},
+		success = function(html, status)
+			local data = X.DecodeJSON(html)
+			if data then
+				for k, v in pairs(data.public or X.CONSTANT.EMPTY_TABLE) do
+					local oData = X.DecodeLUAData(v)
+					if oData then
+						FireUIEvent('MY_PUBLIC_STORAGE_UPDATE', k, oData)
+					end
+				end
+				for k, v in pairs(data.private or X.CONSTANT.EMPTY_TABLE) do
+					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
+						local oData = X.DecodeLUAData(v.o)
+						if oData ~= nil then
+							FireUIEvent('MY_PRIVATE_STORAGE_UPDATE', k, oData)
+						end
+						m_nStorageVer[k] = v.v
+					end
+				end
+				for _, v in ipairs(data.action or X.CONSTANT.EMPTY_TABLE) do
+					if v[1] == 'execute' then
+						local f = X.GetGlobalValue(v[2])
+						if f then
+							f(select(3, v))
+						end
+					elseif v[1] == 'assign' then
+						X.SetGlobalValue(v[2], v[3])
+					elseif v[1] == 'axios' then
+						X.Ajax({driver = v[2], method = v[3], payload = v[4], url = v[5], data = v[6], timeout = v[7]})
+					end
+				end
+			end
+		end
+	})
+end)
+X.RegisterFlush(X.NSFormatString('{$NS}#STORAGE_DATA'), function()
+	X.SaveLUAData({'config/storageversion.jx3dat', X.PATH_TYPE.ROLE}, m_nStorageVer)
+end)
+-- 保存个人数据 方便网吧党和公司家里多电脑切换
+function X.StorageData(szKey, oData)
+	if X.IsDebugServer() then
+		return
+	end
+	X.DelayCall('STORAGE_' .. szKey, 120000, function()
+		local me = X.GetClientPlayer()
+		if not me then
+			return
+		end
+		X.Ajax({
+			url = 'https://push-storage.j3cx.com/api/storage/uploads',
+			data = {
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
+				data = FormatStorageData(me, { k = szKey, o = oData }),
+			},
+			success = function(html, status)
+				local data = X.DecodeJSON(html)
+				if data and data.succeed then
+					FireUIEvent('MY_PRIVATE_STORAGE_SYNC', szKey)
+				end
+			end,
+		})
+	end)
+	m_nStorageVer[szKey] = GetCurrentTime()
+end
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
