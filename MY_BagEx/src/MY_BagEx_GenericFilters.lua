@@ -376,17 +376,31 @@ local function Unhook()
 	local frame = Station.Lookup('Normal/BigBankPanel')
 	if frame and frame.bMYBagExHook then
 		frame.bMYBagExHook = nil
-		frame:Lookup('CheckBox_TimeLtd'):Destroy()
-		frame:Lookup('WndEditBox_KeyWord'):Destroy()
-		frame:Lookup('WndCheckBox_Compare'):Destroy()
+		for _, v in ipairs({
+			'CheckBox_TimeLtd',
+			'WndEditBox_KeyWord',
+			'WndCheckBox_Compare',
+		}) do
+			local el = frame:Lookup(v)
+			if el then
+				el:Destroy()
+			end
+		end
 		UnhookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown)
 	end
 
 	local frame = Station.Lookup('Normal/GuildBankPanel')
 	if frame and frame.bMYBagExHook then
 		frame.bMYBagExHook = nil
-		frame:Lookup('WndEditBox_KeyWord'):Destroy()
-		frame:Lookup('WndCheckBox_Compare'):Destroy()
+		for _, v in ipairs({
+			'WndEditBox_KeyWord',
+			'WndCheckBox_Compare',
+		}) do
+			local el = frame:Lookup(v)
+			if el then
+				el:Destroy()
+			end
+		end
 		UnhookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown)
 	end
 
