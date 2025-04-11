@@ -257,24 +257,27 @@ local function Hook()
 
 		local ui = X.UI(frame)
 		local nX = nPaddingX
+		local bOfficial = not not frame:Lookup('WndContainer_Other/Wnd_Search')
 
-		nX = nX + ui:Append('WndCheckBox', {
-			name = 'CheckBox_TimeLtd',
-			x = nX, y = 56, alpha = 200,
-			text = _L['Time Limited'],
-			checked = l_bBankTimeLtd,
-			onCheck = function(bChecked)
-				if bChecked then
-					X.UI('Normal/BigBankPanel/WndCheckBox_Compare'):Check(false)
+		if not bOfficial then
+			nX = nX + ui:Append('WndCheckBox', {
+				name = 'CheckBox_TimeLtd',
+				x = nX, y = 56, alpha = 200,
+				text = _L['Time Limited'],
+				checked = l_bBankTimeLtd,
+				onCheck = function(bChecked)
+					if bChecked then
+						X.UI('Normal/BigBankPanel/WndCheckBox_Compare'):Check(false)
+					end
+					l_bBankTimeLtd = bChecked
+					DoFilterBank(true)
 				end
-				l_bBankTimeLtd = bChecked
-				DoFilterBank(true)
-			end
-		}):Width() + 3
+			}):Width() + 3
+		end
 
 		nX = nX + ui:Append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
-			x = nX, y = 56,
+			x = bOfficial and 560 or nX, y = bOfficial and 52 or 56,
 			text = _L['Compare with bag'],
 			checked = l_bCompareBank,
 			onCheck = function(bChecked)
@@ -289,21 +292,23 @@ local function Hook()
 		local nW = nX - nPaddingX
 		nX = nPaddingX
 
-		if not frame:Lookup('WndContainer_Other/Wnd_Search') then
-			ui:Append('WndEditBox', {
-				name = 'WndEditBox_KeyWord',
-				x = nX + 3, y = 80, w = nW, h = 21,
-				text = l_szBankFilter,
-				placeholder = _L['Search'],
-				onChange = function(txt)
-					local nLen = txt:len()
-					nLen = math.max(nLen, 15)
-					nLen = math.min(nLen, 25)
-					X.UI(this):Width(nLen * 10)
-					l_szBankFilter = txt
-					DoFilterBank(true)
-				end,
-			})
+		if not bOfficial then
+			if not frame:Lookup('WndContainer_Other/Wnd_Search') then
+				ui:Append('WndEditBox', {
+					name = 'WndEditBox_KeyWord',
+					x = nX + 3, y = 80, w = nW, h = 21,
+					text = l_szBankFilter,
+					placeholder = _L['Search'],
+					onChange = function(txt)
+						local nLen = txt:len()
+						nLen = math.max(nLen, 15)
+						nLen = math.min(nLen, 25)
+						X.UI(this):Width(nLen * 10)
+						l_szBankFilter = txt
+						DoFilterBank(true)
+					end,
+				})
+			end
 		end
 
 		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
