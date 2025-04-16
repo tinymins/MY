@@ -374,7 +374,9 @@ local function Unhook()
 	local frame = Station.Lookup('Normal/BigBagPanel')
 	if frame and frame.bMYBagExHook then
 		frame.bMYBagExHook = nil
-		frame:Lookup('WndEditBox_KeyWord'):Destroy()
+		if frame:Lookup('WndEditBox_KeyWord') then
+			frame:Lookup('WndEditBox_KeyWord'):Destroy()
+		end
 		UnhookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown)
 	end
 
