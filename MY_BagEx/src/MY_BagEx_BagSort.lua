@@ -235,14 +235,15 @@ end
 
 -- 检测增加按纽
 function D.CheckInjection(bRemoveInjection)
+	local hFrame = Station.Lookup('Normal/BigBagPanel')
+	if not hFrame then
+		return
+	end
+	local hInjectRoot = hFrame:Lookup('WndContainer_Btn') or hFrame
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- 植入整理按纽
-		local hFrame = Station.Lookup('Normal/BigBagPanel')
-		if not hFrame then
-			return
-		end
-		local hBtnRef = hFrame:Lookup('Btn_CU')
-		local hBtnNew = hFrame:Lookup('Btn_MY_Sort')
+		local hBtnRef = hInjectRoot:Lookup('Btn_CU')
+		local hBtnNew = hInjectRoot:Lookup('Btn_MY_Sort')
 		if not hBtnRef then
 			return
 		end
@@ -315,7 +316,7 @@ function D.CheckInjection(bRemoveInjection)
 		end)
 	else
 		-- 移除整理按纽
-		X.UI('Normal/BigBagPanel/Btn_MY_Sort'):Remove()
+		X.UI(hInjectRoot:Lookup('Btn_MY_Sort')):Remove()
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagSort__Injection', false)
 	end
 end

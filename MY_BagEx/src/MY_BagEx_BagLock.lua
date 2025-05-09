@@ -25,14 +25,15 @@ local D = {}
 
 -- ¼ì²â¶Ñµþ°´Å¦
 function D.CheckInjection(bRemoveInjection)
+	local hFrame = Station.Lookup('Normal/BigBagPanel')
+	if not hFrame then
+		return
+	end
+	local hInjectRoot = hFrame:Lookup('WndContainer_Btn') or hFrame
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
-		local frame = Station.Lookup('Normal/BigBagPanel')
-		if not frame then
-			return
-		end
-		local hBtnRef = frame:Lookup('Btn_MY_Stack')
-		local btnNew = frame:Lookup('Btn_MY_Lock')
+		local hBtnRef = hInjectRoot:Lookup('Btn_MY_Stack')
+		local btnNew = hInjectRoot:Lookup('Btn_MY_Lock')
 		if not hBtnRef then
 			return
 		end
@@ -69,7 +70,7 @@ function D.CheckInjection(bRemoveInjection)
 		end)
 	else
 		-- ÒÆ³ý¶Ñµþ°´Å¦
-		X.UI('Normal/BigBagPanel/Btn_MY_Lock'):Remove()
+		X.UI(hInjectRoot:Lookup('Btn_MY_Lock')):Remove()
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagLock__Injection', false)
 	end
 end

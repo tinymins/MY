@@ -139,14 +139,15 @@ end
 
 -- ¼ì²â¶Ñµþ°´Å¦
 function D.CheckInjection(bRemoveInjection)
+	local hFrame = Station.Lookup('Normal/BigBagPanel')
+	if not hFrame then
+		return
+	end
+	local hInjectRoot = hFrame:Lookup('WndContainer_Btn') or hFrame
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
-		local frame = Station.Lookup('Normal/BigBagPanel')
-		if not frame then
-			return
-		end
-		local hWndRef = frame:Lookup('Wnd_MY_Split')
-		local hBtnNew = frame:Lookup('Btn_MY_Stack')
+		local hWndRef = hInjectRoot:Lookup('Wnd_MY_Split')
+		local hBtnNew = hInjectRoot:Lookup('Btn_MY_Stack')
 		if not hWndRef then
 			return
 		end
@@ -163,12 +164,12 @@ function D.CheckInjection(bRemoveInjection)
 						MY_BagEx_Bag.ShowAllItemShadow()
 						if MY_BagEx_Bag.bConfirm then
 							X.Confirm('MY_BagEx_BagStack', _L['Sure to start bag stack?'], {
-								x = frame:GetAbsX() + frame:GetW() / 2,
-								y = frame:GetAbsY() + frame:GetH() / 2,
+								x = hFrame:GetAbsX() + hFrame:GetW() / 2,
+								y = hFrame:GetAbsY() + hFrame:GetH() / 2,
 								fnResolve = D.Operate,
 								fnReject = MY_BagEx_Bag.HideAllItemShadow,
 								fnCancel = MY_BagEx_Bag.HideAllItemShadow,
-								fnAutoClose = function() return not frame or not frame:IsVisible() end,
+								fnAutoClose = function() return not hFrame or not hFrame:IsVisible() end,
 							})
 						else
 							D.Operate()
@@ -189,7 +190,7 @@ function D.CheckInjection(bRemoveInjection)
 		end)
 	else
 		-- ÒÆ³ý¶Ñµþ°´Å¦
-		X.UI('Normal/BigBagPanel/Btn_MY_Stack'):Remove()
+		X.UI(hInjectRoot:Lookup('Btn_MY_Stack')):Remove()
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagStack__Injection', false)
 	end
 end
