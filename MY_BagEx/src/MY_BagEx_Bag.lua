@@ -175,6 +175,10 @@ function D.CheckConflict(bRestore)
 			'Normal/BigBagPanel/Btn_Split',
 			'Normal/BigBagPanel/Btn_Stack',
 			'Normal/BigBagPanel/Btn_LockSort',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_CU',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_Split',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_Stack',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_LockSort',
 		}) do
 			local el = Station.Lookup(szPath)
 			if el then
@@ -188,6 +192,10 @@ function D.CheckConflict(bRestore)
 			'Normal/BigBagPanel/Btn_Split',
 			'Normal/BigBagPanel/Btn_Stack',
 			'Normal/BigBagPanel/Btn_LockSort',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_CU',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_Split',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_Stack',
+			'Normal/BigBagPanel/WndContainer_Btn/Btn_LockSort',
 		}) do
 			local el = Station.Lookup(szPath)
 			if el then

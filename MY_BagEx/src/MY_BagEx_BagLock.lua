@@ -42,7 +42,7 @@ function D.CheckInjection(bRemoveInjection)
 		local nH = hBtnRef:GetH()
 		if not btnNew then
 			local bEdit = false
-			btnNew = X.UI('Normal/BigBagPanel')
+			btnNew = X.UI(hInjectRoot)
 				:Append('WndButton', {
 					name = 'Btn_MY_Lock',
 					w = 'auto', h = nH,

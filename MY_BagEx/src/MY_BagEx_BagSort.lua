@@ -251,7 +251,7 @@ function D.CheckInjection(bRemoveInjection)
 		local nY = hBtnRef:GetRelY()
 		local nH = hBtnRef:GetH()
 		if not hBtnNew then
-			hBtnNew = X.UI('Normal/BigBagPanel')
+			hBtnNew = X.UI(hInjectRoot)
 				:Append('WndButton', {
 					name = 'Btn_MY_Sort',
 					w = 'auto', h = nH,

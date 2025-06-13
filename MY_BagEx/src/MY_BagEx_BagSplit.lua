@@ -42,7 +42,7 @@ function D.CheckInjection(bRemoveInjection)
 		local nY = hBtnRef:GetRelY()
 		local nH = hBtnRef:GetH()
 		if not hWndNew then
-			hWndNew = X.UI('Normal/BigBagPanel')
+			hWndNew = X.UI(hInjectRoot)
 				:Append('WndWindow', {
 					name = 'Wnd_MY_Split',
 					w = 0, h = nH,
