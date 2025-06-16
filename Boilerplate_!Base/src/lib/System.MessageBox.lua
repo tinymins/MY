@@ -200,28 +200,60 @@ function X.Dialog(szKey, szMsg, aOptions, fnCancelAction)
 	return X.MessageBox(szKey, tMsg)
 end
 
-function X.DoMessageBox(szName, i)
-	local frame = Station.Lookup('Topmost2/MB_' .. szName) or Station.Lookup('Topmost/MB_' .. szName)
-	if frame then
-		i = i or 1
-		local btn = frame:Lookup('Wnd_All/Btn_Option' .. i)
-		if btn and btn:IsEnabled() then
-			if btn.fnAction then
-				if frame.args then
-					btn.fnAction(X.Unpack(frame.args))
-				else
-					btn.fnAction()
-				end
-			elseif frame.fnAction then
-				if frame.args then
-					frame.fnAction(i, X.Unpack(frame.args))
-				else
-					frame.fnAction(i)
-				end
-			end
-			frame.OnFrameDestroy = nil
-			CloseMessageBox(szName)
+function X.FetchMessageBoxButton(frameOrName, vIndexOrText)
+	local hFrame
+	if X.IsString(frameOrName) then
+		hFrame = Station.SearchFrame('MB_' .. frameOrName)
+	elseif X.IsElement(frameOrName) then
+		hFrame = frameOrName
+	end
+	if not hFrame then
+		return
+	end
+	if X.IsNumber(vIndexOrText) then
+		return hFrame:Lookup('Wnd_All/Btn_Option' .. vIndexOrText)
+			or hFrame:Lookup('Wnd_All/WndFlexContainer_Msg/WndFlexContainer_Opt/Btn_Option' .. vIndexOrText)
+	end
+	local hBtn = X.FetchMessageBoxButton(hFrame, 1)
+	while hBtn do
+		local nIndex = hBtn:GetIndex() + 1
+		local hText = hBtn:Lookup('', 'Text_Option' .. nIndex)
+		local szText = hText:GetText()
+		if szText == vIndexOrText then
+			return hBtn
 		end
+		hBtn = hBtn:GetNext()
+	end
+end
+
+function X.GetMessageBoxButtonAction(frameOrName, vIndexOrText)
+	local hBtn = X.FetchMessageBoxButton(frameOrName, vIndexOrText)
+	return hBtn and hBtn.fnAction
+end
+
+function X.DoMessageBox(frameOrName, nIndex)
+	if not nIndex then
+		nIndex = 1
+	end
+	local hBtn = X.FetchMessageBoxButton(frameOrName, nIndex)
+	if hBtn and hBtn:IsEnabled() then
+		local hFrame = hBtn:GetRoot()
+		local szName = hFrame:GetName():sub(4)
+		if hBtn.fnAction then
+			if hFrame.args then
+				hBtn.fnAction(X.Unpack(hFrame.args))
+			else
+				hBtn.fnAction()
+			end
+		elseif hFrame.fnAction then
+			if hFrame.args then
+				hFrame.fnAction(i, X.Unpack(hFrame.args))
+			else
+				hFrame.fnAction(i)
+			end
+		end
+		hFrame.OnFrameDestroy = nil
+		CloseMessageBox(szName)
 	end
 end
 
