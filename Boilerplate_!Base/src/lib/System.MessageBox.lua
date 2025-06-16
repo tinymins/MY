@@ -231,6 +231,20 @@ function X.GetMessageBoxButtonAction(frameOrName, vIndexOrText)
 	return hBtn and hBtn.fnAction
 end
 
+function X.GetMessageBoxContentHandle(frameOrName)
+	local hFrame
+	if X.IsString(frameOrName) then
+		hFrame = Station.SearchFrame('MB_' .. frameOrName)
+	elseif X.IsElement(frameOrName) then
+		hFrame = frameOrName
+	end
+	if not hFrame then
+		return
+	end
+	return hFrame:Lookup('Wnd_All', 'Handle_Message')
+		or hFrame:Lookup('Wnd_All/WndFlexContainer_Msg/Wnd_Msg', '')
+end
+
 function X.DoMessageBox(frameOrName, nIndex)
 	if not nIndex then
 		nIndex = 1
