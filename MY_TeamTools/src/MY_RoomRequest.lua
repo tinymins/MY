@@ -364,8 +364,8 @@ function D.OnMessageBoxOpen()
 	if not O.bEnable or not frame or not frame:IsValid() or (szPrefix ~= 'RMIV' and szPrefix ~= 'RMAP') then
 		return
 	end
-	local fnAccept = X.Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
-	local fnRefuse = X.Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
+	local fnAccept = X.GetMessageBoxButtonAction(frame, 1)
+	local fnRefuse = X.GetMessageBoxButtonAction(frame, 2)
 	if fnAccept and fnRefuse then
 		-- 获取组队方法
 		local info = PR_ROOM_REQUEST[szGlobalID]

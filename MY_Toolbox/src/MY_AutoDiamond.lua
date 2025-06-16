@@ -218,9 +218,9 @@ end
 
 -- 从系统面板抓取合成函数
 function D.GetCastingAction()
-	local frame = Station.Lookup('Topmost/MB_CastingPanelConfirm')
-	if frame then
-		D.fnProduceAction = frame:Lookup('Wnd_All/Btn_Option1').fnAction
+	local fnAction = X.GetMessageBoxButtonAction('CastingPanelConfirm', 1)
+	if fnAction then
+		D.fnProduceAction = fnAction
 		D.SaveDiamondFormula()
 	end
 end

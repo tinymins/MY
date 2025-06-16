@@ -415,19 +415,8 @@ function D.OnMessageBoxOpen()
 	if not O.bEnable or not frame or not frame:IsValid() or (szPrefix ~= 'ATMP' and szPrefix ~= 'IMTP') then
 		return
 	end
-	local fnAccept, fnRefuse
-	for i = 1, 3 do
-		local hBtn = frame:Lookup('Wnd_All/Btn_Option' .. i)
-		if hBtn then
-			local hText = hBtn:Lookup('', 'Text_Option' .. i)
-			local szText = hText:GetText()
-			if szText == g_tStrings.STR_ACCEPT then
-				fnAccept = hBtn.fnAction
-			elseif szText == g_tStrings.STR_REFUSE then
-				fnRefuse = hBtn.fnAction
-			end
-		end
-	end
+	local fnAccept = X.GetMessageBoxButtonAction(frame, g_tStrings.STR_ACCEPT)
+	local fnRefuse = X.GetMessageBoxButtonAction(frame, g_tStrings.STR_REFUSE)
 	if fnAccept and fnRefuse then
 		-- 获取组队方法
 		local info = PR_PARTY_REQUEST[szName]

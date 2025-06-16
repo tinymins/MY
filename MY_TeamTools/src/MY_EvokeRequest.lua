@@ -119,8 +119,8 @@ function D.OnMessageBoxOpen()
 			end
 		end
 		if szType then
-			local fnAccept = X.Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
-			local fnRefuse = X.Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
+			local fnAccept = X.GetMessageBoxButtonAction(frame, 1)
+			local fnRefuse = X.GetMessageBoxButtonAction(frame, 2)
 			if fnAccept and fnRefuse then
 				local info = EVOKE_LIST[szName]
 				if not info then
