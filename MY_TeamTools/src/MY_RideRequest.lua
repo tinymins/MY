@@ -331,7 +331,7 @@ function D.OnMessageBoxOpen()
 		return
 	end
 	if szMsgName == 'OnInviteFollow' then
-		local hContent = frame:Lookup('Wnd_All', 'Handle_Message')
+		local hContent = X.GetMessageBoxContentHandle(frame)
 		local txt = hContent and hContent:Lookup(0)
 		local szMsg, bRide, szName = txt and txt:GetType() == 'Text' and txt:GetText()
 		for _, szMsgTpl in ipairs(RIDE_MSG) do

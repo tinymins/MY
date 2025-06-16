@@ -106,7 +106,7 @@ function D.OnMessageBoxOpen()
 		return
 	end
 	if szMsgName == 'NeedAddFriend' then
-		local hContent = frame:Lookup('Wnd_All', 'Handle_Message')
+		local hContent = X.GetMessageBoxContentHandle(frame)
 		local txt = hContent and hContent:Lookup(0)
 		local szMsg, szType, szName = txt and txt:GetType() == 'Text' and txt:GetText()
 		for k, szMsgTpl in pairs(REQUEST_MSG) do

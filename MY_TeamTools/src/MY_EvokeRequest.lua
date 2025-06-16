@@ -109,7 +109,7 @@ function D.OnMessageBoxOpen()
 	end
 	if szMsgName:find('^A_E_M_') then
 		local szName = szMsgName:sub(7)
-		local hContent = frame:Lookup('Wnd_All', 'Handle_Message')
+		local hContent = X.GetMessageBoxContentHandle(frame)
 		local txt = hContent and hContent:Lookup(0)
 		local szMsg, szType = txt and txt:GetType() == 'Text' and txt:GetText()
 		for k, szMsgTpl in pairs(EVOKE_MSG) do
