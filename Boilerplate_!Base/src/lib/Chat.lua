@@ -1610,8 +1610,9 @@ end
 
 local HOOKED_UI = setmetatable({}, { __mode = 'k' })
 local function Hook(i)
-	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
-		or Station.Lookup('Normal1/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+	local frame = Station.SearchFrame('ChatPanel' .. i)
+		or Station.SearchFrame('ChatPanel_Normal' .. i)
+	local h = frame and frame:Lookup('Wnd_Message', 'Handle_Message')
 	if h and not HOOKED_UI[h] then
 		HOOKED_UI[h] = true
 		HookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString, { bHookParams = true })
@@ -1621,8 +1622,9 @@ end
 X.RegisterEvent('CHAT_PANEL_OPEN', 'ChatPanelHook', function(event) Hook(arg0) end)
 
 local function Unhook(i)
-	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
-		or Station.Lookup('Normal1/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+	local frame = Station.SearchFrame('ChatPanel' .. i)
+		or Station.SearchFrame('ChatPanel_Normal' .. i)
+	local h = frame and frame:Lookup('Wnd_Message', 'Handle_Message')
 	if h and HOOKED_UI[h] then
 		HOOKED_UI[h] = nil
 		UnhookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString)
@@ -1634,6 +1636,7 @@ local function HookAll()
 	for i = 1, 10 do
 		Hook(i)
 	end
+	Hook('_Recently')
 end
 X.RegisterInit('LIB#ChatPanelHook', HookAll)
 X.RegisterEvent('CHAT_PANEL_INIT', 'ChatPanelHook', HookAll)
