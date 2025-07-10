@@ -548,6 +548,8 @@ function D.UpdateItems(page)
 
 	-- 绘制右侧详情
 	local aXml = {}
+	-- 导出数据
+	local aExport = {}
 
 	-- 绘制装备
 	local tResult = {}
@@ -569,6 +571,7 @@ function D.UpdateItems(page)
 	for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
 		local visible = info.label and (not info.force or info.force == ownerforce) and true or false
 		local rec = visible and info.pos and tResult[info.pos]
+		local exp = { nPos = info.pos }
 		local box = info.box and handle:Lookup(info.box)
 		local txtDurability = info.durability and handle:Lookup(info.durability)
 		local imgBackground = info.background and handle:Lookup(info.background)
@@ -669,11 +672,23 @@ function D.UpdateItems(page)
 						table.insert(aXml, GetFormatText(' [' .. diamon.szName .. ']', 162, GetItemFontColorByQuality(diamon.nQuality)))
 					end
 				end
+				exp.nMaxStrengthLevel = KItemInfo.nMaxStrengthLevel
+				exp.nMaxDurability = KItemInfo.nMaxDurability
+				exp.nQuality = KItemInfo.nQuality
 			--[[#DEBUG BEGIN]]
 			else
 				X.OutputDebugMessage('MY_RoleStatistics_EquipStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			end
+			exp.dwTabType = rec.tabtype
+			exp.dwTabIndex = rec.tabindex
+			exp.dwTabSubIndex = rec.tabsubindex
+			exp.nStackNum = rec.stacknum
+			exp.nStrengthLevel = rec.strength
+			exp.nDurability = rec.durability
+			exp.aDiamondEnchant = rec.diamond_enchant
+			exp.dwPermanentEnchantID = rec.permanent_enchant
+			exp.dwItemFEAEnchantID = rec.fea_enchant
 		else
 			if box then
 				box:ClearObject()
@@ -688,6 +703,7 @@ function D.UpdateItems(page)
 		if visible then
 			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 		end
+		table.insert(aExport, exp)
 	end
 
 	-- 绘制挂饰、其它
@@ -696,6 +712,7 @@ function D.UpdateItems(page)
 		local dwTabType, dwTabIndex = aItemData[1], aItemData[2]
 		local KItemInfo = not X.IsEmpty(dwTabIndex) and GetItemInfo(ITEM_TABLE_TYPE.CUST_TRINKET, dwTabIndex)
 		local box = info.box and handle:Lookup(info.box)
+		local exp = { nPos = -1, szKey = info.key, dwTabType = dwTabType, dwTabIndex = dwTabIndex }
 		if KItemInfo then
 			if box then
 				box:SetObjectIcon(Table_GetItemIconID(KItemInfo.nUiId))
@@ -704,6 +721,8 @@ function D.UpdateItems(page)
 				box.dwTabIndex = dwTabIndex
 				UpdateItemBoxExtend(box, KItemInfo.nGenre, KItemInfo.nQuality)
 			end
+			exp.nGenre = KItemInfo.nGenre
+			exp.nQuality = KItemInfo.nQuality
 		else
 			if box then
 				box:ClearObject()
@@ -724,6 +743,7 @@ function D.UpdateItems(page)
 	hBoard:Clear()
 	hBoard:AppendItemFromString(table.concat(aXml))
 	hBoard:FormatAllItemPos()
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Text_EquipInfoExport').aExport = aExport
 end
 
 function D.OnInitPage()
@@ -742,6 +762,8 @@ function D.OnInitPage()
 		wndPage.nSuitIndex = nIndex
 	end
 	container:FormatAllContentPos()
+
+	wnd:Lookup('Wnd_ItemPage/WndScroll_EquipInfo', 'Text_EquipInfoExport'):SetText(_L['Export'])
 
 	local frame = this:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
@@ -831,6 +853,13 @@ function D.OnLButtonClick()
 			X.SQLitePrepareExecute(DB_OwnerInfoD, wnd.ownerinfo.ownerkey)
 			D.UpdateNames(page)
 		end)
+	end
+end
+
+function D.OnItemLButtonClick()
+	local name = this:GetName()
+	if name == 'Text_EquipInfoExport' then
+		X.UI.OpenTextEditor(X.CompressLUAData(this.aExport))
 	end
 end
 
