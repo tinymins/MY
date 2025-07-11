@@ -445,7 +445,7 @@ function D.FlushDB()
 				if KItem then
 					local aDiamondEnchant = {}
 					for i = 1, KItem.GetSlotCount() do
-						aDiamondEnchant[i] = X.GetItemMountDiamondEnchantID(KItem, i - 1)
+						aDiamondEnchant[i] = X.GetItemMountDiamondEnchantID(KItem, i - 1, me)
 					end
 					itemid = KItem.dwID
 					tabtype = KItem.dwTabType
@@ -618,8 +618,8 @@ function D.UpdateItems(page)
 			if X.IsString(v) then
 				rec[k] = UTF8ToAnsi(v)
 			end
-			rec.diamond_enchant = X.DecodeJSON(rec.diamond_enchant) or {}
 		end
+		rec.diamond_enchant = X.DecodeJSON(rec.diamond_enchant) or {}
 		tResult[rec.boxindex] = rec
 	end
 	local handle = page:Lookup('Wnd_Total/Wnd_ItemPage', '')
@@ -681,9 +681,9 @@ function D.UpdateItems(page)
 					local nType, nTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
 					local diamon = nType and nTabIndex and GetItemInfo(nType, nTabIndex)
 					if diamon then
-						table.insert(aXml, '<image>w=24 h=24 path="fromiconid" frame=' .. Table_GetItemIconID(diamon.nUiId) .. '</image>')
+						table.insert(aXml, '<image>w=20 h=20 path="fromiconid" frame=' .. Table_GetItemIconID(diamon.nUiId) .. '</image>')
 					else
-						table.insert(aXml, '<image>w=24 h=24 path="ui/Image/UICommon/FEPanel.UITex" frame=5 </image>')
+						table.insert(aXml, '<image>w=20 h=20 path="ui/Image/UICommon/FEPanel.UITex" frame=5 </image>')
 					end
 				end
 				-- ¸½Ä§
@@ -717,7 +717,6 @@ function D.UpdateItems(page)
 				end
 				-- ´ó¸½Ä§
 				if rec.temporary_enchant ~= 0 then
-					Output(rec.temporary_enchant)
 					local szImagePath = 'ui/Image/UICommon/FEPanel.UITex'
 					local nFrame = 41
 					local szText = X.Table.GetCommonEnchantDesc(rec.temporary_enchant)
