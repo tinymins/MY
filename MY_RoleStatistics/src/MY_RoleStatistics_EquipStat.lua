@@ -880,7 +880,10 @@ function D.OnResizePage()
 	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Image_EquipInfo'):SetSize(nW - 579, nH - 78)
 	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Handle_EquipInfo'):SetSize(nW - 602, nH - 90)
 	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Handle_EquipInfo'):FormatAllItemPos()
-	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo/Scroll_EquipInfo'):SetH(78)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Text_EquipInfoExport'):SetRelX(nW - 563 - 120)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', ''):FormatAllItemPos()
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo/Scroll_EquipInfo'):SetH(nH - 78)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo/Scroll_EquipInfo'):SetRelX(nW - 563 - 20)
 end
 
 function D.OnActivePage()
@@ -948,7 +951,7 @@ end
 function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Text_EquipInfoExport' then
-		X.UI.OpenTextEditor(X.CompressLUAData(this.aExport))
+		X.UI.OpenTextEditor(X.CompressLUAData(this.aExport) .. '\n' .. X.EncodeLUAData(this.aExport))
 	end
 end
 
