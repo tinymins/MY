@@ -951,7 +951,7 @@ end
 function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Text_EquipInfoExport' then
-		X.UI.OpenTextEditor(X.CompressLUAData(this.aExport) .. '\n' .. X.EncodeLUAData(this.aExport))
+		X.UI.OpenTextEditor(X.CompressLUAData(this.aExport))
 	end
 end
 
