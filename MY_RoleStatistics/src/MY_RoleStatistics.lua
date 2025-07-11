@@ -26,8 +26,15 @@ local D = {
 }
 
 function D.Open(szModule)
+	local function onSizeChange()
+		local ui = X.UI(this)
+		local nW, nH = ui:Size()
+		ui:Children('#Btn_Option'):Left(nW - 40)
+		ui:Children('#PageSet_All'):Size(nW, nH - 48)
+		D.PageSetModule.BroadcastPageEvent(this, 'OnResizePage')
+	end
 	local ui = X.UI.CreateFrame('MY_RoleStatistics', {
-		w = 1000, h = 700,
+		w = 1104, h = 700,
 		close = true,
 		maximize = true,
 		resize = true,
@@ -35,13 +42,7 @@ function D.Open(szModule)
 		minHeight = 700,
 		text = X.PACKET_INFO.NAME .. _L.SPLIT_DOT .. _L['MY_RoleStatistics'],
 		anchor = 'CENTER',
-		onSizeChange = function()
-			local ui = X.UI(this)
-			local nW, nH = ui:Size()
-			ui:Children('#Btn_Option'):Left(nW - 40)
-			ui:Children('#PageSet_All'):Size(nW, nH - 48)
-			D.PageSetModule.BroadcastPageEvent(this, 'OnResizePage')
-		end,
+		onSizeChange = onSizeChange,
 	})
 	ui:Append('WndPageSet', {
 		name = 'PageSet_All',
@@ -54,6 +55,7 @@ function D.Open(szModule)
 	})
 	local frame = ui:Raw()
 	frame:BringToTop()
+	X.ExecuteWithThis(frame, onSizeChange)
 	D.PageSetModule.DrawUI(frame)
 	D.PageSetModule.ActivePage(frame, szModule or 1, true)
 end
