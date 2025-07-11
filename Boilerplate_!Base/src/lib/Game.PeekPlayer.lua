@@ -124,7 +124,7 @@ local function OnGetPlayerEquipInfoPeekPlayer(player)
 			-- ÎåÐÐÊ¯
 			local aSlotItem = {}
 			for i = 1, item.GetSlotCount() do
-				local nEnchantID = X.GetItemMountDiamondEnchantID(item, i - 1)
+				local nEnchantID = X.GetItemMountDiamondEnchantID(item, i - 1, player)
 				if nEnchantID and nEnchantID > 0 then
 					local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
 					if dwTabType and dwTabIndex then
