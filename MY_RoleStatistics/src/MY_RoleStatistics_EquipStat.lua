@@ -631,7 +631,7 @@ function D.UpdateItems(page)
 				if rec.permanent_enchant ~= 0 then
 					local szImagePath = 'ui/Image/UICommon/FEPanel.UITex'
 					local nFrame = 41
-					local szText = Table_GetCommonEnchantDesc(rec.permanent_enchant)
+					local szText = X.Table.GetCommonEnchantDesc(rec.permanent_enchant)
 					if szText then
 						szText = string.gsub(szText, 'font=%d+', 'font=113')
 						table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
