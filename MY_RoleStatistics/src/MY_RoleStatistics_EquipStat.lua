@@ -22,7 +22,7 @@ end
 
 CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
-local DB = X.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v3.db', X.PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v4.db', X.PATH_TYPE.GLOBAL})
 if not DB then
 	return X.OutputSystemMessage(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
@@ -45,6 +45,7 @@ X.SQLiteExecute(DB, [[
 		diamond_enchant NVARCHAR(100) NOT NULL,
 		fea_enchant INTEGER NOT NULL,
 		permanent_enchant INTEGER NOT NULL,
+		temporary_enchant INTEGER NOT NULL,
 		desc NVARCHAR(4000) NOT NULL,
 		time INTEGER NOT NULL,
 		extra TEXT NOT NULL,
@@ -54,7 +55,7 @@ X.SQLiteExecute(DB, [[
 X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS EquipItems_tab_idx ON EquipItems(tabtype, tabindex, tabsubindex)')
 local DB_ItemsW = X.SQLitePrepare(DB, [[
 	REPLACE INTO
-	EquipItems (ownerkey, suitindex, boxtype, boxindex, itemid, tabtype, tabindex, tabsubindex, stacknum, uiid, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, extra)
+	EquipItems (ownerkey, suitindex, boxtype, boxindex, itemid, tabtype, tabindex, tabsubindex, stacknum, uiid, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, temporary_enchant, desc, time, extra)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ]])
 local DB_ItemsR = X.SQLitePrepare(DB, 'SELECT * FROM EquipItems WHERE ownerkey = ? and suitindex = ?')
@@ -259,7 +260,8 @@ end
 
 function D.Migration()
 	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/equip_stat.v2.db', X.PATH_TYPE.GLOBAL})
-	if not IsLocalFileExist(DB_V2_PATH) then
+	local DB_V3_PATH = X.FormatPath({'userdata/role_statistics/equip_stat.v3.db', X.PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
 	X.Confirm(
@@ -290,10 +292,10 @@ function D.Migration()
 								rec.diamond_enchant,
 								rec.fea_enchant,
 								rec.permanent_enchant,
+								0,
 								rec.desc,
-								rec.extra,
 								rec.time,
-								''
+								rec.extra
 							)
 						end
 					end
@@ -319,6 +321,61 @@ function D.Migration()
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			-- 转移V3旧版数据
+			if IsLocalFileExist(DB_V3_PATH) then
+				local DB_V3 = SQLite3_Open(DB_V3_PATH)
+				if DB_V3 then
+					X.SQLiteBeginTransaction(DB)
+					local aEquipItems = X.SQLiteGetAll(DB_V3, 'SELECT * FROM EquipItems WHERE ownerkey IS NOT NULL AND suitindex IS NOT NULL AND boxtype IS NOT NULL')
+					if aEquipItems then
+						for _, rec in ipairs(aEquipItems) do
+							X.SQLitePrepareExecute(
+								DB_ItemsW,
+								rec.ownerkey,
+								rec.suitindex,
+								rec.boxtype,
+								rec.boxindex,
+								rec.itemid,
+								rec.tabtype,
+								rec.tabindex,
+								rec.tabsubindex,
+								rec.stacknum,
+								rec.uiid,
+								rec.strength,
+								rec.durability,
+								rec.diamond_enchant,
+								rec.fea_enchant,
+								rec.permanent_enchant,
+								0,
+								rec.desc,
+								rec.time,
+								rec.extra
+							)
+						end
+					end
+					local aOwnerInfo = X.SQLiteGetAll(DB_V3, 'SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL AND ownername IS NOT NULL AND servername IS NOT NULL')
+					if aOwnerInfo then
+						for _, rec in ipairs(aOwnerInfo) do
+							X.SQLitePrepareExecute(
+								DB_OwnerInfoW,
+								rec.ownerkey,
+								rec.ownername,
+								rec.servername,
+								rec.ownerforce,
+								rec.ownerrole,
+								rec.ownerlevel,
+								rec.ownerscore,
+								rec.ownersuitindex,
+								rec.time,
+								rec.extra
+							)
+						end
+					end
+					X.SQLiteEndTransaction(DB)
+					DB_V3:Release()
+				end
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
 			X.Alert(_L['Migrate succeed!'])
@@ -384,7 +441,7 @@ function D.FlushDB()
 				local KItem = X.GetInventoryItem(me, boxtype, boxindex)
 				local itemid, tabtype, tabindex, tabsubindex = -1, -1, -1, -1
 				local stacknum, uiid, strength, durability = 0, 0, 0, 0
-				local diamond_enchant, fea_enchant, permanent_enchant, desc, extra = 0, 0, 0, '', ''
+				local diamond_enchant, fea_enchant, permanent_enchant, temporary_enchant, desc, extra = 0, 0, 0, 0, '', ''
 				if KItem then
 					local aDiamondEnchant = {}
 					for i = 1, KItem.GetSlotCount() do
@@ -401,13 +458,15 @@ function D.FlushDB()
 					diamond_enchant = AnsiToUTF8(X.EncodeJSON(aDiamondEnchant)) -- 五行石
 					fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and X.GetItemMountFEAEnchantID(KItem) or 0 -- 五彩石
 					permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
+					temporary_enchant = KItem.dwTemporaryEnchantID -- 大附魔
 					desc = AnsiToUTF8(X.GetItemTip(KItem) or '')
 				end
 				X.SQLitePrepareExecute(
 					DB_ItemsW,
 					ownerkey, suitindex, boxtype, boxindex, itemid,
 					tabtype, tabindex, tabsubindex, stacknum, uiid,
-					strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, ''
+					strength, durability, diamond_enchant, fea_enchant, permanent_enchant, temporary_enchant,
+					desc, time, extra
 				)
 			end
 			X.SQLitePrepareExecute(DB_ItemsDL, ownerkey, boxtype, count)
@@ -656,6 +715,36 @@ function D.UpdateItems(page)
 						end
 					end
 				end
+				-- 大附魔
+				if rec.temporary_enchant ~= 0 then
+					Output(rec.temporary_enchant)
+					local szImagePath = 'ui/Image/UICommon/FEPanel.UITex'
+					local nFrame = 41
+					local szText = X.Table.GetCommonEnchantDesc(rec.temporary_enchant)
+					if szText then
+						szText = string.gsub(szText, 'font=%d+', 'font=113')
+						table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
+						table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
+						table.insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
+						table.insert(aXml, GetFormatText(' ', 113))
+						table.insert(aXml, szText)
+					else
+						local enchantAttrib = GetItemEnchantAttrib(rec.temporary_enchant);
+						if enchantAttrib then
+							for k, v in pairs(enchantAttrib) do
+								szText = D.FormatEnchantAttribText(v)
+								if szText ~= '' then
+									szText = string.gsub(szText, 'font=%d+', 'font=113')
+									table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
+									table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
+									table.insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
+									table.insert(aXml, GetFormatText(' ', 113))
+									table.insert(aXml, szText)
+								end
+							end
+						end
+					end
+				end
 				-- 五彩石
 				if KItemInfo.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
 					table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
@@ -688,6 +777,7 @@ function D.UpdateItems(page)
 			exp.nDurability = rec.durability
 			exp.aDiamondEnchant = rec.diamond_enchant
 			exp.dwPermanentEnchantID = rec.permanent_enchant
+			exp.dwTemporaryEnchantID = rec.temporary_enchant
 			exp.dwItemFEAEnchantID = rec.fea_enchant
 		else
 			if box then
