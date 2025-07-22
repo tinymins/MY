@@ -55,6 +55,10 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 })
 local D = {}
 
+function D.IsEnabled()
+	return O.bEnable and not X.IsInInventoryPackageLimitedMap()
+end
+
 function D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 	for _, szPath in ipairs({
 		'Handle_Bag_Compact/Mode_' .. dwBox .. '_' .. dwX .. '/' .. dwBox .. '_' .. dwX,
@@ -168,7 +172,7 @@ end
 
 -- ¼ì²â³åÍ»
 function D.CheckConflict(bRestore)
-	if not bRestore and O.bEnable then
+	if not bRestore and D.IsEnabled() then
 		-- Òþ²Ø³åÍ»µÄÏµÍ³°´Å¥
 		for _, szPath in ipairs({
 			'Normal/BigBagPanel/Btn_CU',
@@ -250,11 +254,11 @@ local settings = {
 				HideItemShadow = D.HideItemShadow,
 				HideAllItemShadow = D.HideAllItemShadow,
 				IsItemBoxLocked = D.IsItemBoxLocked,
+				IsEnabled = D.IsEnabled,
 			},
 		},
 		{
 			fields = {
-				'bEnable',
 				'bConfirm',
 			},
 			root = O,

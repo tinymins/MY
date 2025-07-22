@@ -144,7 +144,7 @@ function D.CheckInjection(bRemoveInjection)
 		return
 	end
 	local hInjectRoot = hFrame:Lookup('WndContainer_Btn') or hFrame
-	if not bRemoveInjection and MY_BagEx_Bag.bEnable and not X.IsInInventoryPackageLimitedMap() then
+	if not bRemoveInjection and MY_BagEx_Bag.IsEnabled() then
 		-- Ö²Èë¶Ñµþ°´Å¦
 		local hWndRef = hInjectRoot:Lookup('Wnd_MY_Split')
 		local hBtnNew = hInjectRoot:Lookup('Btn_MY_Stack')
