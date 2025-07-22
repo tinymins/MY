@@ -275,5 +275,6 @@ end
 X.RegisterUserSettingsInit('MY_BagEx_Bag', function() D.CheckConflict() end)
 X.RegisterFrameCreate('BigBagPanel', 'MY_BagEx_Bag', function() D.CheckConflict() end)
 X.RegisterReload('MY_BagEx_Bag', function() D.CheckConflict(true) end)
+X.RegisterEvent('LOADING_ENDING', 'MY_BagEx_Bag', function() D.OnEnableChange() end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
