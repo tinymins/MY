@@ -18,6 +18,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+X.RegisterRestriction('MY_TargetSelect__PUBG', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local D = {}
@@ -88,8 +89,14 @@ function D.GetRelation(dwID)
 	end
 end
 
+function D.UpdateRestrict()
+	D.bRestrict = X.IsRestricted('MY_TargetSelect__PUBG') and X.IsInPubgMap()
+end
 
 function D.SearchTarget()
+	if D.bRestrict then
+		return
+	end
 	local nFrame = GetLogicFrameCount()
 	if (nFrame - nJustFrame) > 12 then
 		tJustList = {}
@@ -241,5 +248,13 @@ function D.SearchTarget()
 end
 
 X.RegisterHotKey('MY_TargetSelect', _L['Smart select target'], function() D.SearchTarget() end, nil)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TargetSelect__PUBG', function()
+	if arg0 and arg0 ~= 'MY_TargetSelect__PUBG' then
+		return
+	end
+	D.UpdateRestrict()
+end)
+X.RegisterEvent('LOADING_END', D.UpdateRestrict)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
