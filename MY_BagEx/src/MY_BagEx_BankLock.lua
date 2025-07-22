@@ -25,7 +25,7 @@ local D = {}
 
 -- ¼ì²â¶Ñµþ°´Å¦
 function D.CheckInjection(bRemoveInjection)
-	if not bRemoveInjection and MY_BagEx_Bank.bEnable then
+	if not bRemoveInjection and MY_BagEx_Bank.bEnable and not X.IsInInventoryPackageLimitedMap() then
 		-- Ö²Èë¶Ñµþ°´Å¦
 		local frame = Station.Lookup('Normal/BigBankPanel')
 		if not frame then

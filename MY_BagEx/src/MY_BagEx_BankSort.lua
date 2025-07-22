@@ -238,7 +238,7 @@ end
 
 -- 检测增加按纽
 function D.CheckInjection(bRemoveInjection)
-	if not bRemoveInjection and MY_BagEx_Bank.bEnable then
+	if not bRemoveInjection and MY_BagEx_Bank.bEnable and not X.IsInInventoryPackageLimitedMap() then
 		-- 植入整理按纽
 		local hFrame = Station.Lookup('Normal/BigBankPanel')
 		if not hFrame then

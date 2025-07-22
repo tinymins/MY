@@ -240,7 +240,7 @@ function D.CheckInjection(bRemoveInjection)
 		return
 	end
 	local hInjectRoot = hFrame:Lookup('WndContainer_Btn') or hFrame
-	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
+	if not bRemoveInjection and MY_BagEx_Bag.bEnable and not X.IsInInventoryPackageLimitedMap() then
 		-- 植入整理按纽
 		local hBtnRef = hInjectRoot:Lookup('Btn_CU')
 		local hBtnNew = hInjectRoot:Lookup('Btn_MY_Sort')

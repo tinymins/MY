@@ -218,7 +218,7 @@ end
 
 -- 检测增加按纽
 function D.CheckInjection(bRemoveInjection)
-	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
+	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable and not X.IsInInventoryPackageLimitedMap() then
 		-- 植入整理按纽
 		local hFrame = Station.Lookup('Normal/GuildBankPanel')
 		if not hFrame then

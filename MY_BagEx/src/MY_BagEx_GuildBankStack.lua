@@ -77,7 +77,7 @@ end
 
 -- ¼ì²â¶Ñµþ°´Å¦
 function D.CheckInjection(bRemoveInjection)
-	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
+	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable and not X.IsInInventoryPackageLimitedMap() then
 		-- Ö²Èë¶Ñµþ°´Å¦
 		local frame = Station.Lookup('Normal/GuildBankPanel')
 		if not frame then
