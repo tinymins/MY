@@ -417,13 +417,60 @@ local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 		xDefaultValue = 30,
 	},
 })
+
+local function CreateRingBuffer(nCapacity)
+    local nActualCap = 2^math.ceil(math.log(nCapacity > 0 and nCapacity or 1, 2))
+    
+    return {
+        data = {},
+        nCapacity = nActualCap,
+        nStart = 1,
+        nCount = 0,
+        
+        push = function(self, value)
+            local nWriteIdx = (self.nStart + self.nCount - 1) % self.nCapacity + 1
+            
+            self.data[nWriteIdx] = value
+            
+            if self.nCount < self.nCapacity then
+                self.nCount = self.nCount + 1
+            else
+                self.nStart = (self.nStart % self.nCapacity) + 1
+            end
+        end,
+        
+        forEach = function(self, callback)
+            if self.nCount <= 0 then 
+				return 
+			end
+            
+            local nCap = self.nCapacity
+            
+            for i = 0, self.nCount - 1 do
+                local nIdx = (self.nStart + i - 1) % nCap + 1
+                callback(self.data[nIdx], i + 1)
+            end
+        end,
+        
+        size = function(self)
+            return self.nCount
+        end,
+        
+        clear = function(self)
+            self.nStart = 1
+            self.nCount = 0
+        end
+    }
+end
+
+
 local Data          -- 当前战斗数据记录
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
 local UNSAVED_CACHE = {} -- 未保存的战斗记录缓存 { [szFile] = Data }
 local DS_DATA_CONFIG = { passphrase = false }
 local DS_ROOT = {'userdata/fight_stat/', X.PATH_TYPE.ROLE}
-local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
-local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
+local SKILL_EFFECT_CACHE = CreateRingBuffer(25 * 1024)  -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
+local BUFF_UPDATE_CACHE = CreateRingBuffer(25 * 1024) -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
 local ABSORB_CACHE = {} -- 目标盾来源与状态缓存表
 local LOG_REPLAY_FRAME = X.ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 local SKILL_TYPE = X.CONSTANT.SKILL_TYPE
@@ -563,8 +610,8 @@ end
 -- 过图清除当前战斗数据
 X.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END', 'MY_CLIENT_PLAYER_LEAVE_SCENE'}, function()
 	D.FlushData()
-	SKILL_EFFECT_CACHE = {}
-	BUFF_UPDATE_CACHE = {}
+	SKILL_EFFECT_CACHE:clear()
+	BUFF_UPDATE_CACHE:clear()
 	ABSORB_CACHE = {}
 	D.InitData()
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
@@ -835,10 +882,7 @@ end
 do local nLFC, nTime, nTick
 function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	while SKILL_EFFECT_CACHE[1] and nLFC - SKILL_EFFECT_CACHE[1][1] > LOG_REPLAY_FRAME do
-		table.remove(SKILL_EFFECT_CACHE, 1)
-	end
-	table.insert(SKILL_EFFECT_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
+	SKILL_EFFECT_CACHE:push({nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
 	D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 end
 end
@@ -861,10 +905,7 @@ function D.OnBuffUpdate(dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bD
 		return
 	end
 	nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	while BUFF_UPDATE_CACHE[1] and nLFC - BUFF_UPDATE_CACHE[1][1] > LOG_REPLAY_FRAME do
-		table.remove(BUFF_UPDATE_CACHE, 1)
-	end
-	table.insert(BUFF_UPDATE_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel})
+	BUFF_UPDATE_CACHE:push({nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel})
 	D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 end
 end
@@ -874,18 +915,18 @@ do local nCurLFC, nLFC, nTime, nTick, dwCaster, dwTarget,
 	dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel
 function D.ReplayRecentLog()
 	nCurLFC = GetLogicFrameCount()
-	for _, v in ipairs(SKILL_EFFECT_CACHE) do
+	SKILL_EFFECT_CACHE:forEach(function(v)
 		nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult = unpack(v)
 		if nCurLFC - nLFC <= LOG_REPLAY_FRAME then
 			D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 		end
-	end
-	for _, v in ipairs(BUFF_UPDATE_CACHE) do
+	end)
+	BUFF_UPDATE_CACHE:forEach(function(v)
 		nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel = unpack(v)
 		if nCurLFC - nLFC <= LOG_REPLAY_FRAME then
 			D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 		end
-	end
+	end)
 end
 end
 
