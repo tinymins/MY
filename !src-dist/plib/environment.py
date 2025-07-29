@@ -99,7 +99,11 @@ def get_current_packet_id() -> str:
     返回:
         str: 当前插件集目录的名称。
     """
-    packet_path: str = os.path.abspath(
+    parent_dir = os.path.abspath(
         os.path.join(__file__, os.pardir, os.pardir, os.pardir)
     )
-    return os.path.basename(packet_path)
+    for name in os.listdir(parent_dir):
+        full_path = os.path.join(parent_dir, name)
+        if os.path.isdir(full_path) and name.endswith("_!Base"):
+            return name[:-6]
+    raise Exception("获取当前插件集目录的名称失败")

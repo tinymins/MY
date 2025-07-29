@@ -111,7 +111,7 @@ def __build_addon(packet: str, addon: str, time_tag: str) -> None:
                         return
                     # 新增模块：增加计数，生成临时文件
                     file_count += 1
-                    source_file: str = os.path.join(addon, parts[1])
+                    source_file: str = os.path.join(addon, parts[1].replace("\\", "/"))
                     dist_file: str = os.path.join(dist_dir, f"{file_count}.lua")
                     try:
                         source_code: str = codecs.open(
@@ -469,13 +469,23 @@ def __7zip(
 
     print("--------------------------------")
     print("正在压缩打包...")
-    # 调用系统命令压缩包（通过 start /wait 保证依次完成）
-    cmd: str = (
-        'cd ./!src-dist/dist && start /wait /b ../bin/7z.exe a -t7z "'
-        + file_name
-        + '" -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore'
-        + cmd_suffix
-    )
+    # 调用系统命令压缩包
+    if os.name == "nt":
+        # Windows: 使用7z.exe命令（通过 start /wait 保证依次完成）
+        cmd: str = (
+            'cd ./!src-dist/dist && start /wait /b ../bin/7z.exe a -t7z "'
+            + file_name
+            + '" -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore'
+            + cmd_suffix
+        )
+    else:
+        # Linux/macOS: 使用7z命令
+        cmd: str = (
+            'cd ./!src-dist/dist && 7z a -bb0 -bd -bso0 -t7z "'
+            + file_name
+            + '" -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore'
+            + cmd_suffix
+        )
     os.system(cmd)
     print(f'压缩打包完成："{file_name}"。')
     if base_hash:
@@ -484,10 +494,88 @@ def __7zip(
         print("全量打包。")
 
 
+def __lint(packet: str, packet_path: str, diff_version: Optional[str] = None) -> None:
+    """
+    代码检查
+    """
+    # 获取当前版本信息
+    version_info: Dict[str, str] = __get_version_info(packet, diff_version)
+    utils.assert_exit(
+        version_info.get("current") != "",
+        "错误：无法获取当前版本信息，请检查 Base.lua 文件！",
+    )
+    print(f"当前版本：{version_info.get('current')}")
+    print(f"当前提交 hash：{version_info.get('current_hash')}")
+    print(f"历史最大版本：{version_info.get('max')}")
+    print(f"上一版本：{version_info.get('previous')}")
+    print(f"上一版本提交信息：{version_info.get('previous_message')}")
+    print(f"上一版本提交 hash：{version_info.get('previous_hash')}")
+
+    # 执行代码检查
+    # 从上一版本（如果不存在则从最早commit开始）检查 commit message 是否符合规范
+    print("\n正在检查提交信息规范...")
+
+    # 获取起始commit hash
+    start_hash = version_info.get("previous_hash") or ""
+    if not start_hash:
+        # 如果没有上一版本，则获取3个月内最老的commit的hash
+        start_hash = (
+            os.popen(
+                'git log --since="3 months ago" --format="%H" --reverse | head -n 1'
+            )
+            .read()
+            .strip()
+        )
+        if not start_hash:
+            # 如果3个月内没有commit，则获取最新的commit hash
+            start_hash = os.popen("git rev-parse HEAD").read().strip()
+
+    # 获取从起始commit到当前的所有commit信息
+    commits = (
+        os.popen(f'git log {start_hash}..HEAD --pretty=format:"%h|%s"')
+        .read()
+        .strip()
+        .split("\n")
+    )
+
+    # 定义conventional commit的正则表达式
+    commit_pattern = re.compile(
+        r"^(feat|fix|docs|style|refactor|perf|test|chore|build|release)(\([^)]+\))?: .+"
+    )
+
+    has_invalid = False
+    invalid_commits = []
+    for commit in commits:
+        if not commit:
+            continue
+        hash_msg = commit.split("|")
+        if len(hash_msg) != 2:
+            continue
+
+        commit_hash, message = hash_msg
+        # 忽略 merge commits
+        if message.startswith("Merge "):
+            continue
+
+        if not commit_pattern.match(message):
+            invalid_commits.append(f"  - {commit_hash}: {message}")
+            has_invalid = True
+
+    if has_invalid:
+        print("\n不规范的提交信息：")
+        for invalid_commit in invalid_commits:
+            print(invalid_commit)
+        utils.exit_with_message(
+            "\n错误：存在不符合规范的提交信息！\n提交信息必须符合格式：<type>[optional scope]: <description>\n其中type必须是：feat|fix|docs|style|refactor|perf|test|chore|build|release"
+        )
+    else:
+        print("\n提交信息规范检查通过！")
+
+
 def __prepublish(packet: str, packet_path: str, diff_ver: Optional[str] = None) -> None:
     """
     发布前准备工作：
-      - 如果当前在master分支，切换至stable分支、rebse主分支变动并重置提交信息；
+      - 如果当前在master分支，切换至stable分支、rebase主分支变动并重置提交信息；
       - 如果当前在stable分支且存在未提交变更，则提交release信息；
       - 确保工作区干净且当前分支为stable。
 
@@ -545,11 +633,22 @@ def __pack(packet: str, packet_path: str, version_info: Dict[str, str]) -> None:
     time_tag = git.get_head_time_tag()
 
     # 根据运行环境确定压缩包输出目录
-    dist_root: str = os.path.abspath(os.path.join(get_interface_path(), os.pardir))
-    if os.path.isfile(os.path.abspath(os.path.join(dist_root, "gameupdater.exe"))):
-        dist_root = os.path.join(packet_path, "!src-dist", "dist")
+    interface_path = get_interface_path()
+    if interface_path is None:
+        dist_root = os.path.join(
+            os.path.abspath(__file__),
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            "!src-dist",
+            "dist",
+        )
     else:
-        dist_root = os.path.abspath(os.path.join(dist_root, os.pardir, "dist"))
+        dist_root: str = os.path.abspath(os.path.join(get_interface_path(), os.pardir))
+        if os.path.isfile(os.path.abspath(os.path.join(dist_root, "gameupdater.exe"))):
+            dist_root = os.path.join(packet_path, "!src-dist", "dist")
+        else:
+            dist_root = os.path.abspath(os.path.join(dist_root, os.pardir, "dist"))
 
     # 如果存在上一个版本，则生成差异包
     if version_info.get("previous_hash"):
@@ -616,11 +715,16 @@ def run(mode: str, diff_ver: Optional[str] = None, is_source: bool = False) -> N
     if mode == "publish":
         __prepublish(packet, packet_path, diff_ver)
 
+    if mode == "publish" or mode == "ci":
+        __lint(packet, packet_path, diff_ver)
+
     # 执行整体构建打包流程
     __build(packet)
 
-    if mode == "publish":
+    if mode == "publish" or mode == "ci":
         __pack(packet, packet_path, version_info)
+
+    if mode == "publish":
         os.system("git checkout master")
 
     print("--------------------------------")
