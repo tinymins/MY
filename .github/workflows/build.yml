@@ -21,7 +21,8 @@ jobs:
         pip3 install semver luadata
     - name: Install apt dependencies
       run: |
-        sudo apt install lua5.1 p7zip-full
+        sudo rm -f /var/lib/man-db/auto-update
+        sudo apt install --no-install-recommends lua5.1 p7zip-full
     - name: Write secret to file
       run: |
         cat > secret.jx3dat << 'EOF'
