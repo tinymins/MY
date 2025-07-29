@@ -1057,7 +1057,10 @@ end
 -- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',X.GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
 -- ÊÂ¼þ²Ù×÷
 function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dwSkillSrcID)
-	if MY_TEAM_MON_SHIELDED_TOTAL or (MY_TEAM_MON_SHIELDED_OTHER_PLAYER and dwOwner ~= MY_TEAM_MON_CORE_PLAYERID) then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
+		return
+	end
+	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and dwSkillSrcID ~= MY_TEAM_MON_CORE_PLAYERID then
 		return
 	end
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
