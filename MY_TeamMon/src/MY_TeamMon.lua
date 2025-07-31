@@ -1060,7 +1060,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
-	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and dwSkillSrcID ~= MY_TEAM_MON_CORE_PLAYERID then
+	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and X.IsPlayer(dwSkillSrcID) and dwSkillSrcID ~= MY_TEAM_MON_CORE_PLAYERID then
 		return
 	end
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
@@ -1233,7 +1233,10 @@ end
 
 -- 技能事件
 function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
-	if MY_TEAM_MON_SHIELDED_TOTAL or (MY_TEAM_MON_SHIELDED_OTHER_PLAYER and dwCaster ~= MY_TEAM_MON_CORE_PLAYERID) then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
+		return
+	end
+	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and X.IsPlayer(dwCaster) and dwCaster ~= MY_TEAM_MON_CORE_PLAYERID then
 		return
 	end
 	local key = dwCastID .. '_' .. dwLevel
