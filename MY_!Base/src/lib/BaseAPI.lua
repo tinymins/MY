@@ -155,7 +155,14 @@ end
 ---@param dwID number @ID
 ---@return boolean @是否为玩家
 function X.IsPlayer(dwID)
-	return IsPlayer(dwID)
+	return dwID ~= 0 and IsPlayer(dwID)
+end
+
+-- 获取 ID 是否为 NPC（区别于玩家）
+---@param dwID number @ID
+---@return boolean @是否为 NPC
+function X.IsNpc(dwID)
+	return dwID ~= 0 and not IsPlayer(dwID)
 end
 
 -- 获取主角玩家对象
