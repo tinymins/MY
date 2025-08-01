@@ -157,7 +157,7 @@ def __build_addon(packet: str, addon: str, time_tag: str) -> None:
                     squishy.write(f'Module "{file_count}" "{rel_dist_file}"\n')
 
     # 调用squishy工具合并构建（使用minify full压缩级别）
-    os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
+    utils.read_popen_output('lua "./!src-dist/tools/react/squish" --minify-level=full')
     # 删除临时生成的squishy配置文件
     os.remove("squishy")
 
@@ -276,17 +276,17 @@ def __get_version_info(packet: str, diff_ver: Optional[str] = None) -> Dict[str,
         utils.exit_with_message(f"读取Base.lua文件出错：{e}")
 
     # 获取当前最新提交短hash
-    current_hash: str = os.popen('git log -n 1 --pretty=format:"%h"').read().strip()
+    current_hash: str = utils.read_popen_output(
+        'git log -n 1 --pretty=format:"%h"'
+    ).strip()
     # 获取所有包含 release 信息的提交记录（以 SUCCESS|<hash>|release: <version> 格式保存）
-    commit_list: List[str] = (
-        os.popen('git log --grep release: --pretty=format:"SUCCESS|%h|%s"')
-        .read()
-        .split("\n")
-    )
+    commit_list: List[str] = utils.read_popen_output(
+        'git log --grep release: --pretty=format:"SUCCESS|%h|%s"'
+    ).split("\n")
     if diff_ver:
-        extra_commit: str = os.popen(
+        extra_commit: str = utils.read_popen_output(
             f'git log {diff_ver} -n 1 --pretty=format:"SUCCESS|%h|%s"'
-        ).read()
+        )
         commit_list += extra_commit.split("\n")
     commit_list = list(filter(lambda x: x and x.startswith("SUCCESS|"), commit_list))
 
@@ -443,8 +443,7 @@ def __7zip(
         print("--------------------------------")
         print("文件变更列表：")
         filelist: List[str] = (
-            os.popen(f"git diff {base_hash} HEAD --name-status")
-            .read()
+            utils.read_popen_output(f"git diff {base_hash} HEAD --name-status")
             .strip()
             .split("\n")
         )
@@ -519,21 +518,16 @@ def __lint(packet: str, packet_path: str, diff_version: Optional[str] = None) ->
     start_hash = version_info.get("previous_hash") or ""
     if not start_hash:
         # 如果没有上一版本，则获取3个月内最老的commit的hash
-        start_hash = (
-            os.popen(
-                'git log --since="3 months ago" --format="%H" --reverse | head -n 1'
-            )
-            .read()
-            .strip()
-        )
+        start_hash = utils.read_popen_output(
+            'git log --since="3 months ago" --format="%H" --reverse | head -n 1'
+        ).strip()
         if not start_hash:
             # 如果3个月内没有commit，则获取最新的commit hash
-            start_hash = os.popen("git rev-parse HEAD").read().strip()
+            start_hash = utils.read_popen_output("git rev-parse HEAD").strip()
 
     # 获取从起始commit到当前的所有commit信息
     commits = (
-        os.popen(f'git log {start_hash}..HEAD --pretty=format:"%h|%s"')
-        .read()
+        utils.read_popen_output(f'git log {start_hash}..HEAD --pretty=format:"%h|%s"')
         .strip()
         .split("\n")
     )
