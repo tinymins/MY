@@ -1,26 +1,25 @@
 # 茗伊插件集
 
 > 这是在国产大型3D网游《剑网3》中使用的辅助插件，遵循简单实用原则，侧重于 PVE 并且全部开源免费。
-[![Build Status](https://travis-ci.com/tinymins/JX3MY.svg?token=yQdYwdSeW1cRn46LTYo4&branch=master)](https://travis-ci.com/tinymins/JX3MY)
+[![Build Status](https://app.travis-ci.com/tinymins/MY.svg?token=yQdYwdSeW1cRn46LTYo4&branch=master)](https://app.travis-ci.com/github/tinymins/MY)
 
 ## 捐助
 
-<https://jx3.derzh.com/donate/>
+<https://j3cx.com/donate/>
 
-<a href="https://jx3.derzh.com/donate/">![Donate](https://cdn.jsdelivr.net/gh/tinymins/donate@master/combine.jpg)</a>
+<a href="https://j3cx.com/donate/">![Donate](https://cdn.jsdelivr.net/gh/tinymins/donate@master/combine.jpg)</a>
 
 ## 链接
 
-* [科举助手 - 做最全最准确的剑三科举查询利器](https://jx3.derzh.com/exam/)
-* [奇遇查询 - 关注您身边正在发生的一切奇遇事件](https://jx3.derzh.com/serendipity/)
-* [开服记录 - 查询各服务器维护完成开服时间](https://jx3.derzh.com/onlinetime/)
-* [角色字库 - 完整可用的角色名字库](https://jx3.derzh.com/char.txt)
+* [科举助手 - 做最全最准确的剑三科举查询利器](https://j3cx.com/exam/)
+* [奇遇查询 - 关注您身边正在发生的一切奇遇事件](https://j3cx.com/serendipity/)
+* [开服记录 - 查询各服务器维护完成开服时间](https://j3cx.com/onlinetime/)
+* [角色字库 - 完整可用的角色名字库](https://j3cx.com/char.txt)
 
 ## 下载
 
-* 最新版本：[下载地址](https://jx3.derzh.com/down/)
 * 安装方法：在角色登陆页，依次点击`插件管理`,`插件下载`，然后点击`下载`按钮下载各组件。
-* 官方网站：<https://jx3.derzh.com/>
+* 官方网站：<https://j3cx.com/>
 * 更新日志：<https://github.com/tinymins/jx3my/commits/master>
 * 建议&BUG报告：[问题反馈](https://zhaiyiming.com/feedback) [【一名宅。】](https://zhaiyiming.com/archives/jx3-my.html) [【微博留言】](https://weibo.com/zymah)
 
