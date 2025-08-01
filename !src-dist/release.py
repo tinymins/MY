@@ -27,7 +27,9 @@ def __get_release_commit_list() -> List[Dict[str, object]]:
     """
     commit_list: List[Dict[str, object]] = []
     # 执行 git log 命令，根据 'release:' 搜索包含版本信息的 commit
-    output: str = os.popen('git log --grep release: --pretty=format:"%h|%at|%s"').read()
+    output: str = utils.read_popen_output(
+        'git log --grep release: --pretty=format:"%h|%at|%s"'
+    )
     for commit in output.split("\n"):
         try:
             parts = commit.strip().split("|")
@@ -51,7 +53,7 @@ def __get_release_tag_list() -> List[Dict[str, str]]:
     返回字典列表，每个字典包括：版本号 version (str) 及完整标签名 name (str)
     """
     tag_list: List[Dict[str, str]] = []
-    tag_output: str = os.popen("git tag -l").read()
+    tag_output: str = utils.read_popen_output("git tag -l")
     for tag in tag_output.split("\n"):
         tag = tag.strip()
         try:

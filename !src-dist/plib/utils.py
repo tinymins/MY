@@ -6,6 +6,49 @@
 import zlib
 import sys
 from typing import NoReturn
+import subprocess
+
+
+def read_popen_output(command: str) -> str:
+    """
+    执行命令并读取输出。
+
+    参数：
+        command: 要执行的命令字符串
+    返回：
+        命令输出的字符串
+    """
+    try:
+        with subprocess.Popen(
+            command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as process:
+            output, error = process.communicate()
+            if error:
+                raise RuntimeError(f"命令执行错误: {error.decode('utf-8')}")
+            return output.decode("utf-8")
+    except Exception as e:
+        exit_with_message(f"执行命令失败: {e}")
+
+
+def read_file(
+    file_path: str, primary_encoding: str = "gbk", fallback_encoding: str = "utf-8"
+) -> str:
+    """
+    尝试使用主要编码读取文件，如果失败则尝试使用备用编码。
+
+    参数：
+        file_path: 文件路径
+        primary_encoding: 首选编码（默认GBK）
+        fallback_encoding: 备用编码（默认UTF-8）
+    返回：
+        文件内容字符串
+    """
+    try:
+        with open(file_path, "r", encoding=primary_encoding) as f:
+            return f.read()
+    except UnicodeDecodeError:
+        with open(file_path, "r", encoding=fallback_encoding) as f:
+            return f.read()
 
 
 def get_file_crc(file_name: str) -> str:
