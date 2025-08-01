@@ -757,7 +757,7 @@ function D.UpdateShieldStatus()
 	local bShieldedEnterLeaveScene = false
 	if X.IsRestricted('MY_TeamMon.MapRestriction') then
 		-- µØÍ¼ÏÞÖÆÅÐ¶Ï
-		if X.IsInCompetitionMap() then
+		if X.IsInPubgMap() then
 			bShieldedTotal = true
 		end
 		if not X.IsInDungeonMap() then
