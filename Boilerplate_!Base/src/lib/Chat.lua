@@ -22,6 +22,11 @@ function X.GetChatInput()
 	return frame and frame:Lookup('Edit_Input')
 end
 
+function X.GetChatPanel(k)
+	return Station.SearchFrame('ChatPanel' .. k)
+		or Station.SearchFrame('ChatPanel_Normal' .. k)
+end
+
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
 function X.RepeatChatLine(hTime)
@@ -1610,8 +1615,7 @@ end
 
 local HOOKED_UI = setmetatable({}, { __mode = 'k' })
 local function Hook(i)
-	local frame = Station.SearchFrame('ChatPanel' .. i)
-		or Station.SearchFrame('ChatPanel_Normal' .. i)
+	local frame = X.GetChatPanel(i)
 	local h = frame and frame:Lookup('Wnd_Message', 'Handle_Message')
 	if h and not HOOKED_UI[h] then
 		HOOKED_UI[h] = true
@@ -1622,8 +1626,7 @@ end
 X.RegisterEvent('CHAT_PANEL_OPEN', 'ChatPanelHook', function(event) Hook(arg0) end)
 
 local function Unhook(i)
-	local frame = Station.SearchFrame('ChatPanel' .. i)
-		or Station.SearchFrame('ChatPanel_Normal' .. i)
+	local frame = X.GetChatPanel(i)
 	local h = frame and frame:Lookup('Wnd_Message', 'Handle_Message')
 	if h and HOOKED_UI[h] then
 		HOOKED_UI[h] = nil
