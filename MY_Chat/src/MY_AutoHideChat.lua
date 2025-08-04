@@ -193,9 +193,13 @@ end
 
 -- 初始化/生效 设置
 function D.Apply()
-	local shaBack = X.GetChatPanel(1):Lookup('Wnd_Message', 'Shadow_Back')
+	local hFrame = X.GetChatPanel(1)
 	local editInput = X.GetChatInput()
-	if not shaBack or not editInput then
+	if not hFrame or not editInput then
+		return
+	end
+	local shaBack = hFrame:Lookup('Wnd_Message', 'Shadow_Back')
+	if not shaBack then
 		return
 	end
 	if O.bEnable then

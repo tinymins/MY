@@ -84,7 +84,10 @@ function D.ResetMosaics()
 	-- re mosaics
 	D.bForceUpdate = true
 	for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
-		D.Mosaics(X.GetChatPanel(k):Lookup('Wnd_Message', 'Handle_Message'))
+		local hFrame = X.GetChatPanel(k)
+		if hFrame then
+			D.Mosaics(hFrame:Lookup('Wnd_Message', 'Handle_Message'))
+		end
 	end
 	D.bForceUpdate = nil
 	-- hook chat panel

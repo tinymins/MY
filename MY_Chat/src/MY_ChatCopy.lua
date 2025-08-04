@@ -218,7 +218,8 @@ end)
 
 function D.CheckNamelinkEnable()
 	for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
-		local h = X.GetChatPanel(k):Lookup('Wnd_Message', 'Handle_Message')
+		local hFrame = X.GetChatPanel(k)
+		local h = hFrame and hFrame:Lookup('Wnd_Message', 'Handle_Message')
 		if h then
 			D.CheckNamelinkHook(h, 0)
 		end
