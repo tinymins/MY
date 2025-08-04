@@ -1636,17 +1636,16 @@ local function Unhook(i)
 end
 
 local function HookAll()
-	for i = 1, 10 do
-		Hook(i)
+	for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+		Hook(k)
 	end
-	Hook('_Recently')
 end
 X.RegisterInit('LIB#ChatPanelHook', HookAll)
 X.RegisterEvent('CHAT_PANEL_INIT', 'ChatPanelHook', HookAll)
 
 local function UnhookAll()
-	for i = 1, 10 do
-		Unhook(i)
+	for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+		Unhook(k)
 	end
 end
 X.RegisterExit('LIB#ChatPanelHook', UnhookAll)

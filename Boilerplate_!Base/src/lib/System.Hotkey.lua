@@ -199,12 +199,11 @@ if X.PACKET_INFO.DEBUG_LEVEL <= X.DEBUG_LEVEL.DEBUG then
 		'Normal1',
 		'Lowest2',
 	}) do
-		for i = 1, 9 do
-			table.insert(aFrame, v .. '/ChatPanel' .. i)
-			table.insert(aFrame, v .. '/ChatPanel_Normal' .. i)
+		for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+			table.insert(aFrame, v .. '/ChatPanel' .. k)
+			table.insert(aFrame, v .. '/ChatPanel_Normal' .. k)
 		end
 		table.insert(aFrame, v .. '/EditBox')
-		table.insert(aFrame, v .. '/ChatPanel_Recently')
 		table.insert(aFrame, v .. '/' .. X.PACKET_INFO.NAME_SPACE)
 	end
 	X.RegisterHotKey(X.NSFormatString('{$NS}_STAGE_CHAT'), _L['Display only chat panel'], function()
