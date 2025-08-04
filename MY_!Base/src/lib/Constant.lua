@@ -448,6 +448,19 @@ local CONSTANT = {
 		OPEN = 1,
 		CLOSE = 2,
 	}),
+	CHAT_PANEL_INDEX_LIST = X.FreezeTable({
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		8,
+		9,
+		10,
+		'_Recently',
+	}),
 	ITEM_QUALITY = X.FreezeTable({
 		GRAY    = 0, -- »ÒÉ«
 		WHITE   = 1, -- °×É«
