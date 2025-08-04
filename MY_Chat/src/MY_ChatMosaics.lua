@@ -83,8 +83,8 @@ X.RegisterExit('MY_ChatMosaics', D.OnMosaicsDisable)
 function D.ResetMosaics()
 	-- re mosaics
 	D.bForceUpdate = true
-	for i = 1, 10 do
-		D.Mosaics(Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message'))
+	for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+		D.Mosaics(X.GetChatPanel(k):Lookup('Wnd_Message', 'Handle_Message'))
 	end
 	D.bForceUpdate = nil
 	-- hook chat panel

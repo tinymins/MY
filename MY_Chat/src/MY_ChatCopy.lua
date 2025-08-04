@@ -217,9 +217,8 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy__Namelink', function(h, nIndex)
 end)
 
 function D.CheckNamelinkEnable()
-	for i = 1, 10 do
-		local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
-			or Station.Lookup('Normal1/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+	for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+		local h = X.GetChatPanel(k):Lookup('Wnd_Message', 'Handle_Message')
 		if h then
 			D.CheckNamelinkHook(h, 0)
 		end

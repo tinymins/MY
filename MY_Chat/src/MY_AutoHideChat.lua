@@ -42,7 +42,12 @@ local D = {}
 
 -- get sys chat bg alpha
 function D.GetBgAlpha()
-	return Station.Lookup('Lowest2/ChatPanel1'):Lookup('Wnd_Message', 'Shadow_Back'):GetAlpha() / 255
+	for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+		local hFrame = X.GetChatPanel(k)
+		if hFrame then
+			return hFrame:Lookup('Wnd_Message', 'Shadow_Back'):GetAlpha() / 255
+		end
+	end
 end
 
 -- show panel
@@ -66,8 +71,8 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 		return
 	elseif m_nState == STATE.HIDE then
 		-- show each
-		for i = 1, 10 do
-			local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
+		for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+			local hFrame = X.GetChatPanel(k)
 			if hFrame then
 				hFrame:SetMousePenetrable(false)
 			end
@@ -91,8 +96,8 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 		-- calc new alpha
 		local nAlpha = math.min(math.ceil((nFrame - nDelayFrame - nStartFrame) / nShowFrame * (255 - nStartAlpha) + nStartAlpha), 255)
 		-- alpha each panel
-		for i = 1, 10 do
-			local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
+		for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+			local hFrame = X.GetChatPanel(k)
 			if hFrame then
 				hFrame:SetAlpha(nAlpha)
 				hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * D.fAhBgAlpha)
@@ -163,8 +168,8 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 			nAlpha = 255
 		end
 		-- alpha each panel
-		for i = 1, 10 do
-			local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
+		for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+			local hFrame = X.GetChatPanel(k)
 			if hFrame then
 				hFrame:SetAlpha(nAlpha)
 				hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * D.fAhBgAlpha)
@@ -188,7 +193,7 @@ end
 
 -- 初始化/生效 设置
 function D.Apply()
-	local shaBack = Station.Lookup('Lowest2/ChatPanel1/Wnd_Message', 'Shadow_Back')
+	local shaBack = X.GetChatPanel(1):Lookup('Wnd_Message', 'Shadow_Back')
 	local editInput = X.GetChatInput()
 	if not shaBack or not editInput then
 		return

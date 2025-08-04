@@ -342,12 +342,15 @@ local CHANNEL_LIST = {
 		title = _L['CLS'],
 		onClick = function()
 			local function Cls(bAll)
-				for i = 1, 32 do
-					local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
-					local hCheck = Station.Lookup('Lowest2/ChatPanel' .. i .. '/CheckBox_Title')
-					if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
-						h:Clear()
-						h:FormatAllItemPos()
+				for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+					local hFrame = X.GetChatPanel(k)
+					if hFrame then
+						local h = hFrame:Lookup('Wnd_Message', 'Handle_Message')
+						local hCheck = hFrame:Lookup('CheckBox_Title')
+						if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
+							h:Clear()
+							h:FormatAllItemPos()
+						end
 					end
 				end
 			end

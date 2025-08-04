@@ -78,32 +78,28 @@ local D = {
 		'MY_ThreatRank',
 		'MY_Recount_UI',
 	},
-	tLockID = {
-		['JX_TargetList'] = 'JX_TargetList', -- 剑心·焦点列表 [Normal/JX_TargetList]
-		['MY_FocusUI'] = 'MY_FocusUI', -- 茗伊·焦点列表 [Normal/MY_FocusUI]
-		['WhoSeeMe'] = 'WhoSeeMe', -- 谁在看我 [Normal/WhoSeeMe]
-		['HatredPanel'] = 'HatredPanel', -- 仇恨列表 [Normal/HatredPanel]
-		['FightingStatistic'] = 'FightingStatistic', -- 伤害统计 [Normal/FightingStatistic]
-		['MY_ThreatRank'] = 'MY_ThreatRank', -- 茗伊·仇恨统计 [Normal/MY_ThreatRank]
-		['MY_Recount_UI'] = 'MY_Recount_UI', -- 茗伊·伤害统计 [Normal/MY_Recount_UI]
-		['QuestTraceList'] = 'QuestTraceList', -- 任务追踪 [Normal/QuestTraceList]
-		['Matrix'] = 'Matrix', -- 阵法界面 [Normal/Matrix]
-		['ChatPanel1'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel1]
-		['ChatPanel2'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel2]
-		['ChatPanel3'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel3]
-		['ChatPanel4'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel4]
-		['ChatPanel5'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel5]
-		['ChatPanel6'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel6]
-		['ChatPanel7'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel7]
-		['ChatPanel8'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel8]
-		['ChatPanel9'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel9]
-		['ChatPanel10'] = 'ChatPanel', -- 聊天面板 [Lowest2/ChatPanel10]
-		['DynamicActionBar'] = 'DynamicActionBar', -- 动态技能栏 [Lowest1/DynamicActionBar]
-		['ExteriorAction'] = 'ExteriorAction', -- 外装动作 [Normal/ExteriorAction]
-		['MentorMessage'] = 'MentorMessage', -- 师徒提示 [Normal/MentorMessage]
-		['JX_TeamCD'] = 'JX_TeamCD', -- 剑心·团队技能监控 [Normal/JX_TeamCD]
-		['JX_HeightMeter'] = 'JX_HeightMeter', -- 剑心·高度标线 [Normal/JX_HeightMeter]
-	},
+	tLockID = (function()
+		local t = {
+			['JX_TargetList'] = 'JX_TargetList', -- 剑心·焦点列表 [Normal/JX_TargetList]
+			['MY_FocusUI'] = 'MY_FocusUI', -- 茗伊·焦点列表 [Normal/MY_FocusUI]
+			['WhoSeeMe'] = 'WhoSeeMe', -- 谁在看我 [Normal/WhoSeeMe]
+			['HatredPanel'] = 'HatredPanel', -- 仇恨列表 [Normal/HatredPanel]
+			['FightingStatistic'] = 'FightingStatistic', -- 伤害统计 [Normal/FightingStatistic]
+			['MY_ThreatRank'] = 'MY_ThreatRank', -- 茗伊·仇恨统计 [Normal/MY_ThreatRank]
+			['MY_Recount_UI'] = 'MY_Recount_UI', -- 茗伊·伤害统计 [Normal/MY_Recount_UI]
+			['QuestTraceList'] = 'QuestTraceList', -- 任务追踪 [Normal/QuestTraceList]
+			['Matrix'] = 'Matrix', -- 阵法界面 [Normal/Matrix]
+			['DynamicActionBar'] = 'DynamicActionBar', -- 动态技能栏 [Lowest1/DynamicActionBar]
+			['ExteriorAction'] = 'ExteriorAction', -- 外装动作 [Normal/ExteriorAction]
+			['MentorMessage'] = 'MentorMessage', -- 师徒提示 [Normal/MentorMessage]
+			['JX_TeamCD'] = 'JX_TeamCD', -- 剑心·团队技能监控 [Normal/JX_TeamCD]
+			['JX_HeightMeter'] = 'JX_HeightMeter', -- 剑心·高度标线 [Normal/JX_HeightMeter]
+		}
+		for _, k in X.pairs_c(X.CONSTANT.CHAT_PANEL_INDEX_LIST) do
+			t['ChatPanel' .. k] = 'ChatPanel' .. k -- 聊天面板 [Lowest2/ChatPanel1]
+		end
+		return t
+	end)(),
 }
 
 local HOOKED_UI = setmetatable({}, { __mode = 'k' })
