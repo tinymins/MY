@@ -193,29 +193,20 @@ X.RegisterInit(X.NSFormatString('{$NS}#BIND_HOTKEY'), function()
 	end
 end)
 if X.PACKET_INFO.DEBUG_LEVEL <= X.DEBUG_LEVEL.DEBUG then
-	local aFrame = {
-		'Lowest2/ChatPanel1',
-		'Lowest2/ChatPanel2',
-		'Lowest2/ChatPanel3',
-		'Lowest2/ChatPanel4',
-		'Lowest2/ChatPanel5',
-		'Lowest2/ChatPanel6',
-		'Lowest2/ChatPanel7',
-		'Lowest2/ChatPanel8',
-		'Lowest2/ChatPanel9',
-		'Lowest2/EditBox',
-		'Normal1/ChatPanel1',
-		'Normal1/ChatPanel2',
-		'Normal1/ChatPanel3',
-		'Normal1/ChatPanel4',
-		'Normal1/ChatPanel5',
-		'Normal1/ChatPanel6',
-		'Normal1/ChatPanel7',
-		'Normal1/ChatPanel8',
-		'Normal1/ChatPanel9',
-		'Normal1/EditBox',
-		'Normal/' .. X.PACKET_INFO.NAME_SPACE,
-	}
+	local aFrame = {}
+	for _, v in pairs({
+		'Normal',
+		'Normal1',
+		'Lowest2',
+	}) do
+		for i = 1, 9 do
+			table.insert(aFrame, v .. '/ChatPanel' .. i)
+			table.insert(aFrame, v .. '/ChatPanel_Normal' .. i)
+		end
+		table.insert(aFrame, v .. '/EditBox')
+		table.insert(aFrame, v .. '/ChatPanel_Recently')
+		table.insert(aFrame, v .. '/' .. X.PACKET_INFO.NAME_SPACE)
+	end
 	X.RegisterHotKey(X.NSFormatString('{$NS}_STAGE_CHAT'), _L['Display only chat panel'], function()
 		if Station.IsVisible() then
 			for _, v in ipairs(aFrame) do
