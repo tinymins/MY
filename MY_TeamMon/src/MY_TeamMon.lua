@@ -1524,9 +1524,6 @@ end
 function D.OnDoodadEvent(doodad, bEnter)
 	local data = D.GetData('DOODAD', doodad.dwTemplateID)
 	local nTime = GetTime()
-	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and X.IsPlayer(doodad.dwEmployer) and doodad.dwEmployer ~= MY_TEAM_MON_CORE_PLAYERID then
-		return
-	end
 	if bEnter then
 		if not CACHE.DOODAD_LIST[doodad.dwTemplateID] then
 			CACHE.DOODAD_LIST[doodad.dwTemplateID] = {
