@@ -459,6 +459,7 @@ local CONSTANT = {
 		8,
 		9,
 		10,
+		11,
 		'_Recently',
 	}),
 	ITEM_QUALITY = X.FreezeTable({
