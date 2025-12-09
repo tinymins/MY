@@ -108,6 +108,10 @@ local function UpdateTeamMonData()
 							v.nLevel = data.nLevel
 						end
 						v.nIcon = data.nIcon
+						--2025.12.10增加自定义显示名称
+						if v.szDisplayName then
+							v.szDisplayName = X.RenderTemplateString(v.szDisplayName, { sender = '', receiver = '' }, -1, false, false)
+						end
 						table.insert(aBuff, v)
 					end
 				end
