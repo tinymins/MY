@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 插件库自定义函数
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY

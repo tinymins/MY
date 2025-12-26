@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ×ÊÔ´¼à¿Ø
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 if LoadLUAData('interface/DEBUG.jx3dat') and IsLocalFileExist('ui/DEBUG.ini') then
 	Wnd.OpenWindow('ui/DEBUG.ini')

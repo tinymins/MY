@@ -4,7 +4,7 @@
 -- @desc     : 角色属性
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -92,7 +92,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 			return { 255, 255, 255 }
 		end
 		-- 设置基础属性
-		ui:Children('#Image_Kungfu'):Icon((select(2, X.GetSkillName(data.dwMountKungfuID, 1))))
+		ui:Children('#Image_Kungfu'):Icon((select(2, X.GetSkillName(data.dwActualMountKungfuID or data.dwMountKungfuID, 1))))
 		ui:Children('#Text_Name'):Color({ X.GetForceColor(data.dwForceID) })
 		-- 绘制属性条
 		local y0 = 20
@@ -181,8 +181,16 @@ function D.ViewCharInfoToPlayer(dwID)
 	if not nChannel or not szName then
 		X.Alert(_L['Party limit'])
 	else
-		CharInfo.CreateFrame(dwID, szName)
-		X.SendBgMsg(nChannel, 'CHAR_INFO', {'ASK', dwID, X.IsRestricted('MY_CharInfo.Daddy') and 'DEBUG'})
+		local bAcquaintance = X.IsTeammate(dwID) or X.IsFellowship(dwID) or X.IsAuthorPlayer(X.GetClientPlayerID(), X.GetClientPlayerName())
+		local function onAccept()
+			CharInfo.CreateFrame(dwID, szName)
+			X.SendBgMsg(nChannel, 'CHAR_INFO', {'ASK', dwID, X.IsRestricted('MY_CharInfo.Daddy') and 'DEBUG'})
+		end
+		if bAcquaintance then
+			onAccept()
+		else
+			X.Confirm(_L('[%s] will see your detailed character info request, sure to send request?', szName), onAccept)
+		end
 	end
 end
 

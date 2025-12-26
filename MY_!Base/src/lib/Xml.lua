@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : XML ´¦Àíº¯Êý¿â
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 -- Simple JX3 XML decoding and encoding in pure Lua.
 --------------------------------------------------------------------------------

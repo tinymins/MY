@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ”Œœ∑ª∑æ≥ø‚
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -149,6 +149,7 @@ function X.GetTeamMemberInfo(dwID)
 				nCamp = info.nCamp,
 				dwForceID = info.dwForceID,
 				dwKungfuID = info.dwMountKungfuID,
+				dwActualMountKungfuID = info.dwActualMountKungfuID or info.dwMountKungfuID,
 				nMaxLife = info.nMaxLife,
 				nCurrentLife = info.nCurrentLife,
 				nMaxMana = info.nMaxMana,

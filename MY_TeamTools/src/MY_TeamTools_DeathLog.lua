@@ -4,7 +4,7 @@
 -- @desc     : 团队工具 - 重伤记录
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_DeathLog'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -163,15 +163,17 @@ local function OnDeath(dwID, dwKiller)
 					szName = me.szName,
 					dwForceID = me.dwForceID,
 					dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+					dwActualMountKungfuID = UI_GetPlayerMountKungfuID(),
 				}
 			else
 				local team = GetClientTeam()
-				local info = team.GetMemberInfo(dwID)
+				local info = X.GetTeamMemberInfo(dwID)
 				if info then
 					INFO_CACHE[dwID] = {
 						szName = info.szName,
 						dwForceID = info.dwForceID,
-						dwMountKungfuID = info.dwMountKungfuID,
+						dwMountKungfuID = info.dwActualMountKungfuID,
+						dwActualMountKungfuID = info.dwActualMountKungfuID,
 					}
 				end
 			end
@@ -233,7 +235,7 @@ function D.UpdatePage(page)
 		local info = INFO_CACHE[dwID]
 		if info then
 			local h = hDeathList:AppendItemFromData(page.hDeathPlayer, 'Handle_DeathPlayer')
-			local icon = select(2, MY_GetSkillName(info.dwMountKungfuID))
+			local icon = select(2, MY_GetSkillName(info.dwActualMountKungfuID))
 			local szName = info.szName
 			h.dwID = dwID
 			h.szName = szName

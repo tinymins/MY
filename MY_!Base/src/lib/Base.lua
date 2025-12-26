@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 插件命名空间初始化
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 
 -- 游戏语言、游戏运营分支编码、游戏发行版编码、游戏版本号、游戏运行方式
@@ -51,8 +51,8 @@ local CODE_PAGE = {
 }
 
 local _NAME_SPACE_            = 'MY'
-local _BUILD_                 = '20251203'
-local _VERSION_               = '28.0.0'
+local _BUILD_                 = '20251225'
+local _VERSION_               = '28.0.1'
 local _MENU_COLOR_            = {255, 165, 79}
 local _INTERFACE_ROOT_        = 'Interface/'
 local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'

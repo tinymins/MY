@@ -4,7 +4,7 @@
 -- @desc     : 战斗日志 流式保存原始事件数据
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -415,9 +415,9 @@ function D.OnTargetUpdate(dwID, bForce)
 		if dwID == X.GetClientPlayerID() then
 			dwMountKungfuID = UI_GetPlayerMountKungfuID()
 		else
-			local info = GetClientTeam().GetMemberInfo(dwID)
-			if info and not X.IsEmpty(info.dwMountKungfuID) then
-				dwMountKungfuID = info.dwMountKungfuID
+			local info = X.GetTeamMemberInfo(dwID)
+			if info and not X.IsEmpty(info.dwActualMountKungfuID) then
+				dwMountKungfuID = info.dwActualMountKungfuID
 			else
 				local kungfu = player.GetKungfuMount()
 				if kungfu then

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ”Œœ∑ª∑æ≥ø‚
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -142,6 +142,7 @@ function X.GetClientPlayerCharInfo()
 		dwForceID = me.dwForceID,
 		nEquipScore = me.GetTotalEquipScore() or 0,
 		dwMountKungfuID = kungfu and kungfu.dwSkillID or 0,
+		dwActualMountKungfuID = kungfu and kungfu.dwSkillID or 0,
 	}
 	if CharInfoMore_GetShowValue then
 		local aCategory, aContent, tTip = CharInfoMore_GetShowValue()

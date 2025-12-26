@@ -5,7 +5,7 @@
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_PartyBuffList'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -233,11 +233,12 @@ function D.GetPlayer(dwID)
 		player = X.GetClientPlayer()
 		info = {
 			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+			dwActualMountKungfuID = UI_GetPlayerMountKungfuID(),
 			szName = player.szName,
 		}
 	else
 		player = X.GetPlayer(dwID)
-		info = GetClientTeam().GetMemberInfo(dwID)
+		info = X.GetTeamMemberInfo(dwID)
 	end
 	if info then
 		if player then
@@ -284,7 +285,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	if dwTargetID == dwID then
 		h:Lookup('Image_Select'):Show()
 	end
-	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID) or 1435)
+	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
 	h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / math.max(info.fMaxLife64, 1))
 	local box = h:Lookup('Box_Icon')

@@ -6,6 +6,7 @@ return {
 	['Option'] = '設置',
 	['Open Panel'] = '打開界面',
 	['Please unlock talk lock first.'] = '請先解除聊天鎖。',
+	['[%s] will see your detailed character info request, sure to send request?'] = '查看 [%s] 的詳細屬性信息需要對方確認，要繼續發送請求嗎？',
 	['Raid Stat'] = '團隊統計',
 	['Room Stat'] = '房間統計',
 	-- MY_TeamTools_DeathLog

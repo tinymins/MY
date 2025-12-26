@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : BaseXX ´¦ÀíÄ£¿é
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 -- Base64-encoding
 -- Sourced from https://github.com/aiq/basexx/blob/master/lib/basexx.lua

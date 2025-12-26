@@ -4,7 +4,7 @@
 -- @desc     : 目标方位显示
 -- @author   : Webster
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetDirection'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -139,8 +139,8 @@ end
 do
 local function SetObjectAvatar(img, tar, info)
 	if X.IsPlayer(tar.dwID) then
-		if info and info.dwMountKungfuID then
-			img:FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
+		if info and info.dwActualMountKungfuID then
+			img:FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID, 1))
 		else
 			local kungfu = tar.GetKungfuMount and tar.GetKungfuMount()
 			if kungfu and kungfu.dwSkillID ~= 0 then

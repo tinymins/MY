@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 背景通讯处理函数集成
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
@@ -99,22 +99,53 @@ X.RegisterBgMsg('RL', function(_, data, nChannel, dwTalkerID, szTalkerName, bIsS
 end)
 
 -- 查看完整属性
+local CHAR_INFO_BLOCK_LIST = {}
 X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwTalkerID, szTalkerName, bIsSelf)
 	if not bIsSelf and data[2] == X.GetClientPlayerID() then
 		local nReplyChannel = X.IsTeammate(dwTalkerID)
 			and PLAYER_TALK_CHANNEL.RAID
 			or D.GetReplyChannel(nChannel, szTalkerName)
-		if data[1] == 'ASK'  then
-			if not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or data[3] == 'DEBUG' then
+		if data[1] == 'ASK' then
+			local bAcquaintance = X.IsTeammate(dwTalkerID) or X.IsFellowship(dwTalkerID) or X.IsAuthorPlayer(dwTalkerID, szTalkerName)
+			local bDebug = data[3] == 'DEBUG' and bAcquaintance
+			local bConfirm = not bAcquaintance and not bDebug
+			local function fnResolve()
 				local aInfo = X.GetClientPlayerCharInfo()
-				if not X.IsTeammate(dwTalkerID) and not data[3] == 'DEBUG' then
+				if not X.IsTeammate(dwTalkerID) and not bDebug then
 					for _, v in ipairs(aInfo) do
 						v.tip = nil
 					end
 				end
 				X.SendBgMsg(nReplyChannel, 'CHAR_INFO', {'ACCEPT', dwTalkerID, aInfo}, true)
-			else
+			end
+			local function fnReject()
 				X.SendBgMsg(nReplyChannel, 'CHAR_INFO', {'REFUSE', dwTalkerID}, true)
+			end
+			if not CHAR_INFO_BLOCK_LIST[dwTalkerID] and (not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or bDebug) then
+				if bConfirm then
+					X.MessageBox('MY_CharInfo', {
+						szMessage = _L('[%s] wants to see your detailed character info, OK?', szTalkerName),
+						{
+							szOption = g_tStrings.STR_ACCEPT,
+							fnAction = fnResolve,
+						}, {
+							szOption = g_tStrings.STR_REFUSE,
+							fnAction = fnReject,
+						},
+						{
+							szOption = _L('Block'),
+							bCheck = true,
+							fnAction = function()
+								fnReject()
+								CHAR_INFO_BLOCK_LIST[dwTalkerID] = true
+							end,
+						}
+					})
+				else
+					fnResolve()
+				end
+			else
+				fnReject()
 			end
 		end
 	end

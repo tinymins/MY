@@ -4,7 +4,7 @@
 -- @desc     : 仇恨统计
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ThreatRank'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -506,9 +506,9 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
 			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
 			if O.bForceIcon then
-				local info = X.IsTeammate(v.id) and MY_IsPlayer(v.id) and team.GetMemberInfo(v.id)
+				local info = X.IsTeammate(v.id) and MY_IsPlayer(v.id) and X.GetTeamMemberInfo(v.id)
 				if info then
-					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
+					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID, 1))
 				elseif MY_IsPlayer(v.id) then
 					item:Lookup('Image_Icon'):FromUITex(GetForceImage(dwForceID))
 				else

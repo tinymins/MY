@@ -4,7 +4,7 @@
 -- @desc     : 团队面板小队界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
--- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -1120,10 +1120,10 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 	if bIcon then -- 刷新icon
 		local img, bVisible = h:Lookup('Image_Icon'), true
 		if CFG.nShowIcon ~= 4 then
-			if CFG.nShowIcon == 2 and info.dwMountKungfuID == 0 then
+			if CFG.nShowIcon == 2 and info.dwActualMountKungfuID == 0 then
 				img:FromUITex('ui/image/TargetPanel/Target.UITex', 21)
 			elseif CFG.nShowIcon == 2 then
-				local _, nIconID = X.GetSkillName(info.dwMountKungfuID, 1)
+				local _, nIconID = X.GetSkillName(info.dwActualMountKungfuID, 1)
 				if nIconID == 1435 then nIconID = 889 end
 				img:FromIconID(nIconID)
 			elseif CFG.nShowIcon == 1 then
@@ -1186,7 +1186,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		end
 		if CFG.nShowIcon == 4 then
 			local r, g, b = X.GetForceColor(info.dwForceID, 'foreground')
-			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
+			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwActualMountKungfuID])
 			txtSchool:SetFontScheme(CFG.nNameFont)
 			txtSchool:SetFontColor(r, g, b)
 			txtSchool:SetFontScale(fScale)
@@ -2131,7 +2131,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			life:SetFontColor(128, 128, 128)
 			life:SetText(COINSHOP_SOURCE_NULL)
 		end
-		-- if info.dwMountKungfuID == 0 then -- 没有同步成功时显示的内容
+		-- if info.dwActualMountKungfuID == 0 then -- 没有同步成功时显示的内容
 			-- life:SetText('sync ...')
 		-- end
 		h:Lookup('Text_Death'):SetVisible(bDeathFlag)

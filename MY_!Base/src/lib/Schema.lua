@@ -2,7 +2,7 @@
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : LUA SCHEMA ¿â
 -- @ref      : https://github.com/sschoener/lua-schema
--- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+-- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
 ---@class (partial) MY
 local X = MY
