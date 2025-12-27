@@ -7,6 +7,7 @@ return {
 	PLUGIN_AUTHOR_SIGNATURE    = '茗伊 @梦江南',
 
 	['%s, welcome to use %s!'] = '欢迎%s使用%s！',
+	['welcome from %s server %s camp %s tong %s warrior to use %s!'] = '欢迎%s服务器%s阵营%s帮会%s侠士使用%s！',
 	['Author @%s'] = '作者 @%s',
 	['[Author]'] = '〔插件君〕',
 	['[Fake author]'] = '〔该玩家非插件君，注意谨防上当受骗〕',

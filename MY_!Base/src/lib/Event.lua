@@ -318,7 +318,8 @@ X.RegisterEvent('LOADING_ENDING', function()
 	INIT_EVENT = nil
 	-- œ‘ æª∂”≠–≈œ¢
 	X.OutputSystemMessage(_L('%s, welcome to use %s!', X.GetClientPlayerName(), X.PACKET_INFO.NAME)
-		.. _L(' v%s Build %s', X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
+	 	.. _L(' v%s Build %s', X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
+	X.OutputSystemMessage(_L('welcome from %s server %s camp %s tong %s warrior to use %s!', X.GetServerOriginName(), g_tStrings.STR_CAMP_TITLE[X.GetClientPlayer().nCamp or 0], X.GetClientPlayerTongName(-1), X.GetClientPlayerName(), X.PACKET_INFO.NAME))
 end)
 
 function X.RegisterInit(...)
