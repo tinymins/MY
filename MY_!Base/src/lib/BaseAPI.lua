@@ -301,6 +301,36 @@ function X.GetClientPlayerName()
 end
 end
 
+-- 获取阵营名称
+---@param nCamp number @阵营ID
+---@return string @阵营名称
+function X.GetCampName(nCamp)
+	local szCamp = ''
+	if X.IsNumber(nCamp) and nCamp >= 0 then
+		szCamp = g_tStrings.STR_CAMP_TITLE[nCamp]
+	end
+	return szCamp
+end
+
+---获取玩家自身阵营名称
+---@return string @玩家的自身阵营名称
+function X.GetClientPlayerCampName()
+	local PLAYER_Camp = ''
+	PLAYER_Camp = X.GetCampName(X.GetClientPlayer().nCamp)
+	return PLAYER_Camp
+end
+
+---获取目标玩家阵营名称
+---@return string @目标玩家的阵营名称
+function X.GetPlayerCampName(dwID)
+	local PLAYER_Camp = ''
+	local tar = X.GetTargetHandle(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID)
+	if tar then
+		PLAYER_Camp = X.GetCampName(tar.nCamp)
+	end
+	return PLAYER_Camp
+end
+
 -- 获取好友卡片管理器对象
 ---@return userdata | nil @好友卡片管理器对象，获取失败返回空
 function X.GetFellowshipCardClient()
