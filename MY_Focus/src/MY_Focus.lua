@@ -851,6 +851,7 @@ function D.GetDisplayList()
 	local t = {}
 	local me = X.GetClientPlayer()
 	if not D.IsShielded() and me then
+		local tRemoveFocusList = {}
 		for _, p in ipairs(FOCUS_LIST) do
 			if #t >= O.nMaxDisplay then
 				break
@@ -911,8 +912,21 @@ function D.GetDisplayList()
 						szVia = szVia,
 						bDeletable = bDeletable,
 					}, { __index = p }))
+				else
+					-- 不符合显示条件则记录到移除表
+					tRemoveFocusList[p.dwType .. '_' .. p.dwID] = true
 				end
 			end
+		end
+		-- 清理不符合显示条件的焦点并刷新事件
+		if next(tRemoveFocusList) then
+			for i = #FOCUS_LIST, 1, -1 do
+				local q = FOCUS_LIST[i]
+				if tRemoveFocusList[q.dwType .. '_' .. q.dwID] then
+					table.remove(FOCUS_LIST, i)
+				end
+			end
+			FireUIEvent('MY_FOCUS_UPDATE')
 		end
 	end
 	return t
