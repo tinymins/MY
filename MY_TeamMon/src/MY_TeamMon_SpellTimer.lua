@@ -82,11 +82,11 @@ do
 end
 
 -- 解析分段倒计时
-local function ParseCountdown(szCountdown, szSender, szReceiver)
+local function ParseCountdown(szCountdown, szSender, szReceiver, aBackreferences)
 	local aCountdown = MY_TeamMon.ParseCountdown(szCountdown)
 	if X.IsTable(aCountdown) then
 		for _, v in ipairs(aCountdown) do
-			v.szContent = FilterCustomText(v.szContent, szSender, szReceiver)
+			v.szContent = FilterCustomText(v.szContent, szSender, szReceiver, aBackreferences)
 		end
 	end
 	return aCountdown
@@ -104,7 +104,7 @@ end
 -- }
 -- 例子：FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', 0, 'test', { nTime = '5,test;15,测试;25,c', szName = 'demo' })
 -- 性能测试：for i = 1, 200 do FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', 0, i, { nTime = Random(5, 15), nIcon = i }) end
-local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
+local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 	assert(type(tParam) == 'table', 'CreateCountdown failed!')
 	local tTime = {}
 	local nTime = GetTime()
@@ -114,7 +114,7 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 			szContent = tParam.szContent,
 		}
 	elseif X.IsString(tParam.nTime) then
-		local aCountdown = ParseCountdown(tParam.nTime, szSender, szReceiver)
+		local aCountdown = ParseCountdown(tParam.nTime, szSender, szReceiver, aBackreferences)
 		if aCountdown then
 			tTime = aCountdown[1]
 			tParam.nTime = aCountdown
@@ -177,7 +177,7 @@ end
 
 function D.OnEvent(szEvent)
 	if szEvent == 'MY_TEAM_MON__SPELL_TIMER__CREATE' then
-		CreateCountdown(arg0, arg1, arg2, arg3, arg4)
+		CreateCountdown(arg0, arg1, arg2, arg3, arg4, arg5)
 	elseif szEvent == 'MY_TEAM_MON__SPELL_TIMER__DEL' then
 		local ui = ST_CACHE[arg0][arg1]
 		if ui and ui:IsValid() then

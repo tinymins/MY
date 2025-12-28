@@ -1031,18 +1031,18 @@ function D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 					bTalk     = v.bTeamChannel,
 					bHold     = v.bHold,
 				}
-				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
+				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 			end
 		end
 	end
 end
 
 -- 发布事件 为了方便日后修改 集中起来
-function D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
+function D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 	if not O.bPushTeamChannel then
 		tParam.bTalk = false
 	end
-	FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', nType, szKey, tParam, szSender, szReceiver)
+	FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 end
 
 function D.GetSrcName(dwID)
