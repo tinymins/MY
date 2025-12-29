@@ -322,6 +322,20 @@ function X.IsInStarveMap()
 	return me and X.IsStarveMap(me.GetMapID())
 end
 
+---判断地图是不是据点攻防地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是据点攻防地图
+function X.IsStrongholdMap(dwMapID)
+	return X.CONSTANT.STRONGHOLD_MAP[dwMapID] or false
+end
+
+---判断当前地图是不是据点攻防地图
+---@return boolean @当前地图是否是据点攻防地图
+function X.IsInStrongholdMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsStrongholdMap(me.GetMapID())
+end
+
 ---判断地图是不是家园地图
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是家园地图

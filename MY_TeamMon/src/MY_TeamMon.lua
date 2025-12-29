@@ -81,6 +81,7 @@ local MY_TEAM_MON_SPECIAL_MAP = {
 	COMPETITION     = -17, -- 竞技
 	GUILD_TERRITORY = -18, -- 帮会领地
 	CAMP            = -19, -- 阵营地图
+	STRONGHOLD      = -20, -- 据点地图
 	RECYCLE_BIN     =  -9, -- 回收站
 }
 local MY_TEAM_MON_SPECIAL_MAP_NAME = {
@@ -102,6 +103,7 @@ local MY_TEAM_MON_SPECIAL_MAP_NAME = {
 	[MY_TEAM_MON_SPECIAL_MAP.ROGUELIKE      ] = _L['Roguelike data'],
 	[MY_TEAM_MON_SPECIAL_MAP.COMPETITION    ] = _L['Competition data'],
 	[MY_TEAM_MON_SPECIAL_MAP.CAMP           ] = _L['Camp data'],
+	[MY_TEAM_MON_SPECIAL_MAP.STRONGHOLD     ] = _L['Stronghold data'],
 	[MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN    ] = _L['Recycle bin data'],
 }
 local MY_TEAM_MON_SPECIAL_MAP_INFO = {}
@@ -2283,6 +2285,9 @@ function D.IterTable(data, dwMapID, bIterItem, bReverse)
 		end
 		if X.IsCampMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.CAMP])
+		end
+		if X.IsStrongholdMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.STRONGHOLD])
 		end
 		if X.IsStarveMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.STARVE])

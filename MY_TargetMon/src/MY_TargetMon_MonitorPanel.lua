@@ -415,6 +415,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				MY_TARGET_MON_MAP_TYPE.GUILD_TERRITORY, -- 帮会领地
 				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- 八荒衡鉴
 				MY_TARGET_MON_MAP_TYPE.CAMP, -- 阵营地图
+				MY_TARGET_MON_MAP_TYPE.STRONGHOLD, -- 据点地图
 			}) do
 				table.insert(t1, {
 					szOption = MY_TARGET_MON_MAP_TYPE_NAME[eMapType],

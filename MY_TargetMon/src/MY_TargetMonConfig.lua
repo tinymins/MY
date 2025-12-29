@@ -71,6 +71,7 @@ local MY_TARGET_MON_MAP_TYPE = {
 	COMPETITION     = -17, -- 竞技
 	GUILD_TERRITORY = -18, -- 帮会领地
 	CAMP            = -19, -- 阵营地图
+	STRONGHOLD      = -20, -- 据点地图
 	RECYCLE_BIN     =  -9, -- 回收站
 }
 local MY_TARGET_MON_MAP_TYPE_NAME = {
@@ -92,6 +93,7 @@ local MY_TARGET_MON_MAP_TYPE_NAME = {
 	[MY_TARGET_MON_MAP_TYPE.ROGUELIKE      ] = _L['Roguelike map'],
 	[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] = _L['Competition map'],
 	[MY_TARGET_MON_MAP_TYPE.CAMP           ] = _L['Camp map'],
+	[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] = _L['Stronghold map'],
 	[MY_TARGET_MON_MAP_TYPE.RECYCLE_BIN    ] = _L['Recycle bin map'],
 }
 
