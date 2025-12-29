@@ -477,6 +477,18 @@ local CONSTANT = {
 		SKINNING = 3, -- 庖丁
 		READING = 8, -- 阅读
 	},
+	CITY_MAP = {
+		[6]   = true, -- 扬州
+		[8]   = true, -- 洛阳
+		[15]  = true, -- 长安
+		[108] = true, -- 成都
+		[151] = true, -- 洛阳·战乱
+		[156] = true, -- 长安·战乱
+		[172] = true, -- 长安城
+		[194] = true, -- 太原
+		[239] = true, -- 洛阳城
+		[332] = true, -- 侠客岛
+	},
 	MOBA_MAP = {
 		[412] = true, -- 列星岛
 	},

@@ -186,11 +186,18 @@ end
 ---判断一个地图是不是主城地图
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是主城地图
+do
+local CITY_MAP = X.CONSTANT.CITY_MAP or {}
 function X.IsCityMap(dwMapID)
-	local tType = Table_GetMapType(dwMapID)
-	return tType and tType.CITY and true or false
+	if CITY_MAP[dwMapID] ~= nil then
+		return CITY_MAP[dwMapID]
+	else
+		local tType = Table_GetMapType(dwMapID)
+		CITY_MAP[dwMapID] = tType and tType.CITY and true or false
+		return CITY_MAP[dwMapID]
+	end
 end
-
+end
 ---判断当前地图是不是主城地图
 ---@return boolean @当前地图是否是主城地图
 function X.IsInCityMap()
