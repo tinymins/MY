@@ -1,7 +1,8 @@
 return {
 	['[%s] wants to get your location, would you like to share?'] = '[%s] 希望取得你当前所在地图位置，你是否愿意共享当前位置信息？',
 	['Block'] = '屏蔽他',
-	['[%s] wants to see your detailed character info, OK?'] = '[%s] 想查看您的详细角色属性信息，是否告知？',
+	['[%s] wants to see your detailed character info, OK?'] = '[%s] 想查看您的详细角色属性信息，是否允许？',
+	['[%s] refused to share detailed character info with you.'] = '[%s] 拒绝向您共享详细角色属性信息。',
 	['[%s] want to see your info, OK?'] = '团长 [%s] 想知晓您的装备、心法，是否告知？',
 	['I\'ve installed %s v%s'] = '我已安装%s v%s。',
 }

@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.zhaiyiming.com/
--- @desc     : Ä¿±ê¼à¿Ø¼à¿ØÏîÅäÖÃ
--- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @desc     : ç›®æ ‡ç›‘æ§ç›‘æ§é¡¹é…ç½®
+-- @author   : èŒ—ä¼Š @åŒæ¢¦é•‡ @è¿½é£è¹‘å½±
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
 -- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 
 	local nDeltaY = 28
 
-	-- Í¼±ê
+	-- å›¾æ ‡
 	uiWnd:Append('Box', {
 		x = (nW - 50) / 2, y = nY, w = 50, h = 50, icon = mon.nIconID or MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID,
 		onHover = function(bHover) this:SetObjectMouseOver(bHover) end,
@@ -98,14 +98,14 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	})
 	nY = nY + 40
 
-	-- Í¨ÓÃ
+	-- é€šç”¨
 	nX = nPaddingX
 	nX = nX + uiWnd:Append('Text', {
 		x = nX, y = nY - 3, w = 'auto',
 		r = 255, g = 255, b = 0,
 		text = _L['Monitor Common Config'],
 	}):Width() + 5
-	-- ÆôÓÃ
+	-- å¯ç”¨
 	nX = nX + uiWnd:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Monitor Enable'],
@@ -134,7 +134,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			end
 		end,
 	}):Width() + 5
-	-- µÈ¼¶
+	-- ç­‰çº§
 	nX = nX + uiWnd:Append('Text', {
 		x = nX, y = nY - 3, w = 'auto',
 		text = _L['Monitor Level'],
@@ -150,7 +150,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			end
 		end,
 	}):Width() + 5
-	-- ²ãÊı
+	-- å±‚æ•°
 	if dataset.szType == 'BUFF' then
 		nX = nX + uiWnd:Append('Text', {
 			x = nX, y = nY - 3, w = 'auto',
@@ -195,7 +195,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	end
 	nY = nY + nDeltaY
 
-	-- ±¸×¢Ãû³Æ
+	-- å¤‡æ³¨åç§°
 	nX = nPaddingX + 20
 	nX = nX + uiWnd:Append('Text', {
 		x = nX, y = nY - 3, w = 'auto',
@@ -211,7 +211,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nY = nY + nDeltaY
 
-	-- ÌáÊ¾ÄÚÈİ
+	-- æç¤ºå†…å®¹
 	nX = nPaddingX + 20
 	nX = nX + uiWnd:Append('Text', {
 		x = nX, y = nY - 3, w = 'auto',
@@ -243,7 +243,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nY = nY + nDeltaY
 
-	-- ÌáÊ¾ÄÚÈİ
+	-- æç¤ºå†…å®¹
 	nX = nPaddingX + 20
 	nX = nX + uiWnd:Append('Text', {
 		x = nX, y = nY - 3, w = 'auto',
@@ -266,7 +266,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nY = nY + nDeltaY
 
-	-- Ìõ¼ş
+	-- æ¡ä»¶
 	nX = nPaddingX
 	nY = nY + 10
 	nX = nX + uiWnd:Append('Text', {
@@ -276,7 +276,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nY = nY + nDeltaY
 
-	-- ×ÔÉíĞÄ·¨
+	-- è‡ªèº«å¿ƒæ³•
 	nX = nPaddingX + 20
 	nX = nX + uiWnd:Append('WndComboBox', {
 		w = 'auto', h = 25, text = _L['Monitor Self Kungfu Requirement'],
@@ -319,7 +319,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		end,
 	}):Width() + 5
 
-	-- Ä¿±êĞÄ·¨
+	-- ç›®æ ‡å¿ƒæ³•
 	nX = nX + uiWnd:Append('WndComboBox', {
 		w = 'auto', h = 25, text = _L['Monitor Target Kungfu Requirement'],
 		x = nX, y = nY,
@@ -375,7 +375,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		end,
 	}):Width() + 5
 
-	-- µØÍ¼ÒªÇó
+	-- åœ°å›¾è¦æ±‚
 	nX = nX + uiWnd:Append('WndComboBox', {
 		w = 'auto', h = 25, text = _L['Monitor Map Requirement'],
 		x = nX, y = nY,
@@ -398,24 +398,25 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				fnDisable = function() return X.IsEmpty(mon.tMap) or mon.tMap.bAll end,
 			}
 			for _, eMapType in ipairs({
-				MY_TARGET_MON_MAP_TYPE.CITY, -- Ö÷³Ç
-				MY_TARGET_MON_MAP_TYPE.VILLAGE, -- Ò°Íâ
-				MY_TARGET_MON_MAP_TYPE.DUNGEON, -- ÃØ¾³
-				MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON, -- Ğ¡¶ÓÃØ¾³
-				MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON, -- ÍÅ¶ÓÃØ¾³
-				MY_TARGET_MON_MAP_TYPE.COMPETITION, -- ¾º¼¼
-				MY_TARGET_MON_MAP_TYPE.STARVE, -- ÀË¿ÍĞĞ
-				MY_TARGET_MON_MAP_TYPE.ARENA, -- Ãû½£´ó»á
-				MY_TARGET_MON_MAP_TYPE.BATTLEFIELD, -- Õ½³¡
-				MY_TARGET_MON_MAP_TYPE.PUBG, -- ¾ø¾³Õ½³¡
-				MY_TARGET_MON_MAP_TYPE.ZOMBIE, -- Àî¶É¹íÓò
-				MY_TARGET_MON_MAP_TYPE.MONSTER, -- °ÙÕ½
-				MY_TARGET_MON_MAP_TYPE.MOBA, -- ÁĞĞÇĞé¾³
-				MY_TARGET_MON_MAP_TYPE.HOMELAND, -- ¼ÒÔ°
-				MY_TARGET_MON_MAP_TYPE.GUILD_TERRITORY, -- °ï»áÁìµØ
-				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- °Ë»Äºâ¼ø
-				MY_TARGET_MON_MAP_TYPE.CAMP, -- ÕóÓªµØÍ¼
-				MY_TARGET_MON_MAP_TYPE.STRONGHOLD, -- ¾İµãµØÍ¼
+				MY_TARGET_MON_MAP_TYPE.CITY, -- ä¸»åŸ
+				MY_TARGET_MON_MAP_TYPE.VILLAGE, -- é‡å¤–
+				MY_TARGET_MON_MAP_TYPE.DUNGEON, -- ç§˜å¢ƒ
+				MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON, -- å°é˜Ÿç§˜å¢ƒ
+				MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON, -- å›¢é˜Ÿç§˜å¢ƒ
+				MY_TARGET_MON_MAP_TYPE.COMPETITION, -- ç«æŠ€
+				MY_TARGET_MON_MAP_TYPE.STARVE, -- æµªå®¢è¡Œ
+				MY_TARGET_MON_MAP_TYPE.ARENA, -- åå‰‘å¤§ä¼š
+				MY_TARGET_MON_MAP_TYPE.BATTLEFIELD, -- æˆ˜åœº
+				MY_TARGET_MON_MAP_TYPE.PUBG, -- ç»å¢ƒæˆ˜åœº
+				MY_TARGET_MON_MAP_TYPE.ZOMBIE, -- ææ¸¡é¬¼åŸŸ
+				MY_TARGET_MON_MAP_TYPE.MONSTER, -- ç™¾æˆ˜
+				MY_TARGET_MON_MAP_TYPE.MOBA, -- åˆ—æ˜Ÿè™šå¢ƒ
+				MY_TARGET_MON_MAP_TYPE.HOMELAND, -- å®¶å›­
+				MY_TARGET_MON_MAP_TYPE.GUILD_TERRITORY, -- å¸®ä¼šé¢†åœ°
+				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- å…«è’è¡¡é‰´
+				MY_TARGET_MON_MAP_TYPE.CAMP, -- é˜µè¥åœ°å›¾
+				MY_TARGET_MON_MAP_TYPE.STRONGHOLD, -- æ®ç‚¹åœ°å›¾
+				MY_TARGET_MON_MAP_TYPE.SCHOOL, -- é—¨æ´¾åœ°å›¾
 			}) do
 				table.insert(t1, {
 					szOption = MY_TARGET_MON_MAP_TYPE_NAME[eMapType],
@@ -448,7 +449,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		end,
 	}):Width() + 5
 
-	-- Òş²ØÏûÊ§µÄ
+	-- éšè—æ¶ˆå¤±çš„
 	nX = nX + uiWnd:Append('WndCheckBox', {
 		w = 'auto', h = 25, text = dataset.bHideVoid and _L['Monitor Show Even Void'] or _L['Monitor Hide If Void'],
 		x = nX, y = nY,
@@ -459,7 +460,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		end,
 	}):Width() + 5
 
-	-- Òş²ØËûÈËµÄ
+	-- éšè—ä»–äººçš„
 	if dataset.szType == 'BUFF' then
 		nX = nX + uiWnd:Append('WndCheckBox', {
 			w = 'auto', h = 25, text = dataset.bHideOthers and _L['Monitor Show Even Others'] or _L['Monitor Hide If Others'],
@@ -474,7 +475,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 
 	nY = nY + nDeltaY
 
-	-- Ğ§¹û
+	-- æ•ˆæœ
 	nX = nPaddingX
 	nY = nY + 10
 	nX = nX + uiWnd:Append('Text', {
@@ -484,7 +485,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nY = nY + nDeltaY
 
-	-- ³öÏÖÉùÒô
+	-- å‡ºç°å£°éŸ³
 	nX = nPaddingX + 20
 	nX = nX + uiWnd:Append('WndComboBox', {
 		w = 'auto', h = 25, text = _L['Monitor Play Sound When Appear'],
@@ -513,7 +514,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		end,
 	}):Width() + 5
 
-	-- ÏûÊ§ÉùÒô
+	-- æ¶ˆå¤±å£°éŸ³
 	nX = nX + uiWnd:Append('WndComboBox', {
 		w = 'auto', h = 25, text = _L['Monitor Play Sound When Disappear'],
 		x = nX, y = nY,
@@ -541,7 +542,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		end,
 	}):Width() + 5
 
-	-- ÏÔÊ¾ÌØĞ§¿ò
+	-- æ˜¾ç¤ºç‰¹æ•ˆæ¡†
 	nX = nX + uiWnd:Append('WndComboBox', {
 		w = 'auto', h = 25, text = _L['Monitor Active Extent Animate'],
 		x = nX, y = nY,
@@ -619,7 +620,7 @@ function D.OnFrameBreathe()
 end
 
 --------------------------------------------------------------------------------
--- È«¾Öµ¼³ö
+-- å…¨å±€å¯¼å‡º
 --------------------------------------------------------------------------------
 do
 local settings = {

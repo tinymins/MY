@@ -110,6 +110,9 @@ X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwTalkerID, szTalkerNam
 			local bDebug = data[3] == 'DEBUG' and bAcquaintance
 			local bConfirm = not bAcquaintance and not bDebug
 			local function fnResolve()
+				--[[#DEBUG BEGIN]]
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'CHAR_INFO request from ' .. szTalkerName .. ' (' .. dwTalkerID .. ') accepted, sending info.', X.DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
 				local aInfo = X.GetClientPlayerCharInfo()
 				if not X.IsTeammate(dwTalkerID) and not bDebug then
 					for _, v in ipairs(aInfo) do
@@ -121,32 +124,45 @@ X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwTalkerID, szTalkerNam
 			local function fnReject()
 				X.SendBgMsg(nReplyChannel, 'CHAR_INFO', {'REFUSE', dwTalkerID}, true)
 			end
+			--[[#DEBUG BEGIN]]
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'CHAR_INFO request from ' .. szTalkerName .. ' (' .. dwTalkerID .. '), ' .. (bConfirm and 'confirm' or 'no confirm') .. ' required', X.DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			if not CHAR_INFO_BLOCK_LIST[dwTalkerID] and (not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or bDebug) then
 				if bConfirm then
-					X.MessageBox('MY_CharInfo', {
-						szMessage = _L('[%s] wants to see your detailed character info, OK?', szTalkerName),
-						{
-							szOption = g_tStrings.STR_ACCEPT,
-							fnAction = fnResolve,
-						}, {
-							szOption = g_tStrings.STR_REFUSE,
-							fnAction = fnReject,
-						},
-						{
-							szOption = _L('Block'),
-							bCheck = true,
-							fnAction = function()
-								fnReject()
-								CHAR_INFO_BLOCK_LIST[dwTalkerID] = true
-							end,
-						}
-					})
+					X.PeekOtherPlayerByID(dwTalkerID, function (dwID, eState, kPlayer)
+						if not kPlayer or kPlayer.nLevel ~= X.CONSTANT.MAX_PLAYER_LEVEL then
+							--[[#DEBUG BEGIN]]
+							X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'CHAR_INFO request from ' .. szTalkerName .. ' (' .. dwTalkerID .. ') rejected due to not max level.', X.DEBUG_LEVEL.LOG)
+							--[[#DEBUG END]]
+							return
+						end
+						X.MessageBox('MY_CharInfo', {
+							szMessage = _L('[%s] wants to see your detailed character info, OK?', szTalkerName),
+							{
+								szOption = g_tStrings.STR_ACCEPT,
+								fnAction = fnResolve,
+							}, {
+								szOption = g_tStrings.STR_REFUSE,
+								fnAction = fnReject,
+							},
+							{
+								szOption = _L('Block'),
+								bCheck = true,
+								fnAction = function()
+									fnReject()
+									CHAR_INFO_BLOCK_LIST[dwTalkerID] = true
+								end,
+							}
+						})
+					end)
 				else
 					fnResolve()
 				end
 			else
 				fnReject()
 			end
+		elseif data[1] == 'REFUSE' and data[2] == X.GetClientPlayerID() then
+			X.OutputSystemAnnounceMessage(_L('[%s] refused to share detailed character info with you.', szTalkerName))
 		end
 	end
 end)

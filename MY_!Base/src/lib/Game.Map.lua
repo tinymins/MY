@@ -198,6 +198,20 @@ function X.IsInCityMap()
 	return me and X.IsCityMap(me.GetMapID())
 end
 
+---判断一个地图是不是门派地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是门派地图
+function X.IsSchoolMap(dwMapID)
+	return X.CONSTANT.SCHOOL_MAP[dwMapID] or false
+end
+
+---判断当前地图是不是门派地图
+---@return boolean @当前地图是否是门派地图
+function X.IsInSchoolMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsSchoolMap(me.GetMapID())
+end
+
 ---判断一个地图是不是野外地图
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是野外地图

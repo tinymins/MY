@@ -1168,6 +1168,10 @@ function D.OnLButtonClick()
 		menu.x, menu.y = nX, nY
 		PopupMenu(menu)
 	elseif szName == 'WndButton_WorldMark' then
+		if IsCtrlKeyDown() and MY_YunWorldMark then
+			MY_YunWorldMark.OpenPanel()
+			return
+		end
 		local me  = X.GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nMapType = select(2, GetMapParams(dwMapID))

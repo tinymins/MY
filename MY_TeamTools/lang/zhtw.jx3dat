@@ -121,6 +121,7 @@ return {
 	['Asking...'] = '正在徵詢對方意見\n如果長時間未響應可能是對方沒有安裝插件。',
 	['Syncing: %.2f%%.'] = '正在同步數據(%.2f%%)...',
 	['Refuse request'] = '對方拒絕了您的請求！',
+	['Only max level can use this feature.'] = '只有滿級角色才能使用該功能。',
 	['Party limit'] = '必須和對方組隊',
 
 	-- MY_RoomRequest
@@ -276,4 +277,21 @@ return {
     ['Min fight time'] = '最小戰鬥時間限制',
     ['%s second(s)'] = '%s秒',
 	['Show data files'] = '打開數據所在目錄',
+
+	-- MY_YunWorldMark.lua
+	['MY_YunWorldMark'] = '雲世界標記',
+	['World mark'] = '世界標記',
+	['Get current mark data'] = '獲取當前標記數據',
+	['Restore world mark position'] = '恢復世界標記位置',
+	['Please input world mark json:'] = '請輸入世界標記 JSON：',
+	['Search MY cloud world mark'] = '搜索茗伊雲端標記',
+	['Author'] = '作者',
+	['Update time'] = '更新時間',
+	['Use'] = '使用',
+	['Fetch repo meta list failed.'] = '獲取倉庫列表失敗。',
+	['Decode %s failed!'] = '解碼%s失敗！',
+	['Done, %s marks applied.'] = '完成，已應用%s個標點。',
+	['Failed.'] = '失敗。',
+	['Only team marker can do this.'] = '僅團隊標記者可進行該操作。',
+	['About to clear all current world marks and set %d new world marks, continue?'] = '即將清空當前所有世界標記，並設置新的%d個世界標記，是否繼續？',
 }

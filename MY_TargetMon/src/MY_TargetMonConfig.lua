@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.zhaiyiming.com/
--- @desc     : Ä¿±ê¼à¿ØÅäÖÃÏà¹Ø
--- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @desc     : ç›®æ ‡ç›‘æ§é…ç½®ç›¸å…³
+-- @author   : èŒ—ä¼Š @åŒæ¢¦é•‡ @è¿½é£è¹‘å½±
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
 -- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
@@ -53,26 +53,27 @@ local REMOTE_DATA_ROOT = X.FormatPath({'userdata/target_mon/remote/', X.PATH_TYP
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local DEFAULT_MONITOR_ICON_ID = 572
 local MY_TARGET_MON_MAP_TYPE = {
-	COMMON          =  -1, -- Í¨ÓÃ
-	CITY            =  -2, -- Ö÷³Ç
-	DUNGEON         =  -3, -- ÃØ¾³
-	TEAM_DUNGEON    =  -4, -- Ğ¡¶ÓÃØ¾³
-	RAID_DUNGEON    =  -5, -- ÍÅ¶ÓÃØ¾³
-	STARVE          =  -6, -- ÀË¿ÍĞĞ
-	VILLAGE         =  -7, -- Ò°Íâ
-	ARENA           =  -8, -- Ãû½£´ó»á
-	BATTLEFIELD     = -10, -- Õ½³¡
-	PUBG            = -11, -- ¾ø¾³Õ½³¡
-	ZOMBIE          = -12, -- Àî¶É¹íÓò
-	MONSTER         = -13, -- °ÙÕ½
-	MOBA            = -14, -- ÁĞĞÇĞé¾³
-	HOMELAND        = -15, -- ¼ÒÔ°
-	ROGUELIKE       = -16, -- °Ë»Äºâ¼ø
-	COMPETITION     = -17, -- ¾º¼¼
-	GUILD_TERRITORY = -18, -- °ï»áÁìµØ
-	CAMP            = -19, -- ÕóÓªµØÍ¼
-	STRONGHOLD      = -20, -- ¾İµãµØÍ¼
-	RECYCLE_BIN     =  -9, -- »ØÊÕÕ¾
+	COMMON          =  -1, -- é€šç”¨
+	CITY            =  -2, -- ä¸»åŸ
+	DUNGEON         =  -3, -- ç§˜å¢ƒ
+	TEAM_DUNGEON    =  -4, -- å°é˜Ÿç§˜å¢ƒ
+	RAID_DUNGEON    =  -5, -- å›¢é˜Ÿç§˜å¢ƒ
+	STARVE          =  -6, -- æµªå®¢è¡Œ
+	VILLAGE         =  -7, -- é‡å¤–
+	ARENA           =  -8, -- åå‰‘å¤§ä¼š
+	BATTLEFIELD     = -10, -- æˆ˜åœº
+	PUBG            = -11, -- ç»å¢ƒæˆ˜åœº
+	ZOMBIE          = -12, -- ææ¸¡é¬¼åŸŸ
+	MONSTER         = -13, -- ç™¾æˆ˜
+	MOBA            = -14, -- åˆ—æ˜Ÿè™šå¢ƒ
+	HOMELAND        = -15, -- å®¶å›­
+	ROGUELIKE       = -16, -- å…«è’è¡¡é‰´
+	COMPETITION     = -17, -- ç«æŠ€
+	GUILD_TERRITORY = -18, -- å¸®ä¼šé¢†åœ°
+	CAMP            = -19, -- é˜µè¥åœ°å›¾
+	STRONGHOLD      = -20, -- æ®ç‚¹åœ°å›¾
+	SCHOOL          = -21, -- é—¨æ´¾åœ°å›¾
+	RECYCLE_BIN     =  -9, -- å›æ”¶ç«™
 }
 local MY_TARGET_MON_MAP_TYPE_NAME = {
 	[MY_TARGET_MON_MAP_TYPE.COMMON         ] = _L['Common map'],
@@ -94,6 +95,7 @@ local MY_TARGET_MON_MAP_TYPE_NAME = {
 	[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] = _L['Competition map'],
 	[MY_TARGET_MON_MAP_TYPE.CAMP           ] = _L['Camp map'],
 	[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] = _L['Stronghold map'],
+	[MY_TARGET_MON_MAP_TYPE.SCHOOL         ] = _L['School map'],
 	[MY_TARGET_MON_MAP_TYPE.RECYCLE_BIN    ] = _L['Recycle bin map'],
 }
 
@@ -116,14 +118,14 @@ function D.GetDatasetTitle(dataset)
 end
 
 function D.AncientPatchToDataset(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH)
-	-- ´¦ÀíÓÃ»§É¾³ıµÄÄÚ½¨Êı¾İºÍ²»ºÏ·¨µÄÊı¾İ
+	-- å¤„ç†ç”¨æˆ·åˆ é™¤çš„å†…å»ºæ•°æ®å’Œä¸åˆæ³•çš„æ•°æ®
 	if patch.delete or not patch.uuid then
 		return
 	end
-	-- ºÏ²¢Î´ĞŞ¸ÄµÄÄÚÇ¶Êı¾İ
+	-- åˆå¹¶æœªä¿®æ”¹çš„å†…åµŒæ•°æ®
 	local embedded, config = EMBEDDED_CONFIG_HASH[patch.uuid], {}
 	if embedded then
-		-- ÉèÖÃÄÚÇ¶Êı¾İÄ¬ÈÏÊôĞÔ
+		-- è®¾ç½®å†…åµŒæ•°æ®é»˜è®¤å±æ€§
 		for k, v in pairs(embedded) do
 			if k ~= 'monitors' then
 				if patch[k] == nil then
@@ -131,33 +133,33 @@ function D.AncientPatchToDataset(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_H
 				end
 			end
 		end
-		-- ÉèÖÃ¸Ä±ä¹ıµÄÊı¾İ
+		-- è®¾ç½®æ”¹å˜è¿‡çš„æ•°æ®
 		for k, v in pairs(patch) do
 			if k ~= 'monitors' then
 				config[k] = X.Clone(v)
 			end
 		end
-		-- ÉèÖÃ¼à¿ØÏîÄÚÇ¶Êı¾İÉ¾³ıÏîºÍ×Ô¶¨ÒåÏî
+		-- è®¾ç½®ç›‘æ§é¡¹å†…åµŒæ•°æ®åˆ é™¤é¡¹å’Œè‡ªå®šä¹‰é¡¹
 		local monitors = {}
 		local existMon = {}
 		if patch.monitors then
 			for i, mon in ipairs(patch.monitors) do
 				if not mon.delete then
 					local monEmbedded = EMBEDDED_MONITOR_HASH[patch.uuid][mon.uuid]
-					if monEmbedded then -- ¸´ÖÆÄÚÇ¶Êı¾İ
+					if monEmbedded then -- å¤åˆ¶å†…åµŒæ•°æ®
 						if mon.patch then
 							table.insert(monitors, X.ApplyPatch(monEmbedded, mon.patch))
 						else
 							table.insert(monitors, X.Clone(monEmbedded))
 						end
-					elseif not mon.embedded and not mon.patch and mon.manually ~= false then -- É¾³ıµ±Ç°°æ±¾²»´æÔÚµÄÄÚÇ¶Êı¾İ
+					elseif not mon.embedded and not mon.patch and mon.manually ~= false then -- åˆ é™¤å½“å‰ç‰ˆæœ¬ä¸å­˜åœ¨çš„å†…åµŒæ•°æ®
 						table.insert(monitors, X.Clone(mon))
 					end
 				end
 				existMon[mon.uuid] = true
 			end
 		end
-		-- ²åÈëĞÂµÄÄÚÇ¶Êı¾İ
+		-- æ’å…¥æ–°çš„å†…åµŒæ•°æ®
 		for i, monEmbedded in ipairs(embedded.monitors) do
 			if not existMon[monEmbedded.uuid] then
 				local prevUuid, nIndex = monitors[i - 1] and monitors[i - 1].uuid, nil
@@ -182,7 +184,7 @@ function D.AncientPatchToDataset(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_H
 		config.caption = embedded.caption
 		config.embedded = true
 	else
-		-- ²»ÔÙ´æÔÚµÄÄÚÇ¶Êı¾İ
+		-- ä¸å†å­˜åœ¨çš„å†…åµŒæ•°æ®
 		if patch.embedded then
 			return
 		end
@@ -309,7 +311,7 @@ function D.HasAncientData()
 end
 
 function D.ImportAncientData(fnCallback)
-	-- ¼ÓÔØÄÚÖÃÊı¾İ
+	-- åŠ è½½å†…ç½®æ•°æ®
 	local CUSTOM_EMBEDDED_CONFIG_ROOT = X.FormatPath({'userdata/TargetMon/', X.PATH_TYPE.GLOBAL})
 	local EMBEDDED_CONFIG_LIST = {}
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_EMBEDDED_CONFIG_ROOT) or {}) do
@@ -334,12 +336,12 @@ function D.ImportAncientData(fnCallback)
 			for _, mon in ipairs(embedded.monitors) do
 				tMon[mon.uuid] = mon
 			end
-			-- ²åÈë½á¹û¼¯
+			-- æ’å…¥ç»“æœé›†
 			EMBEDDED_CONFIG_HASH[embedded.uuid] = embedded
 			EMBEDDED_MONITOR_HASH[embedded.uuid] = tMon
 		end
 	end
-	-- ¼ÓÔØ½ÇÉ«Êı¾İ
+	-- åŠ è½½è§’è‰²æ•°æ®
 	local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', X.PATH_TYPE.ROLE}
 	local aPatch = X.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY') })
 		or X.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = string.char(0xd5, 0xa6, 0xd, 0x0, 0x0, 0x0, 0x0, 0xf7, 0x48, 0x32, 0xa0, 0xee, 0x90, 0x64, 0x40, 0xe5, 0xd8, 0x96, 0xe0, 0xdc, 0x20, 0xc8, 0x80, 0xd3, 0x68, 0xfa, 0x20, 0xca, 0xb0, 0x2c, 0xc0, 0xc1, 0xf8, 0x5e, 0x60, 0xb8, 0x40, 0x90, 0x0, 0xaf, 0x88, 0xc2, 0xa0, 0xa6, 0xd0, 0xf4, 0x40, 0x9d, 0x18, 0x26, 0xe0, 0x94, 0x60, 0x58, 0x80, 0x8b, 0xa8, 0x8a, 0x20, 0x82, 0xf0, 0xbc, 0xc0, 0x79, 0x38, 0xee, 0x60, 0x70, 0x80, 0x20, 0x0, 0x67, 0xc8, 0x52, 0xa0, 0x5e, 0x10, 0x84, 0x40, 0x55, 0x58, 0xb6, 0xe0, 0x4c, 0xa0, 0xe8, 0x80, 0x43, 0xe8, 0x1a, 0x20, 0x3a, 0x30, 0x4c, 0xc0, 0x31, 0x78, 0x7e, 0x60, 0x28, 0xc0, 0xb0, 0x0, 0x1f, 0x8, 0xe2, 0xa0, 0x16, 0x50, 0x14, 0x40, 0xd, 0x98, 0x46, 0xe0, 0x4, 0xe0, 0x78, 0x80, 0xfb, 0x28, 0xaa, 0x20, 0xf2, 0x70, 0xdc, 0xc0, 0xe9, 0xb8, 0xe, 0x60, 0xe0, 0x0, 0x40, 0x0, 0xd7, 0x48, 0x72, 0xa0, 0xce, 0x90, 0xa4, 0x40, 0xc5, 0xd8, 0xd6, 0xe0, 0xbc, 0x20, 0x8, 0x80, 0xb3, 0x68, 0x3a, 0x20, 0xaa, 0xb0, 0x6c, 0xc0, 0xa1, 0xf8, 0x9e, 0x60, 0x98, 0x40, 0xd0, 0x0, 0x8f, 0x88, 0x2, 0xa0, 0x86, 0xd0, 0x34, 0x40, 0x7d, 0x18, 0x66, 0xe0, 0x74, 0x60, 0x98, 0x80, 0x6b, 0xa8, 0xca, 0x20, 0x62, 0xf0, 0xfc, 0xc0, 0x59, 0x38, 0x2e, 0x60, 0x50, 0x80, 0x60, 0x0, 0x47, 0xc8, 0x92, 0xa0, 0x3e, 0x10, 0xc4, 0x40) })
@@ -365,12 +367,12 @@ function D.ImportAncientData(fnCallback)
 			tLoaded[dataset.uuid] = true
 		end
 	end
-	-- ×ª»»Êı¾İ
+	-- è½¬æ¢æ•°æ®
 	local aResult = {}
 	for i, dataset in ipairs(aDataset) do
 		table.insert(aResult, D.ConvertAncientDataset(dataset))
 	end
-	-- µ¼ÈëÊı¾İ
+	-- å¯¼å…¥æ•°æ®
 	for _, dataset in ipairs(aResult) do
 		local bExist = false
 		for i, v in ipairs(D.DATASET_LIST) do
@@ -392,7 +394,7 @@ function D.ImportAncientData(fnCallback)
 	end
 end
 
--- ±£´æÓÃ»§¼à¿ØÊı¾İ¡¢ÅäÖÃ
+-- ä¿å­˜ç”¨æˆ·ç›‘æ§æ•°æ®ã€é…ç½®
 function D.SaveUserData()
 	X.SaveLUAData(
 		GetUserDataPath(),
@@ -402,7 +404,7 @@ function D.SaveUserData()
 		})
 end
 
--- ¼ÓÔØÓÃ»§¼à¿ØÊı¾İ¡¢ÅäÖÃ
+-- åŠ è½½ç”¨æˆ·ç›‘æ§æ•°æ®ã€é…ç½®
 function D.LoadUserData()
 	local data = X.LoadLUAData(GetUserDataPath())
 	if X.IsTable(data) then
@@ -668,7 +670,7 @@ function D.SendBgMsg(...)
 end
 
 --------------------------------------------------------------------------------
--- È«¾Öµ¼³ö
+-- å…¨å±€å¯¼å‡º
 --------------------------------------------------------------------------------
 do
 local settings = {

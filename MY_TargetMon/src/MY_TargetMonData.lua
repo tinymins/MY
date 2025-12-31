@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.zhaiyiming.com/
--- @desc     : Ä¿±ê¼à¿ØÊıÖµ¼ÆËãÏà¹Ø
--- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @desc     : ç›®æ ‡ç›‘æ§æ•°å€¼è®¡ç®—ç›¸å…³
+-- @author   : èŒ—ä¼Š @åŒæ¢¦é•‡ @è¿½é£è¹‘å½±
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
 -- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
@@ -21,16 +21,16 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local D = {}
-local BUFF_CACHE = {} -- ÏÂ±êÎªÄ¿±êIDµÄÄ¿±êBUFF»º´æÊı×é ·´ÕıID²»¿ÉÄÜÊÇdoodad²»»á³åÍ»
-local BUFF_INFO = {} -- BUFF·´ÏòË÷Òı
-local BUFF_TIME = {} -- BUFF×î³¤³ÖĞøÊ±¼ä
-local SKILL_EXTRA = {} -- »º´æ×Ô¼º·Å¹ıµÄ¼¼ÄÜÓÃÓÚÉ¨Ãè
-local SKILL_CACHE = {} -- ÏÂ±êÎªÄ¿±êIDµÄÄ¿±ê¼¼ÄÜ»º´æÊı×é ·´ÕıID²»¿ÉÄÜÊÇdoodad²»»á³åÍ»
-local SKILL_INFO = {} -- ¼¼ÄÜ·´ÏòË÷Òı
+local BUFF_CACHE = {} -- ä¸‹æ ‡ä¸ºç›®æ ‡IDçš„ç›®æ ‡BUFFç¼“å­˜æ•°ç»„ åæ­£IDä¸å¯èƒ½æ˜¯doodadä¸ä¼šå†²çª
+local BUFF_INFO = {} -- BUFFåå‘ç´¢å¼•
+local BUFF_TIME = {} -- BUFFæœ€é•¿æŒç»­æ—¶é—´
+local SKILL_EXTRA = {} -- ç¼“å­˜è‡ªå·±æ”¾è¿‡çš„æŠ€èƒ½ç”¨äºæ‰«æ
+local SKILL_CACHE = {} -- ä¸‹æ ‡ä¸ºç›®æ ‡IDçš„ç›®æ ‡æŠ€èƒ½ç¼“å­˜æ•°ç»„ åæ­£IDä¸å¯èƒ½æ˜¯doodadä¸ä¼šå†²çª
+local SKILL_INFO = {} -- æŠ€èƒ½åå‘ç´¢å¼•
 local SHIELDED
 local CONFIG_CACHE
-local NEARBY_TARGET_FORCE_CACHE = {} -- ¸½½üÄ¿±êÃÅÅÉ»º´æ
-local NEARBY_FORCE_STAT_CACHE = {} -- ¸½¼şÄ¿±êÃÅÅÉÍ³¼Æ»º´æ
+local NEARBY_TARGET_FORCE_CACHE = {} -- é™„è¿‘ç›®æ ‡é—¨æ´¾ç¼“å­˜
+local NEARBY_FORCE_STAT_CACHE = {} -- é™„ä»¶ç›®æ ‡é—¨æ´¾ç»Ÿè®¡ç¼“å­˜
 local VIEW_LIST_CACHE = {}
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
@@ -61,6 +61,7 @@ local function FilterDatasets(aDataset, dwMapID, dwKungfuID)
 			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] and X.IsCompetitionMap(dwMapID))
 			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.CAMP           ] and X.IsCampMap(dwMapID))
 			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] and X.IsStrongholdMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.SCHOOL         ] and X.IsSchoolMap(dwMapID))
 		)) then
 			table.insert(ret, dataset)
 		end
@@ -104,9 +105,10 @@ local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
 			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] and X.IsCompetitionMap(dwMapID))
 			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.CAMP           ] and X.IsCampMap(dwMapID))
 			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] and X.IsStrongholdMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.SCHOOL         ] and X.IsSchoolMap(dwMapID))
 		))
 		and (X.IsEmpty(mon.tKungfu) or mon.tKungfu.bAll or mon.tKungfu[dwKungfuID]
-			or ( -- ²Ø½£²»Çø·ÖĞÄ·¨
+			or ( -- è—å‰‘ä¸åŒºåˆ†å¿ƒæ³•
 				(dwKungfuID == X.CONSTANT.KUNGFU_TYPE.WEN_SHUI or dwKungfuID == X.CONSTANT.KUNGFU_TYPE.SHAN_JU)
 				and (mon.tKungfu[X.CONSTANT.KUNGFU_TYPE.WEN_SHUI] or mon.tKungfu[X.CONSTANT.KUNGFU_TYPE.SHAN_JU])
 			)
@@ -255,7 +257,7 @@ end
 X.RegisterEvent('SYS_MSG', 'MY_TargetMonData__SKILL', OnSysMsg)
 end
 
--- ¸üĞÂBUFFÊı¾İ ¸üĞÂ¼à¿ØÌõ
+-- æ›´æ–°BUFFæ•°æ® æ›´æ–°ç›‘æ§æ¡
 do
 local EXTENT_ANIMATE = {
 	['[0.7,0.9)'] = 'ui\\Image\\Common\\Box.UITex|17',
@@ -263,11 +265,11 @@ local EXTENT_ANIMATE = {
 	NONE = '',
 }
 local MON_EXIST_CACHE = {}
--- Í¨ÓÃ£ºÅĞ¶Ï¼à¿ØÏîÊÇ·ñÏÔÊ¾
+-- é€šç”¨ï¼šåˆ¤æ–­ç›‘æ§é¡¹æ˜¯å¦æ˜¾ç¤º
 local function Base_MonVisible(mon, dwTarKungfuID)
 	if X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll
 	or mon.tTargetKungfu[dwTarKungfuID]
-	or ( -- ²Ø½£²»Çø·ÖĞÄ·¨
+	or ( -- è—å‰‘ä¸åŒºåˆ†å¿ƒæ³•
 		(dwTarKungfuID == X.CONSTANT.KUNGFU_TYPE.WEN_SHUI or dwTarKungfuID == X.CONSTANT.KUNGFU_TYPE.SHAN_JU)
 		and (mon.tTargetKungfu[X.CONSTANT.KUNGFU_TYPE.WEN_SHUI] or mon.tTargetKungfu[X.CONSTANT.KUNGFU_TYPE.SHAN_JU])
 	) then
@@ -275,9 +277,9 @@ local function Base_MonVisible(mon, dwTarKungfuID)
 	end
 	return false
 end
--- Í¨ÓÃ£º¼à¿ØÏî×ªÊÓÍ¼Êı¾İ
+-- é€šç”¨ï¼šç›‘æ§é¡¹è½¬è§†å›¾æ•°æ®
 local function Base_MonToView(mon, info, item, KObject, dataset, tMonExist, tMonLast)
-	-- ¸ñÊ½»¯ÍêÉÆÊÓÍ¼ÁĞ±íĞÅÏ¢
+	-- æ ¼å¼åŒ–å®Œå–„è§†å›¾åˆ—è¡¨ä¿¡æ¯
 	if dataset.bShowTime and item.bCd and item.nTimeLeft and item.nTimeLeft > 0 then
 		if dataset.bCdBar then
 			item.szProcess = (
@@ -355,11 +357,11 @@ local function Base_MonToView(mon, info, item, KObject, dataset, tMonExist, tMon
 		tMonExist[mon.szUUID] = mon
 	end
 end
--- BUFF£ºÅĞ¶Ï¼à¿ØÏîÊÇ·ñÏÔÊ¾
+-- BUFFï¼šåˆ¤æ–­ç›‘æ§é¡¹æ˜¯å¦æ˜¾ç¤º
 local function Buff_MonVisible(mon, dwTarKungfuID)
 	return Base_MonVisible(mon, dwTarKungfuID)
 end
--- BUFF£º¼à¿ØÏîÆ¥Åä BUFF ¶ÔÏó
+-- BUFFï¼šç›‘æ§é¡¹åŒ¹é… BUFF å¯¹è±¡
 local function Buff_MonMatch(tAllBuff, mon, dataset)
 	local dwClientID, dwControlID = X.GetClientPlayerID(), X.GetControlPlayerID()
 	local tBuff = tAllBuff[mon.dwID]
@@ -380,7 +382,7 @@ local function Buff_MonMatch(tAllBuff, mon, dataset)
 		end
 	end
 end
--- BUFF£º¼à¿ØÏî×ªÊÓÍ¼Êı¾İ
+-- BUFFï¼šç›‘æ§é¡¹è½¬è§†å›¾æ•°æ®
 local function Buff_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
 	if buff and buff.bCool then
 		local nTimeLeft = buff.nLeft * 0.0625
@@ -423,18 +425,18 @@ local function Buff_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMon
 	item.aContentColor = mon.aContentColor or DEFAULT_CONTENT_COLOR
 	Base_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
 end
--- ¼¼ÄÜ£ºÅĞ¶Ï¼à¿ØÏîÊÇ·ñÏÔÊ¾
+-- æŠ€èƒ½ï¼šåˆ¤æ–­ç›‘æ§é¡¹æ˜¯å¦æ˜¾ç¤º
 local function Skill_MonVisible(mon, dwTarKungfuID)
 	return Base_MonVisible(mon, dwTarKungfuID)
 end
--- ¼¼ÄÜ£º¼à¿ØÏîÆ¥Åä BUFF ¶ÔÏó
+-- æŠ€èƒ½ï¼šç›‘æ§é¡¹åŒ¹é… BUFF å¯¹è±¡
 local function Skill_MonMatch(tSkill, mon, dataset)
 	local skill = tSkill[mon.dwID]
 	if skill and (mon.nLevel == 0 or mon.nLevel == skill.nLevel) then
 		return skill
 	end
 end
--- ¼¼ÄÜ£º¼à¿ØÏî×ªÊÓÍ¼Êı¾İ
+-- æŠ€èƒ½ï¼šç›‘æ§é¡¹è½¬è§†å›¾æ•°æ®
 local function Skill_MonToView(mon, skill, item, KObject, dataset, tMonExist, tMonLast)
 	if skill and skill.bCool then
 		if not item.nIconID then
@@ -548,7 +550,7 @@ function UpdateView()
 				end
 				nMonitorCount = nMonitorCount + 1
 				if Buff_MonVisible(mon, dwTarKungfuID) then
-					-- Í¨¹ı¼à¿ØÏîÉú³ÉÊÓÍ¼ÁĞ±í
+					-- é€šè¿‡ç›‘æ§é¡¹ç”Ÿæˆè§†å›¾åˆ—è¡¨
 					local buff = Buff_MonMatch(tBuff, mon, dataset)
 					if mon.szGroup and (
 						tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
@@ -557,12 +559,12 @@ function UpdateView()
 						tMonGroupActiveUUID[mon.szGroup] = nil
 					end
 					if (
-						not mon.szGroup -- ÎŞÍ¬×éÏîÉèÖÃ
+						not mon.szGroup -- æ— åŒç»„é¡¹è®¾ç½®
 						or (
-							not tMonGroupActiveUUID[mon.szGroup] -- ²»´æÔÚ¼¤»îµÄÍ¬×éÏî
+							not tMonGroupActiveUUID[mon.szGroup] -- ä¸å­˜åœ¨æ¿€æ´»çš„åŒç»„é¡¹
 							and (
-								(buff and buff.bCool) -- ²¢ÇÒµ±Ç° BUFF ¼¤»î
-								or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- »òÕßµ±Ç°ÊÇÍ¬×éÏî×îºóÒ»¸öÏÔÊ¾Ïî
+								(buff and buff.bCool) -- å¹¶ä¸”å½“å‰ BUFF æ¿€æ´»
+								or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- æˆ–è€…å½“å‰æ˜¯åŒç»„é¡¹æœ€åä¸€ä¸ªæ˜¾ç¤ºé¡¹
 							)
 						)
 					)
@@ -588,7 +590,7 @@ function UpdateView()
 				end
 				nMonitorCount = nMonitorCount + 1
 				if Skill_MonVisible(mon, dwTarKungfuID) then
-					-- Í¨¹ı¼à¿ØÏîÉú³ÉÊÓÍ¼ÁĞ±í
+					-- é€šè¿‡ç›‘æ§é¡¹ç”Ÿæˆè§†å›¾åˆ—è¡¨
 					local skill = Skill_MonMatch(tSkill, mon, dataset)
 					if mon.szGroup and (
 						tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
@@ -597,12 +599,12 @@ function UpdateView()
 						tMonGroupActiveUUID[mon.szGroup] = nil
 					end
 					if (
-						not mon.szGroup -- ÎŞÍ¬×éÏîÉèÖÃ
+						not mon.szGroup -- æ— åŒç»„é¡¹è®¾ç½®
 						or (
-							not tMonGroupActiveUUID[mon.szGroup] -- ²»´æÔÚ¼¤»îµÄÍ¬×éÏî
+							not tMonGroupActiveUUID[mon.szGroup] -- ä¸å­˜åœ¨æ¿€æ´»çš„åŒç»„é¡¹
 							and (
-								(skill and skill.bCool) -- ²¢ÇÒµ±Ç° ¼¼ÄÜCD ¼¤»î
-								or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- »òÕßµ±Ç°ÊÇÍ¬×éÏî×îºóÒ»¸öÏÔÊ¾Ïî
+								(skill and skill.bCool) -- å¹¶ä¸”å½“å‰ æŠ€èƒ½CD æ¿€æ´»
+								or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- æˆ–è€…å½“å‰æ˜¯åŒç»„é¡¹æœ€åä¸€ä¸ªæ˜¾ç¤ºé¡¹
 							)
 						)
 					)
@@ -657,7 +659,7 @@ local function OnFrameCall()
 			tExistSkillMonitorTargetType[dataset.szTarget] = true
 		end
 	end
-	-- ¸üĞÂ¸÷Ä¿±êBUFFÊı¾İ
+	-- æ›´æ–°å„ç›®æ ‡BUFFæ•°æ®
 	local nLogicFrame, info = GetLogicFrameCount()
 	for eType, _ in pairs(tExistBuffMonitorTargetType) do
 		local KObject = X.GetTargetHandle(D.GetTarget(eType, 'BUFF'))
@@ -667,9 +669,9 @@ local function OnFrameCall()
 				tCache = {}
 				BUFF_CACHE[KObject.dwID] = tCache
 			end
-			-- µ±Ç°ÉíÉÏµÄbuff
-			for _, buff in X.ipairs_c(X.GetBuffList(KObject)) do -- »º´æÊ±±ØĞë¸´ÖÆbuff±í ·ñÔòbuff¹ıÆÚºó±í»á±»»ØÊÕµ¼ÖÂÏÔÊ¾´íÎóµÄBUFF
-				-- ÕıÏòË÷ÒıÓÃÓÚ¼à¿Ø
+			-- å½“å‰èº«ä¸Šçš„buff
+			for _, buff in X.ipairs_c(X.GetBuffList(KObject)) do -- ç¼“å­˜æ—¶å¿…é¡»å¤åˆ¶buffè¡¨ å¦åˆ™buffè¿‡æœŸåè¡¨ä¼šè¢«å›æ”¶å¯¼è‡´æ˜¾ç¤ºé”™è¯¯çš„BUFF
+				-- æ­£å‘ç´¢å¼•ç”¨äºç›‘æ§
 				if not tCache[buff.dwID] then
 					tCache[buff.dwID] = {}
 				end
@@ -682,7 +684,7 @@ local function OnFrameCall()
 				info.nLeft = math.max(buff.nEndFrame - nLogicFrame, 0)
 				info.bCool = true
 				info.nRenderFrame = nLogicFrame
-				-- ·´ÏòË÷ÒıÓÃÓÚ²¶»ñ
+				-- åå‘ç´¢å¼•ç”¨äºæ•è·
 				if not BUFF_INFO[buff.szName] then
 					BUFF_INFO[buff.szName] = {}
 				end
@@ -696,7 +698,7 @@ local function OnFrameCall()
 					}
 				end
 			end
-			-- ´¦ÀíÏûÊ§µÄbuff
+			-- å¤„ç†æ¶ˆå¤±çš„buff
 			for _, tBuff in pairs(tCache) do
 				for k, info in pairs(tBuff) do
 					if info.nRenderFrame ~= nLogicFrame then
@@ -715,7 +717,7 @@ local function OnFrameCall()
 		if KObject then
 			local tSkill = {}
 			local aSkill = X.GetSkillMountList()
-			-- ±éÀúËùÓĞ¼¼ÄÜ Éú³É·´ÏòË÷Òı
+			-- éå†æ‰€æœ‰æŠ€èƒ½ ç”Ÿæˆåå‘ç´¢å¼•
 			for _, dwID in X.spairs(aSkill, SKILL_EXTRA) do
 				if not tSkill[dwID] then
 					local nLevel = KObject.GetSkillLevel(dwID)
@@ -749,7 +751,7 @@ local function OnFrameCall()
 					end
 				end
 			end
-			-- ´¦ÀíÏûÊ§µÄbuff
+			-- å¤„ç†æ¶ˆå¤±çš„buff
 			local tLastSkill = SKILL_CACHE[KObject.dwID]
 			if tLastSkill then
 				for k, skill in pairs(tLastSkill) do
@@ -784,7 +786,7 @@ function D.GetViewData(nIndex)
 end
 
 ----------------------------------------------------------------------------------------------
--- ¿ì½İ¼ü
+-- å¿«æ·é”®
 ----------------------------------------------------------------------------------------------
 do
 for i = 1, 5 do
@@ -819,7 +821,7 @@ end
 end
 
 --------------------------------------------------------------------------------
--- È«¾Öµ¼³ö
+-- å…¨å±€å¯¼å‡º
 --------------------------------------------------------------------------------
 do
 local settings = {
@@ -839,7 +841,7 @@ MY_TargetMonData = X.CreateModule(settings)
 end
 
 ----------------------------------------------------------------------------------------------
--- ÊÂ¼ş×¢²á
+-- äº‹ä»¶æ³¨å†Œ
 ----------------------------------------------------------------------------------------------
 
 local function onShieldedReset()

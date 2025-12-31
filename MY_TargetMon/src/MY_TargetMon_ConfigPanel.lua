@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.zhaiyiming.com/
--- @desc     : Ŀ������ȫ������
--- @author   : ���� @˫���� @׷����Ӱ
+-- @desc     : 目标监控项全局配置
+-- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@zhaiyiming.com)
 -- @copyright: Emil Zhai <root@zhaiyiming.com>
 --------------------------------------------------------------------------------
@@ -445,24 +445,25 @@ function D.Open(szConfigUUID)
 				fnDisable = function() return X.IsEmpty(dataset.tMap) or dataset.tMap.bAll end,
 			}
 			for _, eMapType in ipairs({
-				MY_TARGET_MON_MAP_TYPE.CITY, -- ����
-				MY_TARGET_MON_MAP_TYPE.VILLAGE, -- Ұ��
-				MY_TARGET_MON_MAP_TYPE.DUNGEON, -- �ؾ�
-				MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON, -- С���ؾ�
-				MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON, -- �Ŷ��ؾ�
-				MY_TARGET_MON_MAP_TYPE.COMPETITION, -- ����
-				MY_TARGET_MON_MAP_TYPE.STARVE, -- �˿���
-				MY_TARGET_MON_MAP_TYPE.ARENA, -- �������
-				MY_TARGET_MON_MAP_TYPE.BATTLEFIELD, -- ս��
-				MY_TARGET_MON_MAP_TYPE.PUBG, -- ����ս��
-				MY_TARGET_MON_MAP_TYPE.ZOMBIE, -- ��ɹ���
-				MY_TARGET_MON_MAP_TYPE.MONSTER, -- ��ս
-				MY_TARGET_MON_MAP_TYPE.MOBA, -- �����龳
-				MY_TARGET_MON_MAP_TYPE.HOMELAND, -- ��԰
-				MY_TARGET_MON_MAP_TYPE.GUILD_TERRITORY, -- ������
-				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- �˻ĺ��
-				MY_TARGET_MON_MAP_TYPE.CAMP, -- ��Ӫ��ͼ
-				MY_TARGET_MON_MAP_TYPE.STRONGHOLD, -- �ݵ��ͼ
+				MY_TARGET_MON_MAP_TYPE.CITY, -- 主城
+				MY_TARGET_MON_MAP_TYPE.VILLAGE, -- 野外
+				MY_TARGET_MON_MAP_TYPE.DUNGEON, -- 秘境
+				MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON, -- 小队秘境
+				MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON, -- 团队秘境
+				MY_TARGET_MON_MAP_TYPE.COMPETITION, -- 竞技
+				MY_TARGET_MON_MAP_TYPE.STARVE, -- 浪客行
+				MY_TARGET_MON_MAP_TYPE.ARENA, -- 名剑大会
+				MY_TARGET_MON_MAP_TYPE.BATTLEFIELD, -- 战场
+				MY_TARGET_MON_MAP_TYPE.PUBG, -- 绝境战场
+				MY_TARGET_MON_MAP_TYPE.ZOMBIE, -- 李渡鬼域
+				MY_TARGET_MON_MAP_TYPE.MONSTER, -- 百战
+				MY_TARGET_MON_MAP_TYPE.MOBA, -- 列星虚境
+				MY_TARGET_MON_MAP_TYPE.HOMELAND, -- 家园
+				MY_TARGET_MON_MAP_TYPE.GUILD_TERRITORY, -- 帮会领地
+				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- 八荒衡鉴
+				MY_TARGET_MON_MAP_TYPE.CAMP, -- 阵营地图
+				MY_TARGET_MON_MAP_TYPE.STRONGHOLD, -- 据点地图
+				MY_TARGET_MON_MAP_TYPE.SCHOOL, -- 门派地图
 			}) do
 				table.insert(t1, {
 					szOption = MY_TARGET_MON_MAP_TYPE_NAME[eMapType],
@@ -633,7 +634,7 @@ function D.OnFrameBreathe()
 end
 
 --------------------------------------------------------------------------------
--- ȫ�ֵ���
+-- 全局导出
 --------------------------------------------------------------------------------
 do
 local settings = {

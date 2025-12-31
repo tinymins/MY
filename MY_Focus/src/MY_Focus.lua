@@ -870,7 +870,7 @@ function D.GetDisplayList()
 						and not X.JudgeOperator(via.tRule.tLife.szOperator, fCurrentLife / fMaxLife * 100, via.tRule.tLife.nValue) then
 							bRuleFocus = false
 						end
-						if bRuleFocus and via.tRule.nMaxDistance ~= 0
+						if bRuleFocus and via.tRule.nMaxDistance > 0
 						and X.GetCharacterDistance(me, KObject, O.szDistanceType) > via.tRule.nMaxDistance then
 							bRuleFocus = false
 						end
