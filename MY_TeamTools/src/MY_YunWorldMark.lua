@@ -276,7 +276,7 @@ function D.Search(ui, nPage)
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
 			T = 3,
-			search = szSearch,
+			key = szSearch,
 			map = dwMapID,
 			page = nPage,
 			pageSize = 100,
