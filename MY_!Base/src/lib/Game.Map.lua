@@ -187,6 +187,9 @@ end
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是主城地图
 function X.IsCityMap(dwMapID)
+	if X.CONSTANT.CITY_MAP[dwMapID] ~= nil then
+		return X.CONSTANT.CITY_MAP[dwMapID]
+	end
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.CITY and true or false
 end

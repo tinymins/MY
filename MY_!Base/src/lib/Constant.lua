@@ -535,6 +535,18 @@ local CONSTANT = {
 	ROGUELIKE_MAP = {
 		[995] = true, -- 八荒衡鉴
 	},
+	CITY_MAP = {
+		[  6] = true, -- 扬州
+		[  8] = true, -- 洛阳
+		[ 15] = true, -- 长安
+		[108] = true, -- 成都
+		[151] = true, -- 洛阳·战乱
+		[156] = true, -- 长安·战乱
+		[172] = true, -- 长安城
+		[194] = true, -- 太原
+		[239] = true, -- 洛阳城
+		[332] = true, -- 侠客岛
+	},
 	STRONGHOLD_MAP = {
 		[  9] = true, -- 洛道
 		[ 13] = true, -- 金水镇

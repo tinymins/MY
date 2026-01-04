@@ -48,6 +48,7 @@ return {
 	['Roguelike data'] = '八荒衡鑒的數據',
 	['Competition data'] = '競技地圖的數據',
 	['Camp data'] = '陣營地圖的數據',
+	['Stronghold data'] = '據點地圖的數據',
 	['School map'] = '門派地圖',
 	['Guild territory data'] = '幫會領地的數據',
 	['Recycle bin'] = '回收站',

@@ -151,6 +151,7 @@ return {
 	['Roguelike map'] = '八荒衡鑒地圖',
 	['Competition map'] = '競技地圖',
 	['Camp map'] = '陣營地圖',
+    ['Stronghold data'] = '據點地圖的數據',
     ['School map'] = '門派地圖',
 	['Guild territory map'] = '幫會領地地圖',
 
