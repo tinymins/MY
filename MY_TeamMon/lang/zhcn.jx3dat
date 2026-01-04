@@ -49,7 +49,7 @@ return {
 	['Competition data'] = '竞技地图的数据',
 	['Camp data'] = '阵营地图的数据',
 	['Stronghold data'] = '据点地图的数据',
-	['School map'] = '门派地图的数据',
+	['School data'] = '门派地图的数据',
 	['Guild territory data'] = '帮会领地的数据',
 	['Recycle bin'] = '回收站',
 	['Recycle bin data'] = '回收站的数据',
