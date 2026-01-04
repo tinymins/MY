@@ -411,6 +411,8 @@ function D.RedrawMapList(frame)
 			MY_TEAM_MON_SPECIAL_MAP.GUILD_TERRITORY, -- 帮会领地
 			MY_TEAM_MON_SPECIAL_MAP.ROGUELIKE, -- 八荒衡鉴
 			MY_TEAM_MON_SPECIAL_MAP.CAMP, -- 阵营地图
+			MY_TEAM_MON_SPECIAL_MAP.STRONGHOLD, -- 据点地图
+			MY_TEAM_MON_SPECIAL_MAP.SCHOOL, -- 门派地图
 		},
 	}
 	table.insert(aGroupMap, tCommon)
