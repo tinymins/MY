@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_YunWorldMark'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.2') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -216,6 +216,7 @@ function D.OpenPanel()
 				title = _L['Name'],
 				alignHorizontal = 'left',
 				width = 260,
+				overflow = 'hidden',
 				render = function(value)
 					return GetFormatText(' ' .. X.ReplaceSensitiveWord(tostring(value or '')), 162, 255, 255, 255)
 				end,
@@ -224,7 +225,8 @@ function D.OpenPanel()
 				key = 'szAuthor',
 				title = _L['Author'],
 				alignHorizontal = 'left',
-				width = 160,
+				width = 200,
+				overflow = 'hidden',
 				render = function(value)
 					return GetFormatText(' ' .. X.ReplaceSensitiveWord(tostring(value or '')), 162, 255, 255, 255)
 				end,
@@ -233,7 +235,7 @@ function D.OpenPanel()
 				key = 'dwUpdateTime',
 				title = _L('Update time'),
 				alignHorizontal = 'left',
-				width = 170,
+				width = 130,
 				render = function(value)
 					return GetFormatText(' ' .. X.ReplaceSensitiveWord(tostring(value or '')), 162, 255, 255, 255)
 				end,

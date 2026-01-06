@@ -1587,8 +1587,9 @@ local function InitComponent(raw, szType)
 					hRow:Lookup('Image_RowBg'):SetVisible(nRowIndex % 2 == 1)
 					for nColumnIndex, col in ipairs(aColumns) do
 						local xValue = rec[col.key]
-						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
-						local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', col.overflow == 'hidden' and 'Handle_Item_PixelScroll' or 'Handle_Item') -- 外部居中层
+						hItem:SetName('Handle_Item')
+						local hItemContent = hItem:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_ItemContent') -- 内部文本布局层
 						local szXml
 						if col.render then
 							szXml = col.render(xValue, rec, nRowIndex)
@@ -1818,8 +1819,9 @@ local function InitComponent(raw, szType)
 				local hRowColumns = hRow:Lookup('Handle_RowColumns')
 				hRowColumns:Clear()
 				for nColumnIndex, col in ipairs(aColumns) do
-					local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
-					local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+					local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', col.overflow == 'hidden' and 'Handle_Item_PixelScroll' or 'Handle_Item') -- 外部居中层
+					hItem:SetName('Handle_Item')
+					local hItemContent = hItem:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_ItemContent') -- 内部文本布局层
 					local szXml
 					if X.IsTable(rec) then
 						if col.render then
