@@ -111,6 +111,7 @@ local function UpdateTeamMonData()
 							v.szDisplayName = X.RenderTemplateString(data.szDisplayName, nil, -1, false, false)
 						end
 						v.nIcon = data.nIcon
+						v.szDisplayName = v.szDisplayName and X.RenderTemplateString(v.szDisplayName, nil, -1, false, false)
 						table.insert(aBuff, v)
 					end
 				end
