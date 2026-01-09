@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -411,6 +411,8 @@ function D.RedrawMapList(frame)
 			MY_TEAM_MON_SPECIAL_MAP.GUILD_TERRITORY, -- 帮会领地
 			MY_TEAM_MON_SPECIAL_MAP.ROGUELIKE, -- 八荒衡鉴
 			MY_TEAM_MON_SPECIAL_MAP.CAMP, -- 阵营地图
+			MY_TEAM_MON_SPECIAL_MAP.STRONGHOLD, -- 据点地图
+			MY_TEAM_MON_SPECIAL_MAP.SCHOOL, -- 门派地图
 		},
 	}
 	table.insert(aGroupMap, tCommon)

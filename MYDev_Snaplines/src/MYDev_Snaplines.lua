@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_Snaplines'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -231,7 +231,7 @@ local function InsertElementDetailTip(hElem, tTip)
 		table.insert(tTip, _L('HAlign: %s', hElem:GetHAlign()))
 		table.insert(tTip, _L('RowSpacing: %s', hElem:GetRowSpacing()))
 		table.insert(tTip, _L('IsMultiLine: %s', tostring(hElem:IsMultiLine())))
-		table.insert(tTip, _L('IsCenterEachLine: %s', tostring(hElem:IsCenterEachLine())))
+		table.insert(tTip, _L('IsCenterEachLine: %s', tostring(hElem.IsCenterEachLine and tostring(hElem:IsCenterEachLine()) or 'N/A')))
 		table.insert(tTip, _L('FontSpacing: %s', hElem:GetFontSpacing()))
 		table.insert(tTip, _L('IsRichText: %s', tostring(hElem:IsRichText())))
 		table.insert(tTip, _L('FontScale: %s', hElem:GetFontScale()))

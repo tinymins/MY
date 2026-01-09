@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -38,6 +38,17 @@ function D.OpenPanel(szModule)
 		name = 'Btn_Option',
 		x = 960, y = 54, w = 20, h = 20,
 		buttonStyle = 'OPTION',
+		menu = function()
+			return {
+				{
+					szOption = _L['Manage my online data'],
+					fnAction = function()
+						X.OpenBrowser('https://j3cx.com/team-monitor/mine')
+						X.UI.ClosePopupMenu()
+					end,
+				},
+			}
+		end,
 	})
 	local frame = ui:Raw()
 	frame:BringToTop()

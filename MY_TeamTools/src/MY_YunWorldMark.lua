@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_YunWorldMark'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -145,6 +145,13 @@ function D.OpenPanel()
 						})
 					end,
 				},
+				{
+					szOption = _L['Manage my online world mark'],
+					fnAction = function()
+						X.OpenBrowser('https://j3cx.com/world-mark/mine')
+						X.UI.ClosePopupMenu()
+					end,
+				},
 			}
 			X.UI.PopupMenu(menu)
 		end,
@@ -210,12 +217,32 @@ function D.OpenPanel()
 		y = 90,
 		w = 720,
 		h = 390,
+		onRowHover = function(bIn, rec, nIndex, rect)
+			if not bIn then
+				HideTip()
+				return
+			end
+			local a = {
+				_L['Key'] .. ': ' .. tostring(rec and rec.key or ''),
+				_L['ID'] .. ': ' .. tostring(rec and rec.id or ''),
+				_L['Name'] .. ': ' .. tostring(rec and rec.szName or ''),
+				_L['Author'] .. ': ' .. tostring(rec and rec.szAuthor or ''),
+				_L['Update time'] .. ': ' .. tostring(rec and rec.dwUpdateTime or ''),
+				_L['About'] .. ': ' .. tostring(rec and rec.szAboutURL or ''),
+			}
+			local tipRect = nil
+			if X.IsTable(rect) then
+				tipRect = { rect.x or rect[1], rect.y or rect[2], rect.w or rect[3], rect.h or rect[4] }
+			end
+			X.OutputTip(tipRect, table.concat(a, '\n'), 106, X.UI.TIP_POSITION.RIGHT_LEFT, 450)
+		end,
 		columns = {
 			{
 				key = 'szName',
 				title = _L['Name'],
 				alignHorizontal = 'left',
-				width = 260,
+				width = 300,
+				overflow = 'hidden',
 				render = function(value)
 					return GetFormatText(' ' .. X.ReplaceSensitiveWord(tostring(value or '')), 162, 255, 255, 255)
 				end,
@@ -223,8 +250,9 @@ function D.OpenPanel()
 			{
 				key = 'szAuthor',
 				title = _L['Author'],
-				alignHorizontal = 'left',
+				alignHorizontal = 'center',
 				width = 160,
+				overflow = 'hidden',
 				render = function(value)
 					return GetFormatText(' ' .. X.ReplaceSensitiveWord(tostring(value or '')), 162, 255, 255, 255)
 				end,
@@ -232,8 +260,8 @@ function D.OpenPanel()
 			{
 				key = 'dwUpdateTime',
 				title = _L('Update time'),
-				alignHorizontal = 'left',
-				width = 170,
+				alignHorizontal = 'center',
+				width = 130,
 				render = function(value)
 					return GetFormatText(' ' .. X.ReplaceSensitiveWord(tostring(value or '')), 162, 255, 255, 255)
 				end,
