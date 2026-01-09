@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -60,6 +60,8 @@ local function FilterDatasets(aDataset, dwMapID, dwKungfuID)
 			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.ROGUELIKE      ] and X.IsRoguelikeMap(dwMapID))
 			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] and X.IsCompetitionMap(dwMapID))
 			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.CAMP           ] and X.IsCampMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] and X.IsStrongholdMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.SCHOOL         ] and X.IsSchoolMap(dwMapID))
 		)) then
 			table.insert(ret, dataset)
 		end
@@ -102,6 +104,8 @@ local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
 			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.ROGUELIKE      ] and X.IsRoguelikeMap(dwMapID))
 			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] and X.IsCompetitionMap(dwMapID))
 			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.CAMP           ] and X.IsCampMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] and X.IsStrongholdMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.SCHOOL         ] and X.IsSchoolMap(dwMapID))
 		))
 		and (X.IsEmpty(mon.tKungfu) or mon.tKungfu.bAll or mon.tKungfu[dwKungfuID]
 			or ( -- 藏剑不区分心法

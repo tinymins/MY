@@ -31,4 +31,5 @@ lua_22=src/MY_JBLoverSync.lua
 lua_23=src/MY_JBBind.lua
 lua_24=src/MY_JBTeam.lua
 lua_25=src/MY_JBTeamSnapshot.lua
-lua_26=src/MY_JB.PS.lua
+lua_26=src/MY_YunWorldMark.lua
+lua_27=src/MY_JB.PS.lua

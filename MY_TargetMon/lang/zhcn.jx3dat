@@ -7,6 +7,7 @@ return {
     ['Mingyi target buff monitor'] = '茗伊目标气劲监控',
 
 	['Encrypt and compressing: '] = '更新加密压缩：',
+	['Manage my online data'] = '管理我的在线数据',
 
     ['Enable'] = '启用',
     ['Hide others buff'] = '只看我的',
@@ -151,6 +152,8 @@ return {
 	['Roguelike map'] = '八荒衡鉴地图',
 	['Competition map'] = '竞技地图',
 	['Camp map'] = '阵营地图',
+    ['Stronghold map'] = '据点地图',
+    ['School map'] = '门派地图',
 	['Guild territory map'] = '帮会领地地图',
 
     -- MY_TargetMon_PS.lua

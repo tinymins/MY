@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -154,6 +154,10 @@ end)
 function D.ViewCharInfoToPlayer(dwID)
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+	end
+	local cpi = X.GetClientPlayerInfo()
+	if cpi and cpi.nLevel ~= X.CONSTANT.MAX_PLAYER_LEVEL then
+		return X.Alert(_L['Only max level can use this feature.'])
 	end
 	local nChannel, szName
 	if X.IsTeammate(dwID) then

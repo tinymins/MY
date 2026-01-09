@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.2') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -870,7 +870,7 @@ function D.GetDisplayList()
 						and not X.JudgeOperator(via.tRule.tLife.szOperator, fCurrentLife / fMaxLife * 100, via.tRule.tLife.nValue) then
 							bRuleFocus = false
 						end
-						if bRuleFocus and via.tRule.nMaxDistance ~= 0
+						if bRuleFocus and via.tRule.nMaxDistance > 0
 						and X.GetCharacterDistance(me, KObject, O.szDistanceType) > via.tRule.nMaxDistance then
 							bRuleFocus = false
 						end

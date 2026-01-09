@@ -17,6 +17,7 @@ return {
 	['Color Picker'] = '颜色选择器',
 	['Color Picker Pro'] = '调色板',
 	['Text Editor'] = '文本编辑器',
+	['User Input'] = '用户输入',
 	['Font %d'] = '字体 %d',
 
 	['Add to BOSS list'] = '加入首领列表',

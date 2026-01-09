@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.2') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -1169,6 +1169,10 @@ function D.OnLButtonClick()
 		menu.x, menu.y = nX, nY
 		PopupMenu(menu)
 	elseif szName == 'WndButton_WorldMark' then
+		if IsCtrlKeyDown() and MY_YunWorldMark then
+			MY_YunWorldMark.OpenPanel()
+			return
+		end
 		local me  = X.GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nMapType = select(2, GetMapParams(dwMapID))

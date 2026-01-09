@@ -278,6 +278,15 @@ local COMPONENT_SAMPLE = {
 					end,
 				},
 				{
+					key = 'overflow',
+					title = 'Overflow',
+					width = 30,
+					overflow = 'hidden',
+					render = function()
+						return GetFormatText('OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW OVERFLOW', 162, 255, 255, 0)
+					end,
+				},
+				{
 					key = 'extra',
 					title = 'Extra',
 					minWidth = 300,

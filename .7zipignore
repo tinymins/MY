@@ -1,4 +1,5 @@
 .*
+*.7z
 *.py
 *.pyc
 __pycache__

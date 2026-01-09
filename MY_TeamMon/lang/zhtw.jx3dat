@@ -3,6 +3,7 @@ return {
 	['Leave map %s.'] = '你已離開地圖【%s】。',
 	['Enter map %s.'] = '你已進入地圖【%s】。',
 	['Encrypt and compressing: '] = '更新加密壓縮：',
+	['Manage my online data'] = '管理我的在線數據',
 	-- MY_TeamMon_CenterAlarm.lua --
 	['MY_TeamMon_CenterAlarm'] = '中央提醒',
 	-- MY_TeamMon_CircleLine.lua --
@@ -48,6 +49,8 @@ return {
 	['Roguelike data'] = '八荒衡鑒的數據',
 	['Competition data'] = '競技地圖的數據',
 	['Camp data'] = '陣營地圖的數據',
+	['Stronghold data'] = '據點地圖的數據',
+	['School data'] = '門派地圖的數據',
 	['Guild territory data'] = '幫會領地的數據',
 	['Recycle bin'] = '回收站',
 	['Recycle bin data'] = '回收站的數據',

@@ -342,33 +342,35 @@ return function(env)
 			nMinWidth = 60,
 			szRefreshCircle = 'weekly',
 			Collector = function()
-				local function Collect()
-					local bf1 = env.me.GetBuff(24917, 0)
-					local bf2 = env.me.GetBuff(24918, 0)
-					if not bf1 and not bf2 and not env.IsInMonsterMap() then
-						return
-					end
-					swap['monster'] = { bf1 and bf1.nStackNum or 0, bf2 and bf2.nStackNum or 0 }
-				end
-				env.RegisterEvent('BUFF_UPDATE', 'MY_RoleStatistics_RoleStat__monster', function()
-					-- buff update：
-					-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
-					-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
-					-- arg8：nLevel，arg9：dwSkillSrcID
-					if arg0 ~= env.me.dwID then
-						return
-					end
-					if arg4 ~= 24917 and arg4 ~= 24918 then
-						return
-					end
-					Collect()
-				end)
 				env.RegisterEvent('LOADING_END', 'MY_RoleStatistics_RoleStat__monster', function()
-					Collect()
+					if env.IsInMonsterMap() then
+						if not env.RegisterEvent('BUFF_UPDATE', 'MY_RoleStatistics_RoleStat__monster') then
+							env.RegisterEvent('BUFF_UPDATE', 'MY_RoleStatistics_RoleStat__monster', function()
+								-- buff update：
+								-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
+								-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
+								-- arg8：nLevel，arg9：dwSkillSrcID
+								if env.arg0 ~= env.me.dwID then
+									return
+								end
+								if env.arg4 == 24917 then
+									swap['monster'][1] = env.arg5
+								end
+								if env.arg4 == 24918 then
+									swap['monster'][2] = env.arg5
+								end
+							end)
+						end
+						local bf1 = env.me.GetBuff(24917, 0)
+						local bf2 = env.me.GetBuff(24918, 0)
+						swap['monster'] = { bf1 and bf1.nStackNum or 0, bf2 and bf2.nStackNum or 0 }
+					else
+						env.RegisterEvent('BUFF_UPDATE', 'MY_RoleStatistics_RoleStat__monster', false)
+					end
 				end)
 			end,
 			GetValue = function(prevVal, prevRec)
-				return swap['monster'] or prevVal
+				return swap['monster'] or prevVal or {12, 6}
 			end,
 			GetSummaryValue = function()
 				return nil

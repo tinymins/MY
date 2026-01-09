@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -71,6 +71,8 @@ local MY_TARGET_MON_MAP_TYPE = {
 	COMPETITION     = -17, -- 竞技
 	GUILD_TERRITORY = -18, -- 帮会领地
 	CAMP            = -19, -- 阵营地图
+	STRONGHOLD      = -20, -- 据点地图
+	SCHOOL          = -21, -- 门派地图
 	RECYCLE_BIN     =  -9, -- 回收站
 }
 local MY_TARGET_MON_MAP_TYPE_NAME = {
@@ -92,6 +94,8 @@ local MY_TARGET_MON_MAP_TYPE_NAME = {
 	[MY_TARGET_MON_MAP_TYPE.ROGUELIKE      ] = _L['Roguelike map'],
 	[MY_TARGET_MON_MAP_TYPE.COMPETITION    ] = _L['Competition map'],
 	[MY_TARGET_MON_MAP_TYPE.CAMP           ] = _L['Camp map'],
+	[MY_TARGET_MON_MAP_TYPE.STRONGHOLD     ] = _L['Stronghold map'],
+	[MY_TARGET_MON_MAP_TYPE.SCHOOL         ] = _L['School map'],
 	[MY_TARGET_MON_MAP_TYPE.RECYCLE_BIN    ] = _L['Recycle bin map'],
 }
 

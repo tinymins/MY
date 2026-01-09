@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -81,6 +81,8 @@ local MY_TEAM_MON_SPECIAL_MAP = {
 	COMPETITION     = -17, -- 竞技
 	GUILD_TERRITORY = -18, -- 帮会领地
 	CAMP            = -19, -- 阵营地图
+	STRONGHOLD      = -20, -- 据点地图
+	SCHOOL		    = -21, -- 门派地图
 	RECYCLE_BIN     =  -9, -- 回收站
 }
 local MY_TEAM_MON_SPECIAL_MAP_NAME = {
@@ -102,6 +104,8 @@ local MY_TEAM_MON_SPECIAL_MAP_NAME = {
 	[MY_TEAM_MON_SPECIAL_MAP.ROGUELIKE      ] = _L['Roguelike data'],
 	[MY_TEAM_MON_SPECIAL_MAP.COMPETITION    ] = _L['Competition data'],
 	[MY_TEAM_MON_SPECIAL_MAP.CAMP           ] = _L['Camp data'],
+	[MY_TEAM_MON_SPECIAL_MAP.STRONGHOLD     ] = _L['Stronghold data'],
+	[MY_TEAM_MON_SPECIAL_MAP.SCHOOL         ] = _L['School data'],
 	[MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN    ] = _L['Recycle bin data'],
 }
 local MY_TEAM_MON_SPECIAL_MAP_INFO = {}
@@ -1029,18 +1033,18 @@ function D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 					bTalk     = v.bTeamChannel,
 					bHold     = v.bHold,
 				}
-				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
+				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 			end
 		end
 	end
 end
 
 -- 发布事件 为了方便日后修改 集中起来
-function D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
+function D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 	if not O.bPushTeamChannel then
 		tParam.bTalk = false
 	end
-	FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', nType, szKey, tParam, szSender, szReceiver)
+	FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 end
 
 function D.GetSrcName(dwID)
@@ -2284,6 +2288,9 @@ function D.IterTable(data, dwMapID, bIterItem, bReverse)
 		if X.IsCampMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.CAMP])
 		end
+		if X.IsStrongholdMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.STRONGHOLD])
+		end
 		if X.IsStarveMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.STARVE])
 		end
@@ -2304,6 +2311,9 @@ function D.IterTable(data, dwMapID, bIterItem, bReverse)
 		end
 		if X.IsMobaMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.MOBA])
+		end
+		if X.IsSchoolMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.SCHOOL])
 		end
 		if X.IsHomelandMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.HOMELAND])

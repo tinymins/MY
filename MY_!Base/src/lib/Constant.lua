@@ -480,6 +480,34 @@ local CONSTANT = {
 	MOBA_MAP = {
 		[412] = true, -- 列星岛
 	},
+	SCHOOL_MAP = {
+		[  2] = true, -- 万花
+		[  5] = true, -- 少林
+		[  7] = true, -- 纯阳
+		[ 11] = true, -- 天策
+		[ 16] = true, -- 七秀
+		[ 49] = true, -- 藏剑山庄
+		[102] = true, -- 五毒
+		[122] = true, -- 唐门
+		[150] = true, -- 明教
+		[159] = true, -- 丐帮
+		[193] = true, -- 苍云
+		[213] = true, -- 长歌门
+		[243] = true, -- 霸刀山庄
+		[333] = true, -- 蓬莱
+		[419] = true, -- 凌雪阁
+		[464] = true, -- 衍天宗
+		[526] = true, -- 北天药宗
+		[578] = true, -- 刀宗
+		[642] = true, -- 万灵山庄
+		[666] = true, -- 南诏段氏
+		[158] = true, -- 天策·战乱
+		[473] = true, -- 万花·乱世
+		[474] = true, -- 七秀·乱世
+		[475] = true, -- 少林·乱世
+		[488] = true, -- 藏剑山庄·乱世
+		[718] = true, -- 永宁湾
+	},
 	STARVE_MAP = {
 		[421] = true, -- 浪客行·悬棺裂谷
 		[422] = true, -- 浪客行·桑珠草原
@@ -506,6 +534,34 @@ local CONSTANT = {
 	},
 	ROGUELIKE_MAP = {
 		[995] = true, -- 八荒衡鉴
+	},
+	CITY_MAP = {
+		[  6] = true, -- 扬州
+		[  8] = true, -- 洛阳
+		[ 15] = true, -- 长安
+		[108] = true, -- 成都
+		[151] = true, -- 洛阳·战乱
+		[156] = true, -- 长安·战乱
+		[172] = true, -- 长安城
+		[194] = true, -- 太原
+		[239] = true, -- 洛阳城
+		[332] = true, -- 侠客岛
+	},
+	STRONGHOLD_MAP = {
+		[  9] = true, -- 洛道
+		[ 13] = true, -- 金水镇
+		[ 21] = true, -- 巴陵县
+		[ 22] = true, -- 南屏山
+		[ 23] = true, -- 龙门荒漠
+		[ 30] = true, -- 昆仑
+		[ 35] = true, -- 瞿塘峡
+		[100] = true, -- 白龙口
+		[101] = true, -- 无量山
+		[103] = true, -- 融天岭
+		[104] = true, -- 黑龙沼
+		[105] = true, -- 苍山洱海
+		[139] = true, -- 枫华谷·战乱
+		[153] = true, -- 马嵬驿
 	},
 	-- “子地图”到“主地图”映射表：按地图生效的功能，在同一地图的子地图时，合并数据到主地图
 	MAP_MERGE = {
@@ -935,6 +991,18 @@ local CONSTANT = {
 		[TEAM_MARK.JADE ] = _L['TEAM_MARK_JADE' ],
 		[TEAM_MARK.DART ] = _L['TEAM_MARK_DART' ],
 		[TEAM_MARK.FAN  ] = _L['TEAM_MARK_FAN'  ],
+	},
+	WORLD_MARK = {
+		{ nIndex = 1 , dwNpcTemplateID = 20107, tColor = { 255, 255, 255 } },
+		{ nIndex = 2 , dwNpcTemplateID = 20108, tColor = { 255, 128, 0   } },
+		{ nIndex = 3 , dwNpcTemplateID = 20109, tColor = { 0  , 0  , 255 } },
+		{ nIndex = 4 , dwNpcTemplateID = 20110, tColor = { 0  , 255, 0   } },
+		{ nIndex = 5 , dwNpcTemplateID = 20111, tColor = { 255, 0  , 0   } },
+		{ nIndex = 6 , dwNpcTemplateID = 36781, tColor = { 50 , 220, 255 } },
+		{ nIndex = 7 , dwNpcTemplateID = 36782, tColor = { 255, 100, 220 } },
+		{ nIndex = 8 , dwNpcTemplateID = 36783, tColor = { 255, 255, 0   } },
+		{ nIndex = 9 , dwNpcTemplateID = 36784, tColor = { 200, 40,  255 } },
+		{ nIndex = 10, dwNpcTemplateID = 36785, tColor = { 30,  255, 180 } },
 	},
 	CLIENT_VERSION_TYPE = _G.CLIENT_VERSION_TYPE or X.FreezeTable({
 		NORMAL                 = 0,

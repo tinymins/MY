@@ -187,6 +187,9 @@ end
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是主城地图
 function X.IsCityMap(dwMapID)
+	if X.CONSTANT.CITY_MAP[dwMapID] ~= nil then
+		return X.CONSTANT.CITY_MAP[dwMapID]
+	end
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.CITY and true or false
 end
@@ -196,6 +199,20 @@ end
 function X.IsInCityMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsCityMap(me.GetMapID())
+end
+
+---判断一个地图是不是门派地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是门派地图
+function X.IsSchoolMap(dwMapID)
+	return X.CONSTANT.SCHOOL_MAP[dwMapID] or false
+end
+
+---判断当前地图是不是门派地图
+---@return boolean @当前地图是否是门派地图
+function X.IsInSchoolMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsSchoolMap(me.GetMapID())
 end
 
 ---判断一个地图是不是野外地图
@@ -320,6 +337,20 @@ end
 function X.IsInStarveMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsStarveMap(me.GetMapID())
+end
+
+---判断地图是不是据点攻防地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是据点攻防地图
+function X.IsStrongholdMap(dwMapID)
+	return X.CONSTANT.STRONGHOLD_MAP[dwMapID] or false
+end
+
+---判断当前地图是不是据点攻防地图
+---@return boolean @当前地图是否是据点攻防地图
+function X.IsInStrongholdMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsStrongholdMap(me.GetMapID())
 end
 
 ---判断地图是不是家园地图
