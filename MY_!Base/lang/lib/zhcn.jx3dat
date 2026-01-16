@@ -216,4 +216,13 @@ return {
 
 	['Global config'] = '全局设置',
 	['Distance type'] = '默认距离计算方式',
+
+	FORMAT_RELATIVE_TIME = {
+		['just_now'] = '刚刚',
+		['seconds_ago'] = '%d秒前',
+		['minutes_ago'] = '%d分钟前',
+		['hours_ago'] = '%d小时前',
+		['days_ago'] = '%d天前',
+		['date_format'] = '%yyyy/%MM/%dd',
+	},
 }

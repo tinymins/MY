@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.2') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -181,7 +181,7 @@ end
 
 local function OpenRaidDragPanel(dwMemberID)
 	local hTeam = GetClientTeam()
-	local tMemberInfo = hTeam.GetMemberInfo(dwMemberID)
+	local tMemberInfo = X.GetTeamMemberInfo(dwMemberID)
 	if not tMemberInfo then
 		return
 	end
@@ -202,7 +202,7 @@ local function OpenRaidDragPanel(dwMemberID)
 
 	local hImageLife = hMember:Lookup('Image_Health')
 	local hImageMana = hMember:Lookup('Image_Mana')
-	if tMemberInfo.bIsOnLine then
+	if tMemberInfo.bOnline then
 		local fCurrentLife, fMaxLife = X.GetCharacterLife(tMemberInfo)
 		if fMaxLife > 0 then
 			hImageLife:SetPercentage(fCurrentLife / fMaxLife)
@@ -330,7 +330,7 @@ end
 function D.SetTargetTeammate(dwID, info)
 	if X.IsInPubgMap() and X.GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
 		BattleField_MatchPlayer(dwID)
-	elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
+	elseif info.bOnline and CanTarget(dwID) then -- 有待考证
 		if CFG.bTempTargetEnable then
 			X.DelayCall('MY_Cataclysm_TempTarget', false)
 			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
@@ -436,7 +436,7 @@ function MY_CataclysmParty_Base.OnItemMouseEnter()
 	OnItemRefreshTip()
 	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
 	local info = dwID ~= CTM_TEMP_TARGET_ID and CTM:GetMemberInfo(dwID) or nil
-	if info and info.bIsOnLine and CanTarget(dwID) and CFG.bTempTargetEnable then
+	if info and info.bOnline and CanTarget(dwID) and CFG.bTempTargetEnable then
 		X.DelayCall('MY_Cataclysm_TempTarget', false)
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
@@ -534,12 +534,12 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 				table.insert(menu, v)
 			end
 		end
-		table.insert(menu, { szOption = g_tStrings.STR_LOOKUP, bDisable = not info.bIsOnLine, fnAction = function()
+		table.insert(menu, { szOption = g_tStrings.STR_LOOKUP, bDisable = not info.bOnline, fnAction = function()
 			X.ViewOtherPlayerByID(dwID)
 		end })
 		if MY_CharInfo and MY_CharInfo.ViewCharInfoToPlayer then
 			table.insert(menu, {
-				szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR, bDisable = not info.bIsOnLine, fnAction = function()
+				szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR, bDisable = not info.bOnline, fnAction = function()
 					MY_CharInfo.ViewCharInfoToPlayer(dwID)
 				end
 			})
@@ -728,7 +728,7 @@ function CTM:GetMemberInfo(dwID)
 	if not team then
 		return
 	end
-	return team.GetMemberInfo(dwID)
+	return X.GetTeamMemberInfo(dwID)
 end
 
 function CTM:GetTeamInfo()
@@ -1037,8 +1037,9 @@ end
 function CTM:CallRefreshImages(dwID, ...)
 	if type(dwID) == 'number' then
 		local info = self:GetMemberInfo(dwID)
-		if info and CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
-			self:RefreshImages(CTM_CACHE[dwID], dwID, info, ...)
+		local handle = CTM_CACHE[dwID]
+		if info and handle and handle:IsValid() then
+			self:RefreshImages(handle, dwID, info, ...)
 		end
 	else
 		for k, v in pairs(CTM_CACHE) do
@@ -1120,10 +1121,10 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 	if bIcon then -- 刷新icon
 		local img, bVisible = h:Lookup('Image_Icon'), true
 		if CFG.nShowIcon ~= 4 then
-			if CFG.nShowIcon == 2 and info.dwActualMountKungfuID == 0 then
+			if CFG.nShowIcon == 2 and info.dwActualKungfuID == 0 then
 				img:FromUITex('ui/image/TargetPanel/Target.UITex', 21)
 			elseif CFG.nShowIcon == 2 then
-				local _, nIconID = X.GetSkillName(info.dwActualMountKungfuID, 1)
+				local _, nIconID = X.GetSkillName(info.dwActualKungfuID, 1)
 				if nIconID == 1435 then nIconID = 889 end
 				img:FromIconID(nIconID)
 			elseif CFG.nShowIcon == 1 then
@@ -1186,7 +1187,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		end
 		if CFG.nShowIcon == 4 then
 			local r, g, b = X.GetForceColor(info.dwForceID, 'foreground')
-			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwActualMountKungfuID])
+			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwActualKungfuID])
 			txtSchool:SetFontScheme(CFG.nNameFont)
 			txtSchool:SetFontColor(r, g, b)
 			txtSchool:SetFontScale(fScale)
@@ -1888,8 +1889,9 @@ end
 function CTM:CallDrawHPMP(dwID, ...)
 	if type(dwID) == 'number' then
 		local info = self:GetMemberInfo(dwID)
-		if info and CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
-			self:DrawHPMP(CTM_CACHE[dwID], dwID, info, ...)
+		local handle = CTM_CACHE[dwID]
+		if info and handle and handle:IsValid() then
+			self:DrawHPMP(handle, dwID, info, ...)
 		end
 	else
 		for k, v in pairs(CTM_CACHE) do
@@ -1961,7 +1963,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
 		if h.nDistanceLevel then
 			nAlpha = CFG.tDistanceAlpha[h.nDistanceLevel]
-		elseif info.bIsOnLine then
+		elseif info.bOnline then
 			nAlpha = CFG.tOtherAlpha[3]
 		else
 			nAlpha = CFG.tOtherAlpha[2]
@@ -1989,13 +1991,13 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		end
 		if bSha then
 			local r, g, b = unpack(CFG.tManaColor)
-			if not info.bIsOnLine then
+			if not info.bOnline then
 				r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
 			end
 			self:DrawShadow(Msha, hMana:GetW() * nPercentage, Msha:GetH(), r, g, b, nAlpha, CFG.bManaGradient)
 			Msha:Show()
 		else
-			if info.bIsOnLine then
+			if info.bOnline then
 				Mimg:ToNormal()
 			else
 				Mimg:ToGray()
@@ -2046,7 +2048,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			-- 颜色计算
 			local nNewW = hLife:GetW() * fLifePercentage
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
-			if info.bIsOnLine then
+			if info.bOnline then
 				if CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
 					if player or X.GetPlayer(dwID) then
 						if h.nDistanceLevel then
@@ -2071,7 +2073,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			Ledg:SetAlpha(nAlpha)
 			Ledg:SetRelX(nRelX)
 			Ledg:SetAbsX(hLife:GetAbsX() + nRelX)
-			if info.bIsOnLine then
+			if info.bOnline then
 				Limg:ToNormal()
 			else
 				Limg:ToGray()
@@ -2089,7 +2091,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		-- 数值绘制
 		local life = h:Lookup('Text_Life')
 		local nFontAlpha = math.min(nAlpha * 0.4 + 255 * 0.6, 255)
-		if not info.bIsOnLine then
+		if not info.bOnline then
 			nFontAlpha = nFontAlpha * 0.8
 		end
 		life:SetAlpha(nAlpha == 0 and 0 or nFontAlpha)
@@ -2097,7 +2099,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		life:SetFontScale(CFG.fLifeFontScale)
 		h:Lookup('Text_Name'):SetAlpha(nFontAlpha)
 
-		if not bDeathFlag and info.bIsOnLine then
+		if not bDeathFlag and info.bOnline then
 			life:SetFontColor(255, 255, 255)
 			if CFG.nHPShownMode2 == 0 then
 				life:SetText('')
@@ -2123,7 +2125,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 					end
 				end
 			end
-		elseif not info.bIsOnLine then
+		elseif not info.bOnline then
 			life:SetText('')
 		elseif bDeathFlag then
 			life:SetText('')
@@ -2131,14 +2133,14 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			life:SetFontColor(128, 128, 128)
 			life:SetText(COINSHOP_SOURCE_NULL)
 		end
-		-- if info.dwActualMountKungfuID == 0 then -- 没有同步成功时显示的内容
+		-- if info.dwActualKungfuID == 0 then -- 没有同步成功时显示的内容
 			-- life:SetText('sync ...')
 		-- end
 		h:Lookup('Text_Death'):SetVisible(bDeathFlag)
-		h:Lookup('Text_OffLine'):SetVisible(not info.bIsOnLine)
+		h:Lookup('Text_OffLine'):SetVisible(not info.bOnline)
 		h:Lookup('Text_Death'):SetFontScale(CFG.fLifeFontScale)
 		h:Lookup('Text_OffLine'):SetFontScale(CFG.fLifeFontScale)
-		h:Lookup('Image_PlayerBg'):SetVisible(info.bIsOnLine)
+		h:Lookup('Image_PlayerBg'):SetVisible(info.bOnline)
 	end
 end
 
@@ -2155,11 +2157,11 @@ function CTM:RefreshSputtering()
 			for _, dwID in pairs(tGroupInfo.MemberList) do
 				local info, nCount = team.GetMemberInfo(dwID), 0
 				local player = X.GetPlayer(dwID)
-				if player and not info.bDeathFlag and info.bIsOnLine then
+				if player and not info.bDeathFlag and info.bOnline then
 					for _, dwID2 in pairs(tGroupInfo.MemberList) do
 						local info2 = team.GetMemberInfo(dwID2)
 						local player2 = X.GetPlayer(dwID2)
-						if player2 and not info2.bDeathFlag and info2.bIsOnLine
+						if player2 and not info2.bDeathFlag and info2.bOnline
 						and X.GetCharacterDistance(player, player2, 'gwwean') <= CFG.nSputteringDistance then
 							nCount = nCount + 1
 						end
@@ -2171,19 +2173,25 @@ function CTM:RefreshSputtering()
 				tCount[dwID] = nCount
 			end
 			for _, dwID in pairs(tGroupInfo.MemberList) do
-				CTM_CACHE[dwID]:Lookup('Handle_Sputtering'):SetVisible(tCount[dwID] == nMaxCount)
-				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Text_Sputtering'):SetAlpha(CFG.nSputteringFontAlpha)
-				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Text_Sputtering'):SetText(nMaxCount)
-				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Text_Sputtering'):SetFontColor(unpack(CFG.tSputteringFontColor))
-				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Shadow_Sputtering'):SetAlpha(CFG.nSputteringShadowAlpha)
-				CTM_CACHE[dwID]:Lookup('Handle_Sputtering/Shadow_Sputtering'):SetColorRGB(unpack(CFG.tSputteringShadowColor))
+				local handle = CTM_CACHE[dwID]
+				if handle and handle:IsValid() then
+					handle:Lookup('Handle_Sputtering'):SetVisible(tCount[dwID] == nMaxCount)
+					handle:Lookup('Handle_Sputtering/Text_Sputtering'):SetAlpha(CFG.nSputteringFontAlpha)
+					handle:Lookup('Handle_Sputtering/Text_Sputtering'):SetText(nMaxCount)
+					handle:Lookup('Handle_Sputtering/Text_Sputtering'):SetFontColor(unpack(CFG.tSputteringFontColor))
+					handle:Lookup('Handle_Sputtering/Shadow_Sputtering'):SetAlpha(CFG.nSputteringShadowAlpha)
+					handle:Lookup('Handle_Sputtering/Shadow_Sputtering'):SetColorRGB(unpack(CFG.tSputteringShadowColor))
+				end
 			end
 		end
 	else
 		for nGroup = 0, team.nGroupNum - 1 do
 			local tGroupInfo = team.GetGroupInfo(nGroup)
 			for _, dwID in pairs(tGroupInfo.MemberList) do
-				CTM_CACHE[dwID]:Lookup('Handle_Sputtering'):Hide()
+				local handle = CTM_CACHE[dwID]
+				if handle and handle:IsValid() then
+					handle:Lookup('Handle_Sputtering'):Hide()
+				end
 			end
 		end
 	end
@@ -2219,7 +2227,7 @@ function CTM:StartTeamVote(eType)
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
 			local info = self:GetMemberInfo(k)
-			local bAwait = info.bIsOnLine
+			local bAwait = info.bOnline
 			if k == X.GetClientPlayerID() then
 				if eType == 'raid_ready' then
 					bAwait = false
@@ -2258,20 +2266,20 @@ function CTM:ChangeTeamVoteState(eType, dwID, status)
 	if not opt then
 		return
 	end
-	if CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
-		local h = CTM_CACHE[dwID]
-		h:Lookup(opt.awaitPath):Hide()
+	local handle = CTM_CACHE[dwID]
+	if handle and handle:IsValid() then
+		handle:Lookup(opt.awaitPath):Hide()
 		if status == 'resolve' and opt.resolvePath then
 			local key = 'MY_CATACLYSM_READY_' .. eType .. '_' .. dwID
-			local hResolve = h:Lookup(opt.resolvePath)
+			local hResolve = handle:Lookup(opt.resolvePath)
 			hResolve:Show()
 			hResolve:SetAlpha(240)
 			X.BreatheCall(key, function()
-				if not X.IsElement(h) then
+				if not X.IsElement(handle) then
 					X.BreatheCall(key, false)
 					return
 				end
-				local hResolve = h:Lookup(opt.resolvePath)
+				local hResolve = handle:Lookup(opt.resolvePath)
 				if not X.IsElement(hResolve) then
 					X.BreatheCall(key, false)
 					return
@@ -2283,7 +2291,7 @@ function CTM:ChangeTeamVoteState(eType, dwID, status)
 				end
 			end)
 		elseif status == 'reject' then
-			h:Lookup(opt.rejectPath):Show()
+			handle:Lookup(opt.rejectPath):Show()
 		end
 	end
 end
@@ -2317,8 +2325,9 @@ function CTM:CallEffect(dwTargetID, nDelay)
 end
 
 local function GetMemberHandle(dwID)
-	if CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
-		return CTM_CACHE[dwID]
+	local handle = CTM_CACHE[dwID]
+	if handle and handle:IsValid() then
+		return handle
 	end
 end
 

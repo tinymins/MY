@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_EnterMap'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -65,7 +65,7 @@ X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalke
 				tInfoCache[dwTalkerID] = {
 					szName = info.szName,
 					dwForceID = info.dwForceID,
-					dwMountKungfuID = info.dwActualMountKungfuID,
+					dwMountKungfuID = info.dwActualKungfuID,
 				}
 			end
 		end
@@ -280,6 +280,8 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnActivePage',
+				'OnResizePage',
 				'OnDeactivePage',
 				bStatRange = true,
 			},

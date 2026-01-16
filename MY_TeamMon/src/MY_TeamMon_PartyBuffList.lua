@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_PartyBuffList'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -285,7 +285,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	if dwTargetID == dwID then
 		h:Lookup('Image_Select'):Show()
 	end
-	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID) or 1435)
+	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwActualKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
 	h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / math.max(info.fMaxLife64, 1))
 	local box = h:Lookup('Box_Icon')

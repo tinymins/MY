@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -92,7 +92,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 			return { 255, 255, 255 }
 		end
 		-- 设置基础属性
-		ui:Children('#Image_Kungfu'):Icon((select(2, X.GetSkillName(data.dwActualMountKungfuID or data.dwMountKungfuID, 1))))
+		ui:Children('#Image_Kungfu'):Icon((select(2, X.GetSkillName(data.dwActualKungfuID or data.dwKungfuID, 1))))
 		ui:Children('#Text_Name'):Color({ X.GetForceColor(data.dwForceID) })
 		-- 绘制属性条
 		local y0 = 20

@@ -141,8 +141,8 @@ function X.GetClientPlayerCharInfo()
 		szName = me.szName,
 		dwForceID = me.dwForceID,
 		nEquipScore = me.GetTotalEquipScore() or 0,
-		dwMountKungfuID = kungfu and kungfu.dwSkillID or 0,
-		dwActualMountKungfuID = kungfu and kungfu.dwSkillID or 0,
+		dwKungfuID = kungfu and kungfu.dwSkillID or 0,
+		dwActualKungfuID = kungfu and kungfu.dwSkillID or 0,
 	}
 	if CharInfoMore_GetShowValue then
 		local aCategory, aContent, tTip = CharInfoMore_GetShowValue()
@@ -200,9 +200,9 @@ local function RequestTeammateGlobalID()
 	local nTime = GetTime()
 	local aRequestGlobalID = {}
 	for _, dwTarID in ipairs(team.GetTeamMemberList()) do
-		local info = team.GetMemberInfo(dwTarID)
+		local info = X.GetTeamMemberInfo(dwTarID)
 		if not PLAYER_GLOBAL_ID[dwTarID]
-		and (info and info.bIsOnLine)
+		and (info and info.bOnline)
 		and (not REQUEST_TIME[dwTarID] or nTime - REQUEST_TIME[dwTarID] > 2000) then
 			table.insert(aRequestGlobalID, dwTarID)
 			REQUEST_TIME[dwTarID] = nTime
@@ -312,6 +312,13 @@ end
 ---@return string @去除跨服服务器后缀和转服后缀的角色名
 function X.ExtractPlayerBaseName(szName)
 	return (X.DisassemblePlayerName(szName))
+end
+
+-- 格式化原始角色名
+---@param szName string @角色名
+---@return string @角色被系统强制改名前的原始角色名
+function X.ExtractPlayerInitialName(szName)
+	return szName:gsub('[@%d].*$', '')
 end
 
 --------------------------------------------------------------------------------

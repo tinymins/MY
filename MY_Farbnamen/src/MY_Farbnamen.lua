@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Farbnamen'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -616,7 +616,7 @@ function D.RegisterNameIDHeader(szName, dwID, szHeaderXml)
 		return X.OutputDebugMessage('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', X.DEBUG_LEVEL.ERROR)
 	end
 	if dwID == '*' then
-		szName = X.ExtractPlayerBaseName(szName)
+		szName = X.ExtractPlayerInitialName(szName)
 	end
 	NAME_ID_HEADER_XML[szName][dwID] = szHeaderXml
 end
@@ -635,12 +635,18 @@ function D.GetTip(szName)
 		-- author info
 		if tInfo.dwID and tInfo.szName then
 			local szHeaderXml = GUID_HEADER_XML[tInfo.szGlobalID]
-				or (NAME_ID_HEADER_XML[tInfo.szName] and NAME_ID_HEADER_XML[tInfo.szName][tInfo.dwID])
+			if not szHeaderXml and NAME_ID_HEADER_XML[tInfo.szName] then
+				szHeaderXml =  NAME_ID_HEADER_XML[tInfo.szName][tInfo.dwID]
+			end
+			if not szHeaderXml then
+				local szInitialName = X.ExtractPlayerInitialName(tInfo.szName)
+				szHeaderXml = NAME_ID_HEADER_XML[szInitialName] and NAME_ID_HEADER_XML[szInitialName][tInfo.dwID]
+			end
 			if szHeaderXml then
 				table.insert(tTip, szHeaderXml)
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			elseif tInfo.dwID ~= X.GetClientPlayerID() then
-				local szName = X.ExtractPlayerBaseName(tInfo.szName)
+				local szName = X.ExtractPlayerInitialName(tInfo.szName)
 				local szHeaderXml = NAME_ID_HEADER_XML[szName] and NAME_ID_HEADER_XML[szName]['*']
 				if szHeaderXml then
 					table.insert(tTip, szHeaderXml)
@@ -654,7 +660,7 @@ function D.GetTip(szName)
 		end
 		-- ∆¥“Ù
 		if IsCtrlKeyDown() then
-			local szPinyin = X.Han2TonePinyin(X.ExtractPlayerBaseName(szName), true)[1]
+			local szPinyin = X.Han2TonePinyin(X.ExtractPlayerInitialName(szName), true)[1]
 			if not X.IsEmpty(szPinyin) then
 				table.insert(tTip, GetFormatText(szPinyin .. '\n', 136))
 			end

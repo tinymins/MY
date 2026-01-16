@@ -188,7 +188,7 @@ X.UI.FRAME_THEME = X.FreezeTable({
 	EMPTY  = 'empty' , -- 空白窗体
 })
 X.UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
-X.UI.IS_GLASSMORPHISM = IsFileExist('ui\\Image\\denglu\\Sign_BdCommon.UITex')
+X.UI.IS_GLASSMORPHISM = IsFileExist('ui\\Image\\denglu\\Sign_BdCommon.UITex') and not X.IS_CLASSIC
 
 local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
@@ -1273,29 +1273,76 @@ local function InitComponent(raw, szType)
 			if not nScrollX or nScrollX == 'auto' then
 				nScrollX = raw:GetW() - nFixedLWidth - nFixedRWidth
 			end
-			local nExtraWidth, nStaticWidth = nScrollX, 0
+			-- 计算各列最终宽度
+			local aColWidth = {}
+			local nTotalBaseWidth = 0
+			local aFlexibleCols = {} -- 弹性列（没有设置width字段的列）
 			for i, col in ipairs(aScrollableColumns) do
-				if col.minWidth then
-					nExtraWidth = nExtraWidth - col.minWidth
-				elseif col.width then
-					nExtraWidth = nExtraWidth - col.width
-					nStaticWidth = nStaticWidth + col.width
+				local nBaseWidth = col.width or col.minWidth or 0
+				aColWidth[i] = nBaseWidth
+				nTotalBaseWidth = nTotalBaseWidth + nBaseWidth
+				if not col.width then
+					table.insert(aFlexibleCols, i)
 				end
 			end
-			if nExtraWidth < 0 then
-				nScrollX = nScrollX - nExtraWidth
-				nExtraWidth = 0
+			-- 计算剩余宽度
+			local nExtraWidth = nScrollX - nTotalBaseWidth
+			if nExtraWidth > 0 then
+				-- 第一步：如果存在非固定宽度列，优先将剩余宽度平均分配给它们
+				if #aFlexibleCols > 0 then
+					local nAvgExtra = nExtraWidth / #aFlexibleCols
+					for _, i in ipairs(aFlexibleCols) do
+						aColWidth[i] = aColWidth[i] + nAvgExtra
+					end
+					nExtraWidth = 0 -- 剩余宽度已分配完
+				end
+				-- 第二步：收集所有未达到maxWidth的列，检查并处理超出maxWidth的情况
+				local aUnmaxedCols = {}
+				local nOverflow = 0
+				for i, col in ipairs(aScrollableColumns) do
+					if col.maxWidth and aColWidth[i] > col.maxWidth then
+						nOverflow = nOverflow + (aColWidth[i] - col.maxWidth)
+						aColWidth[i] = col.maxWidth
+					else
+						table.insert(aUnmaxedCols, i)
+					end
+				end
+				-- 加上情况一中未分配的剩余宽度
+				nOverflow = nOverflow + nExtraWidth
+				-- 第三步：循环将超出部分按原始width比例分配给未达到maxWidth的列
+				while nOverflow > 0.01 and #aUnmaxedCols > 0 do
+					local nTotalOrigWidth = 0
+					for _, i in ipairs(aUnmaxedCols) do
+						nTotalOrigWidth = nTotalOrigWidth + (aScrollableColumns[i].minWidth or aScrollableColumns[i].width or 0)
+					end
+					if nTotalOrigWidth <= 0 then
+						break
+					end
+					local aNextUnmaxedCols = {}
+					local nNextOverflow = 0
+					for _, i in ipairs(aUnmaxedCols) do
+						local col = aScrollableColumns[i]
+						local nOrigWidth = col.minWidth or col.width or 0
+						local nAddWidth = nOverflow * nOrigWidth / nTotalOrigWidth
+						aColWidth[i] = aColWidth[i] + nAddWidth
+						if col.maxWidth and aColWidth[i] > col.maxWidth then
+							nNextOverflow = nNextOverflow + (aColWidth[i] - col.maxWidth)
+							aColWidth[i] = col.maxWidth
+						else
+							table.insert(aNextUnmaxedCols, i)
+						end
+					end
+					nOverflow = nNextOverflow
+					aUnmaxedCols = aNextUnmaxedCols
+				end
+			elseif nExtraWidth < 0 then
+				-- 宽度不足，使用原始宽度，出现滚动条
+				nScrollX = nTotalBaseWidth
 			end
+			-- 应用计算后的宽度
 			for i, col in ipairs(aScrollableColumns) do
 				local hCol = hScrollableColumns:Lookup(i - 1) -- 外部居中层
-				local nMinWidth = col.minWidth
-				local nWidth = i == #aScrollableColumns
-					and (nScrollX - nX)
-					or (
-						nMinWidth
-							and math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
-							or (col.width or 0)
-					)
+				local nWidth = aColWidth[i] or col.width or col.minWidth or 0
 				if i == 1 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end

@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.2') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -172,10 +172,10 @@ function D.UpdateItem(hItem, p)
 	-- 心法
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
-		if tMemberInfo and tMemberInfo.dwActualMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(tMemberInfo.dwActualMountKungfuID))
+		if tMemberInfo and tMemberInfo.dwActualKungfuID then
+			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(tMemberInfo.dwActualKungfuID))
 			hInfoList:Lookup('Handle_Kungfu'):Show()
-			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwActualMountKungfuID, 1))
+			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwActualKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
@@ -234,8 +234,8 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass'):Hide()
 		hItem:Lookup('Handle_L/Handle_School'):Show()
 		-- 心法图标
-		if tMemberInfo and tMemberInfo.dwActualMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwActualMountKungfuID, 1))
+		if tMemberInfo and tMemberInfo.dwActualKungfuID then
+			hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwActualKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then

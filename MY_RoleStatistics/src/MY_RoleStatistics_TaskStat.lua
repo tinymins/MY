@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_TaskStat'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -1271,7 +1271,9 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnActivePage',
 				'OnResizePage',
+				'OnDeactivePage',
 				szSaveDB = 'MY_RoleStatistics_TaskStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_TaskStat.bFloatEntry',
 			},

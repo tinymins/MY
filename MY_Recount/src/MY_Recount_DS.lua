@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -1724,9 +1724,9 @@ X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµ
 	local me = X.GetClientPlayer()
 	if team and me and (me.IsInParty() or me.IsInRaid()) then
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
-			local info = team.GetMemberInfo(dwID)
+			local info = X.GetTeamMemberInfo(dwID)
 			if info then
-				if not info.bIsOnLine then
+				if not info.bOnline then
 					D.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.OFFLINE, true)
 				elseif info.bDeathFlag then
 					D.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.DEATH, true)

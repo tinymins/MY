@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar_ScreenArrow'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.2') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -355,8 +355,8 @@ function D.OnBreathe()
 						dwMountKungfuID = UI_GetPlayerMountKungfuID()
 					else
 						local info = X.GetTeamMemberInfo(dwID)
-						if info and not X.IsEmpty(info.dwActualMountKungfuID) then
-							dwMountKungfuID = info.dwActualMountKungfuID
+						if info and not X.IsEmpty(info.dwActualKungfuID) then
+							dwMountKungfuID = info.dwActualKungfuID
 						else
 							local kungfu = kTarget.GetKungfuMount()
 							if kungfu then

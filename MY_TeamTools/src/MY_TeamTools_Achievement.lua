@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_Achievement'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -223,12 +223,12 @@ X.RegisterEvent('LOADING_ENDING', function()
 end)
 
 -- 获取成员列表
-function D.GetMemberList(bIsOnLine)
+function D.GetMemberList(bOnline)
 	local aList = {}
 	if MY_TeamTools.szStatRange == 'RAID' then
 		for _, dwID in ipairs(X.GetTeamMemberList()) do
 			local tMember = X.GetTeamMemberInfo(dwID)
-			if tMember and (not bIsOnLine or tMember.bOnline) then
+			if tMember and (not bOnline or tMember.bOnline) then
 				table.insert(aList, {
 					dwID = tMember.dwID,
 					szGlobalID = tMember.szGlobalID,
@@ -916,6 +916,8 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnActivePage',
+				'OnResizePage',
 				'OnDeactivePage',
 				bStatRange = true,
 			},

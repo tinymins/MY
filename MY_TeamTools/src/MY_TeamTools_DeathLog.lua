@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_DeathLog'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -172,8 +172,8 @@ local function OnDeath(dwID, dwKiller)
 					INFO_CACHE[dwID] = {
 						szName = info.szName,
 						dwForceID = info.dwForceID,
-						dwMountKungfuID = info.dwActualMountKungfuID,
-						dwActualMountKungfuID = info.dwActualMountKungfuID,
+						dwMountKungfuID = info.dwActualKungfuID,
+						dwActualMountKungfuID = info.dwActualKungfuID,
 					}
 				end
 			end
@@ -235,7 +235,7 @@ function D.UpdatePage(page)
 		local info = INFO_CACHE[dwID]
 		if info then
 			local h = hDeathList:AppendItemFromData(page.hDeathPlayer, 'Handle_DeathPlayer')
-			local icon = select(2, MY_GetSkillName(info.dwActualMountKungfuID))
+			local icon = select(2, MY_GetSkillName(info.dwActualKungfuID))
 			local szName = info.szName
 			h.dwID = dwID
 			h.szName = szName
@@ -429,6 +429,8 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnActivePage',
+				'OnResizePage',
 				'OnDeactivePage',
 			},
 			root = D,

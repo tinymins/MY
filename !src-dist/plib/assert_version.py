@@ -162,7 +162,7 @@ def update_assert_version(
     """
     # 验证新版本格式
     try:
-        Semver(new_version)
+        new_semver = Semver(new_version)
     except Exception:
         print(f"Error: Invalid version format: {new_version}")
         return 0, 0
@@ -171,6 +171,10 @@ def update_assert_version(
     current_dir = os.getcwd()
     print(f"Scanning Lua files in: {current_dir}")
     print(f"Target version: {new_version}")
+
+    # 检测是否为大版本升级
+    is_major_upgrade = False
+    previous_version = ""
 
     # 如果指定了 diff 参数或 force_changed，使用 git.get_version_info 获取版本信息
     if diff_ver is not None or force_changed:
@@ -181,11 +185,33 @@ def update_assert_version(
 
         base_hash = version_info.get("previous_hash", "")
         changed_folders = version_info.get("changed_addon_folders", [])
+        previous_version = version_info.get("previous", "")
 
         if base_hash:
-            print(f"Base version: {version_info.get('previous', '')} ({base_hash})")
+            print(f"Base version: {previous_version} ({base_hash})")
 
-        if changed_folders:
+        # 检测大版本升级
+        if previous_version:
+            try:
+                prev_semver = Semver(previous_version)
+                is_major_upgrade = new_semver.major > prev_semver.major
+                if is_major_upgrade:
+                    print(
+                        f"⚠️ Major version upgrade detected ({previous_version} -> {new_version})"
+                    )
+                    print(
+                        "Scanning ALL Lua files to update incompatible version constraints..."
+                    )
+            except Exception:
+                pass
+
+        # 大版本升级时，扫描所有文件（让 satisfies 逻辑判断是否需要更新）
+        if is_major_upgrade:
+            lua_files = find_lua_files(current_dir)
+            # 大版本升级时不强制更新，让 semver_satisfies 自然判断
+            # ^28.x.x 不满足 29.0.0，会自动更新
+            force_update = False
+        elif changed_folders:
             print(f"Changed addon folders: {', '.join(changed_folders)}")
             # 只处理变更的子插件文件夹中的 Lua 文件
             lua_files = []

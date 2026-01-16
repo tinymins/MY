@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamRestore'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.3') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -54,7 +54,7 @@ function D.Save(nIndex, szName)
 		tList2[nGroup] = {}
 		for _, dwID in ipairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
-			local info = team.GetMemberInfo(dwID)
+			local info = X.GetTeamMemberInfo(dwID)
 			if szName then
 				local item = {}
 				item.nGroup = nGroup
@@ -62,7 +62,7 @@ function D.Save(nIndex, szName)
 				item.bForm = dwID == tGroupInfo.dwFormationLeader
 				tList[szName] = item
 				table.insert(tList2[nGroup], {
-					dwMountKungfuID = info.dwMountKungfuID,
+					dwKungfuID = info.dwKungfuID,
 					nMark = tMark[dwID],
 					bForm = dwID == tGroupInfo.dwFormationLeader,
 					nGroup = nGroup,
@@ -231,14 +231,14 @@ function D.Restore2(n)
 	for nGroup = 0, team.nGroupNum - 1 do
 		local tGroupInfo = team.GetGroupInfo(nGroup)
 		for k,v in pairs(tGroupInfo.MemberList) do
-			local info = team.GetMemberInfo(v)
-			tWrong[v] = { nGroup = nGroup, dwMountKungfuID = info.dwMountKungfuID }
+			local info = X.GetTeamMemberInfo(v)
+			tWrong[v] = { nGroup = nGroup, dwKungfuID = info.dwKungfuID }
 		end
 	end
 
-	local fnAction = function(dwMountKungfuID,nGroup,dwID)
+	local fnAction = function(dwKungfuID,nGroup,dwID)
 		for k,v in pairs(tWrong) do
-			if dwMountKungfuID and v.dwMountKungfuID == dwMountKungfuID then -- 只要内功匹配的人
+			if dwKungfuID and v.dwKungfuID == dwKungfuID then -- 只要内功匹配的人
 				return k,v
 			elseif nGroup and v.nGroup == nGroup and k ~= dwID then -- 不是自己的同组人要一个
 				return k,v
@@ -250,9 +250,9 @@ function D.Restore2(n)
 	for nGroup,tGroup in pairs(tSaved) do
 		for k,v in ipairs(tGroup) do
 			local tGroupInfo = team.GetGroupInfo(nGroup)
-			local dwID,tab = fnAction(v.dwMountKungfuID)
+			local dwID,tab = fnAction(v.dwKungfuID)
 			if dwID then
-				local info = team.GetMemberInfo(dwID)
+				local info = X.GetTeamMemberInfo(dwID)
 				if nGroup == tab.nGroup then
 					tWrong[dwID] = nil
 					X.OutputSystemMessage(_L('Need not adjust: %s', info.szName))

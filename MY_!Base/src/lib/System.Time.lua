@@ -241,6 +241,92 @@ function X.TimeToDate(nTimestamp)
 	return date.year, date.month, date.day, date.hour, date.minute, date.second
 end
 
+---@class FormatRelativeTimeThreshold @相对时间阈值配置
+---@field nJustNow number @显示"刚刚"的秒数阈值，默认值：10
+---@field nSeconds number @显示"x秒前"的秒数阈值，默认值：60
+---@field nMinutes number @显示"x分钟前"的秒数阈值，默认值：3600
+---@field nHours number @显示"x小时前"的秒数阈值，默认值：86400
+---@field nDays number @显示"x天前"的秒数阈值，默认值：2592000 (30天)
+
+---@class FormatRelativeTimeFormat @相对时间格式化文本配置
+---@field szJustNow string @"刚刚"的格式化文本
+---@field szSecondsAgo string @"x秒前"的格式化文本，需包含 %d 占位符
+---@field szMinutesAgo string @"x分钟前"的格式化文本，需包含 %d 占位符
+---@field szHoursAgo string @"x小时前"的格式化文本，需包含 %d 占位符
+---@field szDaysAgo string @"x天前"的格式化文本，需包含 %d 占位符
+---@field szDateFormat string @超出阈值后显示的日期格式化文本，使用 X.FormatTime 格式
+
+---@class FormatRelativeTimeOptions @相对时间格式化配置
+---@field nJustNow number? @显示"刚刚"的秒数阈值，默认值：10
+---@field nSeconds number? @显示"x秒前"的秒数阈值，默认值：60
+---@field nMinutes number? @显示"x分钟前"的秒数阈值，默认值：3600
+---@field nHours number? @显示"x小时前"的秒数阈值，默认值：86400
+---@field nDays number? @显示"x天前"的秒数阈值，默认值：2592000 (30天)
+---@field szJustNow string? @"刚刚"的格式化文本
+---@field szSecondsAgo string? @"x秒前"的格式化文本，需包含 %d 占位符
+---@field szMinutesAgo string? @"x分钟前"的格式化文本，需包含 %d 占位符
+---@field szHoursAgo string? @"x小时前"的格式化文本，需包含 %d 占位符
+---@field szDaysAgo string? @"x天前"的格式化文本，需包含 %d 占位符
+---@field szDateFormat string? @超出阈值后显示的日期格式化文本，使用 X.FormatTime 格式
+
+---@type FormatRelativeTimeOptions
+local FORMAT_RELATIVE_TIME_DEFAULT_OPTIONS = {
+	nJustNow = 10,      -- 10秒内显示"刚刚"
+	nSeconds = 60,      -- 60秒内显示"x秒前"
+	nMinutes = 3600,    -- 1小时内显示"x分钟前"
+	nHours = 86400,     -- 24小时内显示"x小时前"
+	nDays = 2592000,    -- 30天内显示"x天前"
+}
+
+-- 格式化相对时间
+-- (string) X.FormatRelativeTime(nTimestamp, tOptions)
+---@param nTimestamp number @UNIX时间戳
+---@param tOptions FormatRelativeTimeOptions? @配置参数，可选，不传使用默认值
+---@return string @格式化后的相对时间描述
+function X.FormatRelativeTime(nTimestamp, tOptions)
+	local nNow = GetCurrentTime()
+	local nDiff = nNow - nTimestamp
+	-- 合并默认配置
+	local nJustNow = FORMAT_RELATIVE_TIME_DEFAULT_OPTIONS.nJustNow
+	local nSeconds = FORMAT_RELATIVE_TIME_DEFAULT_OPTIONS.nSeconds
+	local nMinutes = FORMAT_RELATIVE_TIME_DEFAULT_OPTIONS.nMinutes
+	local nHours = FORMAT_RELATIVE_TIME_DEFAULT_OPTIONS.nHours
+	local nDays = FORMAT_RELATIVE_TIME_DEFAULT_OPTIONS.nDays
+	local szJustNow = _L.FORMAT_RELATIVE_TIME.just_now
+	local szSecondsAgo = _L.FORMAT_RELATIVE_TIME.seconds_ago
+	local szMinutesAgo = _L.FORMAT_RELATIVE_TIME.minutes_ago
+	local szHoursAgo = _L.FORMAT_RELATIVE_TIME.hours_ago
+	local szDaysAgo = _L.FORMAT_RELATIVE_TIME.days_ago
+	local szDateFormat = _L.FORMAT_RELATIVE_TIME.date_format
+	if X.IsTable(tOptions) then
+		if X.IsNumber(tOptions.nJustNow) then nJustNow = tOptions.nJustNow end
+		if X.IsNumber(tOptions.nSeconds) then nSeconds = tOptions.nSeconds end
+		if X.IsNumber(tOptions.nMinutes) then nMinutes = tOptions.nMinutes end
+		if X.IsNumber(tOptions.nHours) then nHours = tOptions.nHours end
+		if X.IsNumber(tOptions.nDays) then nDays = tOptions.nDays end
+		if X.IsString(tOptions.szJustNow) then szJustNow = tOptions.szJustNow end
+		if X.IsString(tOptions.szSecondsAgo) then szSecondsAgo = tOptions.szSecondsAgo end
+		if X.IsString(tOptions.szMinutesAgo) then szMinutesAgo = tOptions.szMinutesAgo end
+		if X.IsString(tOptions.szHoursAgo) then szHoursAgo = tOptions.szHoursAgo end
+		if X.IsString(tOptions.szDaysAgo) then szDaysAgo = tOptions.szDaysAgo end
+		if X.IsString(tOptions.szDateFormat) then szDateFormat = tOptions.szDateFormat end
+	end
+	-- 根据时间差返回相对时间描述
+	if nDiff < nJustNow then
+		return szJustNow
+	elseif nDiff < nSeconds then
+		return string.format(szSecondsAgo, nDiff)
+	elseif nDiff < nMinutes then
+		return string.format(szMinutesAgo, math.floor(nDiff / 60))
+	elseif nDiff < nHours then
+		return string.format(szHoursAgo, math.floor(nDiff / 3600))
+	elseif nDiff < nDays then
+		return string.format(szDaysAgo, math.floor(nDiff / 86400))
+	else
+		return X.FormatTime(nTimestamp, szDateFormat)
+	end
+end
+
 ---格式化数字小数点
 ---(string) X.FormatNumberDot(nValue, nDot, bDot, nMin)
 ---@param nValue number @要格式化的数字

@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetDirection'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -139,8 +139,8 @@ end
 do
 local function SetObjectAvatar(img, tar, info)
 	if X.IsPlayer(tar.dwID) then
-		if info and info.dwActualMountKungfuID then
-			img:FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID, 1))
+		if info and info.dwActualKungfuID then
+			img:FromIconID(Table_GetSkillIconID(info.dwActualKungfuID, 1))
 		else
 			local kungfu = tar.GetKungfuMount and tar.GetKungfuMount()
 			if kungfu and kungfu.dwSkillID ~= 0 then

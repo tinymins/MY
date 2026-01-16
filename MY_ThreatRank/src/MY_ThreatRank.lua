@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ThreatRank'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -508,7 +508,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if O.bForceIcon then
 				local info = X.IsTeammate(v.id) and MY_IsPlayer(v.id) and X.GetTeamMemberInfo(v.id)
 				if info then
-					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwActualMountKungfuID, 1))
+					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwActualKungfuID, 1))
 				elseif MY_IsPlayer(v.id) then
 					item:Lookup('Image_Icon'):FromUITex(GetForceImage(dwForceID))
 				else

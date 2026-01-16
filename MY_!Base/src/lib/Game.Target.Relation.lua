@@ -137,11 +137,7 @@ function X.IsAuthorPlayer(dwID, szName, szGlobalID)
 	if szGlobalID and AUTHOR_GLOBAL_ID[szGlobalID] then
 		return true
 	end
-	if dwID and (
-		AUTHOR_ROLE[dwID] == szName
-			or AUTHOR_ROLE[dwID] == X.ExtractPlayerOriginName(szName)
-			or AUTHOR_ROLE[dwID] == X.ExtractPlayerBaseName(szName)
-	) then
+	if dwID and (AUTHOR_ROLE[dwID] == szName or AUTHOR_ROLE[dwID] == X.ExtractPlayerInitialName(szName)) then
 		return true
 	end
 	return false

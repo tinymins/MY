@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -1382,21 +1382,20 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		end
 	end
 	local item         = GetItem(info.dwID)
-	local team         = GetClientTeam()
-	local player       = team.GetMemberInfo(dwID)
+	local playerInfo   = X.GetTeamMemberInfo(dwID)
 	local aPartyMember = D.GetaPartyMember(info.dwDoodadID)
 	if item then
-		if not player or (player and not player.bIsOnLine) then -- 不在线
+		if not playerInfo or (playerInfo and not playerInfo.bOnline) then -- 不在线
 			return X.Alert(_L['No Pick up Object, may due to Network off - line'])
 		end
 		if not aPartyMember(dwID) then -- 给不了
 			return X.Alert(_L['No Pick up Object, may due to Network off - line'])
 		end
-		if player.dwMapID ~= me.GetMapID() then -- 不在同一地图
+		if playerInfo.dwMapID ~= me.GetMapID() then -- 不在同一地图
 			return X.Alert(_L['No Pick up Object, Please confirm that in the Dungeon.'])
 		end
 		local tab = {
-			szPlayer   = player.szName,
+			szPlayer   = playerInfo.szName,
 			dwID       = item.dwID,
 			nUiId      = item.nUiId,
 			szNpcName  = info.szDoodadName,
@@ -1406,7 +1405,7 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 			nVersion   = item.nVersion,
 			nTime      = GetCurrentTime(),
 			nQuality   = item.nQuality,
-			dwForceID  = player.dwForceID,
+			dwForceID  = playerInfo.dwForceID,
 			szName     = X.GetItemNameByItem(item),
 			nGenre     = item.nGenre,
 		}

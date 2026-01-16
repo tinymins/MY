@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^28.0.1') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -277,8 +277,8 @@ end
 function D.GetTeamMemberMenu(fnAction, bDisable, bSelf)
 	local tTeam, menu = {}, {}
 	for _, v in ipairs(GetClientTeam().GetTeamMemberList()) do
-		local info = GetClientTeam().GetMemberInfo(v)
-		table.insert(tTeam, { szName = info.szName, dwID = v, dwForce = info.dwForceID, bIsOnLine = info.bIsOnLine})
+		local info = X.GetTeamMemberInfo(v)
+		table.insert(tTeam, { szName = info.szName, dwID = v, dwForce = info.dwForceID, bOnline = info.bOnline})
 	end
 	local dwID = X.GetClientPlayerID()
 	table.sort(tTeam, function(a, b) return a.dwForce < b.dwForce end)
@@ -288,7 +288,7 @@ function D.GetTeamMemberMenu(fnAction, bDisable, bSelf)
 			table.insert(menu, {
 				szOption = v.szName,
 				szLayer  = 'ICON_RIGHTMOST',
-				bDisable = bDisable and not v.bIsOnLine,
+				bDisable = bDisable and not v.bOnline,
 				szIcon   = szIcon,
 				nFrame   = nFrame,
 				rgb      = { X.GetForceColor(v.dwForce) },

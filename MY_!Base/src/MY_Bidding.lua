@@ -787,7 +787,7 @@ X.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, szT
 		nPrice = data.nPrice,
 		dwTime = GetCurrentTime(),
 		dwTick = GetTickCount(),
-		dwKungfu = GetClientTeam().GetMemberInfo(dwTalkerID).dwMountKungfuID,
+		dwKungfu = X.GetTeamMemberInfo(dwTalkerID).dwKungfuID,
 	})
 	local frame = D.GetFrame(data.szKey)
 	if not frame then
