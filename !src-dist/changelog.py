@@ -184,7 +184,7 @@ def process_changelog_input(changelog_input: str) -> List[str]:
         else:
             # 转换 插件:内容 或 插件：内容 格式为 * [插件] 内容
             if re.search(r"[：:]", line):
-                parts = re.split(r"[：:]", line, 1)
+                parts = re.split(r"[：:]", line, maxsplit=1)
                 plugin = parts[0].strip().strip('"').strip('"').strip('"')
                 content = (
                     parts[1].strip().strip('"').strip('"').strip('"')
