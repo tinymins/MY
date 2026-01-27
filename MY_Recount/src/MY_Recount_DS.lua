@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -637,7 +637,7 @@ function D.GetPlayer(dwID)
 	if dwID == X.GetClientPlayerID() then
 		player = X.GetClientPlayer()
 		info = {
-			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+			dwKungfuID = UI_GetPlayerMountKungfuID(),
 			szName = player.szName,
 		}
 	else
