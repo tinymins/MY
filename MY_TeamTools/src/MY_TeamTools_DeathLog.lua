@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_DeathLog'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -162,8 +162,8 @@ local function OnDeath(dwID, dwKiller)
 				INFO_CACHE[dwID] = {
 					szName = me.szName,
 					dwForceID = me.dwForceID,
-					dwMountKungfuID = UI_GetPlayerMountKungfuID(),
-					dwActualMountKungfuID = UI_GetPlayerMountKungfuID(),
+					dwKungfuID = UI_GetPlayerMountKungfuID(),
+					dwActualKungfuID = UI_GetPlayerMountKungfuID(),
 				}
 			else
 				local team = GetClientTeam()
@@ -172,8 +172,8 @@ local function OnDeath(dwID, dwKiller)
 					INFO_CACHE[dwID] = {
 						szName = info.szName,
 						dwForceID = info.dwForceID,
-						dwMountKungfuID = info.dwActualKungfuID,
-						dwActualMountKungfuID = info.dwActualKungfuID,
+						dwKungfuID = info.dwActualKungfuID,
+						dwActualKungfuID = info.dwActualKungfuID,
 					}
 				end
 			end

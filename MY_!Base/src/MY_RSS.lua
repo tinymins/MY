@@ -22,19 +22,20 @@ end
 --------------------------------------------------------------------------------
 local D = {}
 local RSS_FILE = {'temporary/rss.jx3dat', X.PATH_TYPE.GLOBAL}
-local RSS_DATA = X.LoadLUAData(RSS_FILE)
+local RSS_DATA = X.LoadLUAData(RSS_FILE) or {}
 local RSS_ADAPTER = {}
 local RSS_DATA_CACHE = {}
+local RSS_BASE_URL      = 'https://rss.j3cx.com'
 local RSS_PULL_BASE_URL = 'https://pull.j3cx.com'
 local RSS_PUSH_BASE_URL = 'https://push.j3cx.com'
 local RSS_PAGE_BASE_URL = 'https://page.j3cx.com'
 
 function D.Get(szKey)
-	if not RSS_DATA then
+	if X.IsNil(RSS_DATA) then
 		return
 	end
 	if not RSS_DATA_CACHE[szKey] then
-		local data = RSS_DATA[szKey]
+		local data = X.Clone(RSS_DATA[szKey])
 		if RSS_ADAPTER[szKey] then
 			data = RSS_ADAPTER[szKey](data)
 		end
@@ -46,35 +47,76 @@ end
 function D.RegisterAdapter(szKey, fnAdapter)
 	RSS_ADAPTER[szKey] = fnAdapter
 	RSS_DATA_CACHE[szKey] = nil
-	if not RSS_DATA then
+	if X.IsNil(RSS_DATA) then
 		return
 	end
 	FireUIEvent('MY_RSS_UPDATE', szKey)
 end
 
 function D.Sync()
-	X.Ajax({
-		url = RSS_PULL_BASE_URL .. '/config/all'
+	local RSS_URL = {
+		RSS_BASE_URL .. '/rss'
 			.. '?l=' .. X.ENVIRONMENT.GAME_LANG
 			.. '&L=' .. X.ENVIRONMENT.GAME_EDITION
 			.. '&_=' .. GetCurrentTime(),
-		success = function(html, status)
-			RSS_DATA = X.DecodeJSON(html)
-			if X.IsTable(RSS_DATA) and not X.IsNumber(RSS_DATA.EXPIRES) then
-				local year, month, day, hour, minute, second = X.TimeToDate(GetCurrentTime())
-				if hour >= 7 then
-					day = day + 1
-				end
-				RSS_DATA.EXPIRES = X.DateToTime(year, month, day, 7, 0, 0)
+		RSS_PULL_BASE_URL .. '/config/all'
+			.. '?l=' .. X.ENVIRONMENT.GAME_LANG
+			.. '&L=' .. X.ENVIRONMENT.GAME_EDITION
+			.. '&_=' .. GetCurrentTime(),
+	}
+	local tData, tDataIndex = {}, {}
+	local nPending =  #RSS_URL
+	do
+		local nYear, nMonth, nDay, nHour, nMinute, nSecond = X.TimeToDate(GetCurrentTime())
+		if nHour >= 7 then
+			nDay = nDay + 1
+		end
+		tData.EXPIRES = X.DateToTime(nYear, nMonth, nDay, 7, 0, 0)
+	end
+	local function fnAction(nIndex, data)
+		if X.IsTable(data) then
+			if X.IsNumber(data.EXPIRES) then
+				tData.EXPIRES = math.min(tData.EXPIRES or math.huge, data.EXPIRES)
 			end
-			X.SaveLUAData(RSS_FILE, RSS_DATA)
-			FireUIEvent('MY_RSS_UPDATE')
-		end,
-	})
+			for k, v in pairs(data) do
+				if k ~= 'EXPIRES' and nIndex < (tDataIndex[k] or math.huge) then
+					tData[k] = v
+					tDataIndex[k] = nIndex
+					RSS_DATA[k] = v
+					RSS_DATA_CACHE[k] = nil
+					FireUIEvent('MY_RSS_UPDATE', k)
+				end
+			end
+		end
+		nPending = nPending - 1
+		if nPending > 0 then
+			return
+		end
+		for k, _ in pairs(RSS_DATA) do
+			if X.IsNil(tData[k]) then
+				RSS_DATA[k] = nil
+				RSS_DATA_CACHE[k] = nil
+				FireUIEvent('MY_RSS_UPDATE', k)
+			end
+		end
+		X.SaveLUAData(RSS_FILE, RSS_DATA)
+	end
+	for nIndex, szURL in ipairs(RSS_URL) do
+		X.Ajax({
+			url = szURL,
+			success = function(html, status)
+				local data = X.DecodeJSON(html)
+				fnAction(nIndex, data)
+			end,
+			error = function(errMsg, status)
+				fnAction(nIndex, nil)
+			end,
+		})
+	end
 end
 
 X.RegisterInit('MY_RSS', function()
-	if not RSS_DATA or not X.IsNumber(RSS_DATA.EXPIRES) or RSS_DATA.EXPIRES < GetCurrentTime() then
+	if not X.IsNumber(RSS_DATA.EXPIRES) or RSS_DATA.EXPIRES < GetCurrentTime() then
 		D.Sync()
 	else
 		FireUIEvent('MY_RSS_UPDATE')
