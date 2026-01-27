@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar_ScreenArrow'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -350,21 +350,21 @@ function D.OnBreathe()
 				end
 				oo:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrawArrow()
 				if dwType == TARGET.PLAYER then
-					local dwMountKungfuID = -1
+					local dwKungfuID = -1
 					if dwID == X.GetClientPlayerID() then
-						dwMountKungfuID = UI_GetPlayerMountKungfuID()
+						dwKungfuID = UI_GetPlayerMountKungfuID()
 					else
 						local info = X.GetTeamMemberInfo(dwID)
 						if info and not X.IsEmpty(info.dwActualKungfuID) then
-							dwMountKungfuID = info.dwActualKungfuID
+							dwKungfuID = info.dwActualKungfuID
 						else
 							local kungfu = kTarget.GetKungfuMount()
 							if kungfu then
-								dwMountKungfuID = kungfu.dwSkillID
+								dwKungfuID = kungfu.dwSkillID
 							end
 						end
 					end
-					rlcmd(string.format("set caption kungfu icon %u %u %u", dwID, 1, dwMountKungfuID))
+					rlcmd(string.format("set caption kungfu icon %u %u %u", dwID, 1, dwKungfuID))
 				end
 				-- 这里要想办法覆盖C++的颜色设置 C++代码上有个强制逻辑 优先级比rlcmd还高 估计是两个人写的
 				local szRelation = X.GetCharacterRelation(UI_GetClientPlayerID(), dwID)

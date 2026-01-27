@@ -50,9 +50,14 @@ local CODE_PAGE = {
 	GBK = 936,
 }
 
+local IETF_BCP_47 = {
+	zhcn = 'zh-CN',
+	zhtw = 'zh-TW',
+}
+
 local _NAME_SPACE_            = 'MY'
-local _BUILD_                 = '20260114'
-local _VERSION_               = '29.0.0'
+local _BUILD_                 = '20260127'
+local _VERSION_               = '29.0.3'
 local _MENU_COLOR_            = {255, 165, 79}
 local _INTERFACE_ROOT_        = 'Interface/'
 local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
@@ -110,6 +115,7 @@ local X = {
 	ENVIRONMENT = setmetatable({}, {
 		__index = setmetatable({
 			GAME_LANG = _GAME_LANG_,
+			GAME_LOCALE = IETF_BCP_47[_GAME_LANG_] or 'en-US',
 			GAME_BRANCH = _GAME_BRANCH_,
 			GAME_EDITION = _GAME_EDITION_,
 			GAME_VERSION = _GAME_VERSION_,

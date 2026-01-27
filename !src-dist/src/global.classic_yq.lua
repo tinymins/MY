@@ -1003,6 +1003,7 @@ SetOnlineFrameAnchor = FunctionType
 SetTarget = FunctionType
 SetTeamMark = FunctionType
 SETTING_CAST_MODE = TableType
+SetWorldMark = FunctionType
 SFX_REPRESENT = TableType
 SHARE_QUEST = TableType
 SHOP_SYSTEM_RESPOND_CODE = TableType

@@ -15,21 +15,6 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 function X.GetFontList()
 	local aList, tExist = {}, {}
-	-- 插件字体包
-	local FR = _G[X.NSFormatString('{$NS}_FontResource')]
-	if X.IsTable(FR) and X.IsFunction(FR.GetList) then
-		for _, p in ipairs(FR.GetList()) do
-			local szFile = p.szFile:gsub('/', '\\')
-			local szKey = szFile:lower()
-			if not tExist[szKey] then
-				table.insert(aList, {
-					szName = p.szName,
-					szFile = p.szFile,
-				})
-				tExist[szKey] = true
-			end
-		end
-	end
 	-- 系统字体
 	for _, p in X.ipairs_r(Font.GetFontPathList() or {}) do
 		local szFile = p.szFile:gsub('/', '\\')
@@ -42,30 +27,15 @@ function X.GetFontList()
 			tExist[szKey] = true
 		end
 	end
-	-- 按照描述文件添加字体
+	-- 用户字体
 	local CUSTOM_FONT_DIR = X.FormatPath({'font/', X.PATH_TYPE.GLOBAL})
-	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_FONT_DIR)) do
-		local info = szFile:lower():find('%.jx3dat$') and X.LoadLUAData(CUSTOM_FONT_DIR .. szFile, { passphrase = false })
-		if info and info.szName and info.szFile then
-			local szFontFile = info.szFile:gsub('^%./', CUSTOM_FONT_DIR):gsub('/', '\\')
-			local szKey = szFontFile:lower()
-			if not tExist[szKey] then
-				table.insert(aList, {
-					szName = info.szName,
-					szFile = szFontFile,
-				})
-				tExist[szKey] = true
-			end
-		end
-	end
-	-- 纯字体文件
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_FONT_DIR)) do
 		if szFile:lower():find('%.[to]tf$') then
 			local szFontFile = (CUSTOM_FONT_DIR .. szFile):gsub('/', '\\')
 			local szKey = szFontFile:lower()
 			if not tExist[szKey] then
 				table.insert(aList, {
-					szName = szFile,
+					szName = szFile:gsub('%..+$', ''),
 					szFile = szFontFile,
 				})
 				tExist[szKey] = true

@@ -255,56 +255,7 @@ function PS.OnPanelActive(wnd)
 		x = x, h = 30,
 		text = _L['Error message'],
 		menu = function()
-			local menu = {
-				{
-					szOption = _L['Show error message'],
-					tip = {
-						render = _L['Show error message, please commit it while report bugs'],
-						position = X.UI.TIP_POSITION.BOTTOM_TOP,
-					},
-					fnAction = function()
-						local szErrmsg = X.GetAddonErrorMessage()
-						local nErrmsgLen, nMaxLen = #szErrmsg, 1024
-						if nErrmsgLen == 0 then
-							X.Alert(_L['No error message found.'])
-							return
-						end
-						if nErrmsgLen > 300 then
-							szErrmsg = szErrmsg:sub(0, nMaxLen)
-								.. '\n========================================'
-								.. '\n' .. '... ' .. (nErrmsgLen - nMaxLen) .. ' char(s) omitted.'
-								.. '\n========================================'
-								.. '\n# Full error logs:'
-								.. '\n> ' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath())
-								.. '\n========================================'
-						end
-						X.UI.OpenTextEditor(szErrmsg, { w = 800, h = 600, title = _L['Error message'] })
-						X.UI.ClosePopupMenu()
-					end,
-				},
-				{
-					szOption = _L['Open error message folder'],
-					fnAction = function()
-						X.OpenFolder(X.GetAbsolutePath(X.GetAddonErrorMessageFilePath()))
-						X.UI.ClosePopupMenu()
-					end,
-				},
-				{
-					szOption = _L['Open logs folder'],
-					fnAction = function()
-						X.OpenFolder(X.GetAbsolutePath(X.FormatPath({'logs/', X.PATH_TYPE.ROLE})))
-						X.UI.ClosePopupMenu()
-					end,
-				},
-				X.CONSTANT.MENU_DIVIDER,
-				{
-					szOption = _L['Report bugs'],
-					fnAction = function()
-						X.OpenBrowser(X.PACKET_INFO.AUTHOR_FEEDBACK_URL)
-						X.UI.ClosePopupMenu()
-					end,
-				},
-			}
+			local menu = {}
 			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
 				table.insert(menu, 1, {
 					szOption = _L['Enable debug tools'],
@@ -315,6 +266,7 @@ function PS.OnPanelActive(wnd)
 						X.SetDebugging('Dev_UIManager', true)
 						X.SetDebugging('Dev_UIFindStation', true)
 						X.SetDebugging('Dev_DebugLogs', true)
+						X.SetDebugging('Dev_BgMsgViewer', true)
 						X.OutputSystemAnnounceMessage(_L['Debug tools has been enabled...'])
 						X.Panel.Reopen()
 						X.UI.ClosePopupMenu()
@@ -322,9 +274,132 @@ function PS.OnPanelActive(wnd)
 				})
 				table.insert(menu, 2, X.CONSTANT.MENU_DIVIDER)
 			end
+			if X.IsDebugging('Dev_BgMsgViewer') then
+				table.insert(menu, 1, {
+					szOption = _L['Open BgMsgViewer'],
+					rgb = { 128, 255, 128 },
+					fnAction = function()
+						_G[X.NSFormatString('{$NS}_BgMsgViewer')].Open()
+						X.UI.ClosePopupMenu()
+					end,
+				})
+				table.insert(menu, 2, X.CONSTANT.MENU_DIVIDER)
+			end
+			table.insert(menu, {
+				szOption = _L['Show error message'],
+				tip = {
+					render = _L['Show error message, please commit it while report bugs'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+				fnAction = function()
+					local szErrmsg = X.GetAddonErrorMessage()
+					local nErrmsgLen, nMaxLen = #szErrmsg, 1024
+					if nErrmsgLen == 0 then
+						X.Alert(_L['No error message found.'])
+						return
+					end
+					if nErrmsgLen > 300 then
+						szErrmsg = szErrmsg:sub(0, nMaxLen)
+							.. '\n========================================'
+							.. '\n' .. '... ' .. (nErrmsgLen - nMaxLen) .. ' char(s) omitted.'
+							.. '\n========================================'
+							.. '\n# Full error logs:'
+							.. '\n> ' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath())
+							.. '\n========================================'
+					end
+					X.UI.OpenTextEditor(szErrmsg, { w = 800, h = 600, title = _L['Error message'] })
+					X.UI.ClosePopupMenu()
+				end,
+			})
+			table.insert(menu, {
+				szOption = _L['Open error message folder'],
+				fnAction = function()
+					X.OpenFolder(X.GetAbsolutePath(X.GetAddonErrorMessageFilePath()))
+					X.UI.ClosePopupMenu()
+				end,
+			})
+			table.insert(menu, {
+				szOption = _L['Open logs folder'],
+				fnAction = function()
+					X.OpenFolder(X.GetAbsolutePath(X.FormatPath({'logs/', X.PATH_TYPE.ROLE})))
+					X.UI.ClosePopupMenu()
+				end,
+			})
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+			table.insert(menu, {
+				szOption = _L['Report bugs'],
+				fnAction = function()
+					X.OpenBrowser(X.PACKET_INFO.AUTHOR_FEEDBACK_URL)
+					X.UI.ClosePopupMenu()
+				end,
+			})
 			return menu
 		end,
 	}):AutoWidth():Width() + 5
+	function D.fnDrawRSS()
+		local tRSS = MY_RSS.Get('MP')
+		if tRSS and X.IsString(tRSS.t) then
+			local function FormatSQS(s)
+				local SQS = X.EncodeQuerystring(X.SignPostData(X.ConvertToUTF8(
+					{
+						l = X.ENVIRONMENT.GAME_LANG,
+						L = X.ENVIRONMENT.GAME_EDITION,
+						S = X.GetRegionOriginName(),
+						s = X.GetServerOriginName(),
+						n = X.GetClientPlayerInfo().szName,
+					}),
+					X.SECRET['J3CX::SHARE_MSG']
+				))
+				return X.StringReplaceW(s, '{$SQS}', SQS)
+			end
+			local szText = tRSS.t
+			local szPath = X.IsString(tRSS.u) and tRSS.u or nil
+			local szMode = X.IsString(tRSS.m) and tRSS.m or nil
+			local function CreateMenu(menu, data)
+				for _, v in ipairs(data) do
+					if X.IsTable(v) and X.IsString(v.t) then
+						local m = {
+							szOption = v.t,
+							fnAction = function()
+								if not X.IsString(v.u) then
+									return
+								end
+								X.OpenBrowser(FormatSQS(v.u), v.m)
+								X.UI.ClosePopupMenu()
+							end,
+						}
+						if v.c then
+							m.r, m.g, m.b = X.HumanColor2RGB(v.c)
+						end
+						if X.IsTable(v.s) then
+							m = CreateMenu(m, v.s)
+						end
+						table.insert(menu, m)
+					end
+				end
+				return menu
+			end
+			local menu = CreateMenu({}, tRSS.s)
+			local t = {
+				x = x, h = 30,
+				name = 'WndButton_RSS',
+				text = szText,
+			}
+			if tRSS.c then
+				t.r, t.g, t.b = X.HumanColor2RGB(tRSS.c)
+			end
+			if #menu == 0 then
+				t.onClick = function()
+					X.OpenBrowser(FormatSQS(szPath), szMode)
+				end
+			else
+				t.menu = menu
+			end
+			x = x + ui:Append('WndButton', t):AutoWidth():Width() + 5
+			PS.OnPanelResize(wnd)
+			D.fnDrawRSS = nil
+		end
+	end
 	PS.OnPanelResize(wnd)
 end
 
@@ -355,6 +430,7 @@ function PS.OnPanelResize(wnd)
 	ui:Fetch('WndButton_SerendipitySearch'):Top(fScaleH + 65)
 	ui:Fetch('WndButton_UserPreference'):Top(fScaleH + 65)
 	ui:Fetch('WndButton_AddonErrorMessage'):Top(fScaleH + 65)
+	ui:Fetch('WndButton_RSS'):Top(fScaleH + 65)
 end
 
 function PS.OnPanelBreathe(wnd)
@@ -364,6 +440,17 @@ function PS.OnPanelBreathe(wnd)
 	ui:Fetch('Text_Memory'):Text(GetMemoryText())
 end
 
+function PS.OnPanelDeactivate()
+	D.fnDrawRSS = nil
+end
+
 X.Panel.Register(nil, 'Welcome', _L['Welcome'], '', PS)
+
+X.RegisterEvent('MY_RSS_UPDATE', 'PS_Welcome_RSS_Update', function()
+	if arg0 and arg0 ~= 'MP' then
+		return
+	end
+	X.SafeCall(D.fnDrawRSS)
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

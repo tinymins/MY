@@ -50,6 +50,9 @@ MY_RSS.RegisterAdapter('share-event', function(data)
 end)
 
 X.RegisterEvent('MY_RSS_UPDATE', function()
+	if arg0 and arg0 ~= 'share-event' then
+		return
+	end
 	for k, _ in pairs(CURRENT_EVENT) do
 		X.RegisterEvent(k, 'MY_ShareKnowledge__Event', false)
 	end
@@ -449,6 +452,9 @@ MY_RSS.RegisterAdapter('share-msg', function(data)
 end)
 
 X.RegisterEvent('MY_RSS_UPDATE', function()
+	if arg0 and arg0 ~= 'share-msg' then
+		return
+	end
 	for k, _ in pairs(CURRENT_MSG_CHANNEL) do
 		X.RegisterMsgMonitor(k, 'MY_ShareKnowledge__MSG', false)
 	end

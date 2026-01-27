@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Font'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.2') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -134,6 +134,7 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 10, 30
+	local nX, nY = nPaddingX, nPaddingY
 	local nW, nH = ui:Size()
 	local aFontList = X.GetFontList()
 	local aFontName, aFontPath = {}, {}
@@ -153,11 +154,11 @@ function PS.OnPanelActive(wnd)
 			btnApply:Enable(bFileExist and szNewFile ~= szFontFile)
 		end
 
-		ui:Append('Text', { text = _L[' * '] .. p.szTitle, x = nPaddingX, y = nPaddingY })
-		nPaddingY = nPaddingY + 40
+		ui:Append('Text', { text = _L[' * '] .. p.szTitle, x = nX, y = nY })
+		nY = nY + 30
 
 		acFontFile = ui:Append('WndAutocomplete', {
-			x = nPaddingX, y = nPaddingY, w = nW - nPaddingX - 60 - 150 - 5 - 35 - 5 - nPaddingX - 5, h = 25,
+			x = nX, y = nY, w = nW - nX - 60 - 150 - 5 - 35 - 5 - nX - 5, h = 25,
 			text = szFontFile,
 			onChange = function(szText)
 				UpdateBtnEnable()
@@ -183,7 +184,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		ui:Append('WndButton', {
-			x = nW - nPaddingX - 60 - 150 - 5 - 35 - 5, y = nPaddingY, w = 35, h = 25,
+			x = nW - nX - 60 - 150 - 5 - 35 - 5, y = nY, w = 35, h = 25,
 			text = '...',
 			buttonStyle = 'FLAT',
 			onClick = function()
@@ -196,7 +197,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		acFontName = ui:Append('WndAutocomplete', {
-			x = nW - nPaddingX - 60 - 150 - 5, y = nPaddingY, w = 150, h = 25,
+			x = nW - nX - 60 - 150 - 5, y = nY, w = 150, h = 25,
 			text = szFontName,
 			onChange = function(szText)
 				UpdateBtnEnable()
@@ -220,7 +221,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		btnApply = ui:Append('WndButton', {
-			x = nW - nPaddingX - 60, y = nPaddingY, w = 60, h = 25,
+			x = nW - nX - 60, y = nY, w = 60, h = 25,
 			text = _L['Apply'], enable = false,
 			buttonStyle = 'FLAT',
 			onClick = function()
@@ -231,10 +232,74 @@ function PS.OnPanelActive(wnd)
 				UpdateBtnEnable()
 			end
 		})
-		nPaddingY = nPaddingY + 60
+		nY = nY + 40
 	end
+
+	nX = nPaddingX + 5
+	nY = nY + 10
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
+		text = _L['1. This plugin only modifies in-game font settings and does not include font files. You need to prepare font files yourself.'],
+	}):AutoHeight():Height() + 2
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
+		text = _L['2. Font files can be downloaded from various font websites. Please pay attention to copyright issues.'],
+	}):AutoHeight():Height() + 2
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
+		text = _L['3. It is recommended to use common TTF or OTF format font files. Avoid using FON format to prevent compatibility issues.'],
+	}):AutoHeight():Height() + 2
+	nY = nY + ui:Append('Text', {
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
+		text = _L['4. Place the prepared font files in the font directory to use them, click button below to open font folder.'],
+	}):AutoHeight():Height() + 2
+
+	nX = nPaddingX
+	nY = nY + 10
+	ui:Append('WndButton', {
+		x = nX, y = nY, w = 150, h = 30,
+		text = _L['Open font folder'],
+		onClick = function()
+			X.OpenFolder(X.FormatPath({'font/', X.PATH_TYPE.GLOBAL}))
+		end,
+	})
+
+	ui:Append('WndButton', {
+		x = nX + 160, y = nY, w = 150, h = 30,
+		text = _L['Refresh font list'],
+		onClick = function()
+			X.Panel.SwitchTab('MY_Font', true)
+		end,
+	})
+
+	ui:Append('WndButton', {
+		x = nX + 320, y = nY, w = 150, h = 30,
+		text = _L['Get more fonts'],
+		onClick = function()
+			X.OpenBrowser('https://j3cx.com/fonts/' .. X.ENVIRONMENT.GAME_LOCALE, 'outer')
+		end,
+	})
 end
 X.Panel.Register(_L['System'], 'MY_Font', _L['MY_Font'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)
+
+-- 兼容历史位置
+do
+	local szSrcDir = X.PACKET_INFO.ROOT .. 'MY_FontResource/font/'
+	local aFontDesc = X.LoadLUAData(szSrcDir .. X.ENVIRONMENT.GAME_LANG .. '.jx3dat')
+	if aFontDesc then
+		local szDstDir = X.FormatPath({'font/', X.PATH_TYPE.GLOBAL})
+		for _, tFont in ipairs(aFontDesc) do
+			if tFont.tLang[X.ENVIRONMENT.GAME_LANG] and tFont.szFile:sub(1, 2) == './' then
+				local szSrcFile = X.NormalizePath(szSrcDir .. tFont.szFile:sub(3))
+				if IsFileExist(szSrcFile) then
+					local szExt = string.match(tFont.szFile, '%.([^%.]+)$') or 'ttf'
+					local szDstFile = szDstDir .. tFont.szName .. '.' .. szExt
+					CPath.Move(szSrcFile, szDstFile)
+				end
+			end
+		end
+	end
+end
 
 -- 初始化设置
 do

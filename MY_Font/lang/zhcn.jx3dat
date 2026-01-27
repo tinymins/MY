@@ -11,4 +11,13 @@ return {
 	['Please select your font file.'] = '请选择字体文件',
 
 	['Please click apply or sure button to save change!'] = '请点击确定或应用按钮保存设置，否则下次登录时聊天字体将恢复初始设置。',
+
+	['1. This plugin only modifies in-game font settings and does not include font files. You need to prepare font files yourself.'] = '1. 本插件仅修改游戏内字体设置，不包含字体文件本身，用户需自行准备字体文件。',
+	['2. Font files can be downloaded from various font websites. Please pay attention to copyright issues.'] = '2. 字体文件可从各大字体网站下载，注意版权问题。',
+	['3. It is recommended to use common TTF or OTF format font files. Avoid using FON format to prevent compatibility issues.'] = '3. 推荐使用常见的 TTF 或 OTF 格式字体文件，避免使用 FON 格式以防兼容性问题。',
+	['4. Place the prepared font files in the font directory to use them, click button below to open font folder.'] = '4. 将准备好的字体文件放置在字体目录下即可使用，点击下方按钮打开字体文件夹。',
+
+	['Open font folder'] = '打开字体文件夹',
+	['Refresh font list'] = '刷新字体列表',
+	['Get more fonts'] = '获取更多字体',
 }

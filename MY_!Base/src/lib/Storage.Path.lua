@@ -81,6 +81,10 @@ function X.FormatPath(oFilePath, tParams)
 	if string.find(szFilePath, '{$lang}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or X.ENVIRONMENT.GAME_LANG)
 	end
+	-- if exist {$locale} then add locale identity
+	if string.find(szFilePath, '{$locale}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$locale}', tParams['locale'] or X.ENVIRONMENT.GAME_LOCALE)
+	end
 	-- if exist {$edition} then add edition identity
 	if string.find(szFilePath, '{$edition}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or X.ENVIRONMENT.GAME_EDITION)

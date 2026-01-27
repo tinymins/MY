@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.1') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -411,24 +411,24 @@ function D.OnTargetUpdate(dwID, bForce)
 		end
 		local szName = player.szName
 		local dwForceID = player.dwForceID
-		local dwMountKungfuID = -1
+		local dwKungfuID = -1
 		if dwID == X.GetClientPlayerID() then
-			dwMountKungfuID = UI_GetPlayerMountKungfuID()
+			dwKungfuID = UI_GetPlayerMountKungfuID()
 		else
 			local info = X.GetTeamMemberInfo(dwID)
 			if info and not X.IsEmpty(info.dwActualKungfuID) then
-				dwMountKungfuID = info.dwActualKungfuID
+				dwKungfuID = info.dwActualKungfuID
 			else
 				local kungfu = player.GetKungfuMount()
 				if kungfu then
-					dwMountKungfuID = kungfu.dwSkillID
+					dwKungfuID = kungfu.dwSkillID
 				end
 			end
 		end
 		local szGUID = X.GetPlayerGlobalID(dwID) or ''
 		local aEquip, nEquipScore, aTalent, tZhenPai
 		local function OnGet()
-			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID, tZhenPai })
+			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwKungfuID, nEquipScore, aEquip, aTalent, szGUID, tZhenPai })
 		end
 		X.GetPlayerEquipScore(dwID, function(nScore)
 			nEquipScore = nScore
