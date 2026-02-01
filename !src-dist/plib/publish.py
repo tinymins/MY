@@ -560,11 +560,16 @@ def __prepublish(packet: str, packet_path: str, diff_ver: Optional[str] = None) 
     )
 
 
-def __pack(packet: str, packet_path: str, version_info: Dict[str, str]) -> None:
+def __pack(
+    packet: str,
+    packet_path: str,
+    version_info: Dict[str, str],
+) -> None:
     """
     打包流程：
       根据是否存在上一个版本的提交hash，
       分别生成差异包和全量包（分别处理 remake 与 classic 分支）。
+      如果 git 不可用，则自动跳过差异包。
 
     参数：
         packet: 包标识
@@ -592,8 +597,8 @@ def __pack(packet: str, packet_path: str, version_info: Dict[str, str]) -> None:
         else:
             dist_root = os.path.abspath(os.path.join(dist_root, os.pardir, "dist"))
 
-    # 如果存在上一个版本，则生成差异包
-    if version_info.get("previous_hash"):
+    # 如果 git 可用且存在上一个版本，则生成差异包
+    if git.is_available() and version_info.get("previous_hash"):
         file_name_fmt: str = os.path.abspath(
             os.path.join(
                 dist_root,
@@ -634,24 +639,53 @@ def __pack(packet: str, packet_path: str, version_info: Dict[str, str]) -> None:
     __7zip(packet, file_name_fmt % "classic-", "", "", ".7zipignore-classic")
 
 
-def run(mode: str, diff_ver: Optional[str] = None, is_source: bool = False) -> None:
+def run(
+    mode: str,
+    diff_ver: Optional[str] = None,
+    is_source: bool = False,
+) -> None:
     """
     脚本入口函数，根据 mode 确定打包或发布流程。
 
     参数：
-        mode: 发布模式，取值 "publish" 或其他（仅打包，不发布）
+        mode: 执行模式
+            - "build": 仅构建，不打压缩包
+            - "archive": 构建 + 打压缩包（仅完整包）
+            - "ci": 构建 + lint + 打压缩包（完整包+差异包）
+            - "publish": 完整发布流程
         diff_ver: 指定对比版本（可选）
         is_source: 是否仅打包源码（目前未使用，可扩展）
     """
+    print("--------------------------------")
     print("> 对比版本: %s" % (diff_ver or "auto"))
-    print("> 发布模式: %s" % mode)
+    print("> 执行模式: %s" % mode)
     packet: str = get_current_packet_id()
     packet_path: str = get_packet_path()
-    version_info: Dict[str, str] = __get_version_info(packet, diff_ver)
 
-    if diff_ver and version_info.get("previous_hash") == "":
-        print("错误：指定的对比提交未找到（release: %s）。" % diff_ver)
-        exit()
+    # build/archive 模式不依赖 git，仅需要从 Base.lua 获取版本号
+    if mode in ("build", "archive"):
+        version_info: Dict[str, str] = {"current": "", "current_hash": ""}
+        base_file: str = f"{packet}_!Base/src/lib/Base.lua"
+        try:
+            content = utils.read_file(base_file)
+            for line in content.splitlines():
+                if line.startswith("local _VERSION_ "):
+                    import re
+
+                    version_info["current"] = re.sub(
+                        r"(?is)^local _VERSION_\s+=", "", line
+                    ).strip()[1:-1]
+                    break
+        except Exception as e:
+            print(f"Warning: Cannot read version from {base_file}: {e}")
+        if not version_info.get("current"):
+            version_info["current"] = "0.0.0"
+    else:
+        version_info = __get_version_info(packet, diff_ver)
+
+        if diff_ver and version_info.get("previous_hash") == "":
+            print("错误：指定的对比提交未找到（release: %s）。" % diff_ver)
+            exit()
 
     # 如为发布模式，先执行预发布检查与操作
     if mode == "publish":
@@ -663,8 +697,10 @@ def run(mode: str, diff_ver: Optional[str] = None, is_source: bool = False) -> N
     # 执行整体构建打包流程
     __build(packet)
 
-    if mode == "publish" or mode == "ci":
+    # 打包流程
+    if mode == "publish" or mode == "ci" or mode == "archive":
         __pack(packet, packet_path, version_info)
+    # build 模式不打包
 
     if mode == "publish":
         os.system("git checkout master")

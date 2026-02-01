@@ -2,6 +2,11 @@
 
 """
 本脚本提供 Git 相关的工具函数，包括状态检查、版本信息获取等。
+
+注意：
+    - 本模块函数在 Git 不可用时可能抛出异常或返回空值
+    - 上层调用者应先通过 is_available() 检测 Git 可用性
+    - 根据业务需求决定是否退出或降级处理
 """
 
 import os
@@ -13,6 +18,30 @@ from typing import List, Dict, Optional
 import plib.utils as utils
 from plib.semver import Semver
 from plib.environment import get_current_packet_id
+
+
+def is_available() -> bool:
+    """
+    检测当前目录是否是有效的 Git 仓库。
+
+    检测条件：
+        1. git 命令可用
+        2. 当前目录处于 git 工作区内（存在 .git 目录或父目录中有）
+
+    返回:
+        bool: 是有效的 Git 仓库返回 True，否则返回 False
+    """
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        return result.stdout.strip().lower() == "true"
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return False
 
 
 def is_clean() -> bool:
@@ -50,7 +79,6 @@ def get_current_branch() -> str:
         str: 当前分支的名称，如果找不到则返回空字符串。
     """
     try:
-        # 运行 "git branch" 命令，获取分支列表
         result = subprocess.run(
             ["git", "branch"],
             check=True,
@@ -60,12 +88,10 @@ def get_current_branch() -> str:
         )
         branch_lines: List[str] = result.stdout.strip().splitlines()
         for line in branch_lines:
-            # 当前分支的行以 "*" 开头，后面跟着一个空格及分支名称
             if line.startswith("*"):
                 return line[2:].strip()
         return ""
-    except subprocess.CalledProcessError:
-        # 若执行命令失败，则返回空字符串
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
         return ""
 
 
@@ -75,10 +101,9 @@ def get_head_time_tag() -> str:
 
     返回:
         str: 格式为 "YYYYMMDDHHMMSS-commit_hash" 的字符串，
-             如果获取失败则返回当前本地时间的字符串标签。
+             如果获取失败则返回当前本地时间的字符串标签（不含 hash）。
     """
     try:
-        # 获取当前提交的短哈希
         result_hash = subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
             check=True,
@@ -88,7 +113,6 @@ def get_head_time_tag() -> str:
         )
         commit_hash: str = result_hash.stdout.strip()
 
-        # 获取当前提交的日期，格式为 YYYYMMDDHHMMSS
         result_date = subprocess.run(
             ["git", "log", "-1", "--format=%cd", "--date=format:%Y%m%d%H%M%S"],
             check=True,
@@ -99,8 +123,8 @@ def get_head_time_tag() -> str:
         commit_date: str = result_date.stdout.strip()
 
         return f"{commit_date}-{commit_hash}"
-    except subprocess.CalledProcessError:
-        # 如果获取 Git 信息失败，则使用当前本地时间作为标签
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        # Git 不可用时，仅返回本地时间（不含 hash）
         return time.strftime("%Y%m%d%H%M%S", time.localtime())
 
 

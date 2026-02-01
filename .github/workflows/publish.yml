@@ -56,59 +56,23 @@ jobs:
           git checkout master
           git reset --hard origin/master
 
-      - name: Calculate new version
-        id: calculate_version
+      - name: Update version, changelog and AssertVersion
+        id: update_changelog
         run: |
           VERSION_TYPE="${{ github.event.inputs.version_type }}"
-          CURRENT_VERSION=$(grep "_VERSION_.*'.*'" MY_!Base/src/lib/Base.lua | sed -E "s/.*'(.*)'.*/\1/")
+          CHANGELOG="${{ github.event.inputs.changelog }}"
 
-          # 验证当前版本格式
-          if ! echo "$CURRENT_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "::error::Current version format is invalid: $CURRENT_VERSION. Expected format: X.Y.Z"
-            exit 1
-          fi
+          echo "🔄 开始更新版本信息..."
 
-          # 使用Python计算新版本号
-          NEW_VERSION=$(python3 -c "
-          import semver
+          # 使用 changelog.py 脚本更新版本号和更新日志
+          python3 \!src-dist/changelog.py --version-type "$VERSION_TYPE" --changelog "$CHANGELOG"
 
-          current = '$CURRENT_VERSION'
-          version_type = '$VERSION_TYPE'.lower()  # 转换为小写
+          # 从 Base.lua 读取更新后的版本号
+          NEW_VERSION=$(grep "_VERSION_.*'.*'" MY_!Base/src/lib/Base.lua | sed -E "s/.*'(.*)'.*/\1/")
 
-          try:
-            if version_type == 'patch':
-              new_version = semver.bump_patch(current)
-            elif version_type == 'minor':
-              new_version = semver.bump_minor(current)
-            elif version_type == 'major':
-              new_version = semver.bump_major(current)
-            else:
-              raise ValueError(f'Invalid version type: {version_type}')
+          echo "📦 新版本号: $NEW_VERSION"
 
-            print(new_version)
-          except Exception as e:
-            print(f'Error calculating new version: {e}', file=sys.stderr)
-            exit(1)
-          ")
-
-          echo "Current version: $CURRENT_VERSION"
-          echo "Version type: $VERSION_TYPE"
-          echo "New version: $NEW_VERSION"
-
-          # 设置输出变量
-          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Update Base.lua version and build
-        run: |
-          DATE=$(date +%Y%m%d)
-          NEW_VERSION="${{ steps.calculate_version.outputs.new_version }}"
-          sed -i "s/\(local _BUILD_\)\( *\)\(=\) *'[^']*'/\1\2\3 '${DATE}'/" MY_!Base/src/lib/Base.lua
-          sed -i "s/\(local _VERSION_\)\( *\)\(=\) *'[^']*'/\1\2\3 '${NEW_VERSION}'/" MY_!Base/src/lib/Base.lua
-
-      - name: Update AssertVersion calls in Lua files
-        run: |
-          NEW_VERSION="${{ steps.calculate_version.outputs.new_version }}"
+          # 更新 AssertVersion 调用
           echo "🔍 Updating AssertVersion calls to version: $NEW_VERSION"
           python3 \!src-dist/update_assert_version.py "$NEW_VERSION" --force-changed
 
@@ -120,68 +84,23 @@ jobs:
             git diff --name-only
           fi
 
-      - name: Update CHANGELOG.md
-        id: update_changelog
-        run: |
-          NEW_VERSION="${{ steps.calculate_version.outputs.new_version }}"
-          CHANGELOG="${{ github.event.inputs.changelog }}"
-          TMPFILE=$(mktemp)
-          echo "# 更新日志" > $TMPFILE
-          echo "" >> $TMPFILE
+          # 设置输出变量
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-          # 智能处理更新日志内容
-          process_changelog() {
-            local input="$1"
+          # 读取生成的更新日志内容（从 CHANGELOG.md 中提取最新条目）
+          PROCESSED_CHANGELOG=$(sed -n '/^## 茗伊插件集 v'"$NEW_VERSION"'/,/^## 茗伊插件集 v[0-9]/{ /^## 茗伊插件集 v[0-9]/!p; /^## 茗伊插件集 v'"$NEW_VERSION"'/p }' CHANGELOG.md | sed '/^$/d')
 
-            # 首先处理原始格式 * [插件] 内容，在 * 前面添加分隔符
-            input=$(echo "$input" | sed 's/\([^|]\)\(\*[[:space:]]*\[\)/\1|\2/g')
-
-            # 按 | 分割每一行
-            echo "$input" | tr '|' '\n' | while IFS= read -r line; do
-              # 去掉首尾空格
-              line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-
-              # 去掉首尾引号
-              line=$(echo "$line" | sed 's/^["""]//;s/["""]$//')
-
-              # 跳过空行
-              [ -z "$line" ] && continue
-
-              # 检查是否已经是 * [插件] 格式
-              if echo "$line" | grep -q '^\*[[:space:]]*\['; then
-                # 已经是正确格式，只需要格式化空格
-                plugin=$(echo "$line" | sed 's/^\*[[:space:]]*\[\([^]]*\)\].*/\1/' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-                content=$(echo "$line" | sed 's/^\*[[:space:]]*\[[^]]*\][[:space:]]*//')
-                echo "* [$plugin] $content"
-              else
-                # 转换 插件:内容 格式为 * [插件] 内容
-                if echo "$line" | grep -q '[：:]'; then
-                  plugin=$(echo "$line" | sed 's/\([^：:]*\)[：:].*/\1/' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^["""]//;s/["""]$//')
-                  content=$(echo "$line" | sed 's/[^：:]*[：:][[:space:]]*//' | sed 's/^["""]//;s/["""]$//')
-                  echo "* [$plugin] $content"
-                else
-                  # 如果没有冒号，假设整行都是内容
-                  echo "* $line"
-                fi
-              fi
-            done
-          }
-
-          # 处理更新日志并保存到临时变量
-          PROCESSED_CHANGELOG="## 茗伊插件集 v${NEW_VERSION}"$'\n\n'"$(process_changelog "$CHANGELOG")"
-
-          # 输出到 TMPFILE
-          echo "$PROCESSED_CHANGELOG" >> $TMPFILE
-          echo "" >> $TMPFILE
-          tail -n +3 CHANGELOG.md >> $TMPFILE
-          mv $TMPFILE CHANGELOG.md
-
-          # 设置步骤输出（用于后续步骤）
+          # 设置步骤输出
           {
             echo "changelog<<EOF"
             echo "$PROCESSED_CHANGELOG"
             echo "EOF"
           } >> $GITHUB_OUTPUT
+
+      - name: Calculate version for outputs
+        id: calculate_version
+        run: |
+          echo "new_version=${{ steps.update_changelog.outputs.new_version }}" >> $GITHUB_OUTPUT
 
       - name: Write secret to file
         run: |
