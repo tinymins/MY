@@ -19,22 +19,12 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
--- 幸运香囊 -- 下一次有一点五倍几率砸中年兽陶罐
--- 幸运锦囊 -- 下一次砸年兽陶罐失败则保留两点五成积分
--- 如意香囊 -- 下一次有两点五倍几率砸中年兽陶罐
--- 如意锦囊 -- 下一次砸年兽陶罐失败则保留一半积分
--- 寄忧谷 -- 下一次有五倍几率砸中年兽陶罐
--- 醉生 -- 下一次砸年兽陶罐失败则不损失积分
+-- 醉生 --下一次有五倍几率砸中年兽陶罐，若失败也不损失积分
 
 local TAOGUAN = X.GetItemNameByUIID(74224) -- 年兽陶罐
 local XIAOJINCHUI = X.GetItemNameByUIID(65611) -- 小金锤
 local XIAOYINCHUI = X.GetItemNameByUIID(65609) -- 小银锤
 local MEILIANGYUQIAN = X.GetItemNameByUIID(65589) -- 梅良玉签
-local XINGYUNXIANGNANG = X.GetItemNameByUIID(65578) -- 幸运香囊
-local XINGYUNJINNANG = X.GetItemNameByUIID(65581) -- 幸运锦囊
-local RUYIXIANGNANG = X.GetItemNameByUIID(65579) -- 如意香囊
-local RUYIJINNANG = X.GetItemNameByUIID(65582) -- 如意锦囊
-local JIYOUGU = X.GetItemNameByUIID(65580) -- 寄忧谷
 local ZUISHENG = X.GetItemNameByUIID(65583) -- 醉生
 
 local FILTER_ITEM = {}
@@ -84,103 +74,13 @@ local O = X.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
 			_L('Use %s when score reaches', XIAOJINCHUI),
 		}),
 		xSchema = X.Schema.Number,
-		xDefaultValue = 320,
+		xDefaultValue = 80,
 	},
 	bPauseNoXiaojinchui = { -- 缺少小金锤时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
 		szDescription = X.MakeCaption({
 			_L['Stop break when no item'] .. XIAOJINCHUI,
-		}),
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
-	nUseXingyunXiangnang = { -- 开始吃幸运香囊的分数
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L('Use %s when score reaches', XINGYUNXIANGNANG),
-		}),
-		xSchema = X.Schema.Number,
-		xDefaultValue = 80,
-	},
-	bPauseNoXingyunXiangnang = { -- 缺少幸运香囊时停砸
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L['Stop break when no item'] .. XINGYUNXIANGNANG,
-		}),
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-	nUseXingyunJinnang = { -- 开始吃幸运锦囊的分数
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L('Use %s when score reaches', XINGYUNJINNANG),
-		}),
-		xSchema = X.Schema.Number,
-		xDefaultValue = 80,
-	},
-	bPauseNoXingyunJinnang = { -- 缺少幸运锦囊时停砸
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L['Stop break when no item'] .. XINGYUNJINNANG,
-		}),
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-	nUseRuyiXiangnang = { -- 开始吃如意香囊的分数
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L('Use %s when score reaches', RUYIXIANGNANG),
-		}),
-		xSchema = X.Schema.Number,
-		xDefaultValue = 80,
-	},
-	bPauseNoRuyiXiangnang = { -- 缺少如意香囊时停砸
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L['Stop break when no item'] .. RUYIXIANGNANG,
-		}),
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-	nUseRuyiJinnang = { -- 开始吃如意锦囊的分数
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L('Use %s when score reaches', RUYIJINNANG),
-		}),
-		xSchema = X.Schema.Number,
-		xDefaultValue = 80,
-	},
-	bPauseNoRuyiJinnang = { -- 缺少如意锦囊时停砸
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L['Stop break when no item'] .. RUYIJINNANG,
-		}),
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-	nUseJiyougu = { -- 开始吃寄忧谷的分数
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L('Use %s when score reaches', JIYOUGU),
-		}),
-		xSchema = X.Schema.Number,
-		xDefaultValue = 1280,
-	},
-	bPauseNoJiyougu = { -- 缺少寄忧谷时停砸
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Taoguan'],
-		szDescription = X.MakeCaption({
-			_L['Stop break when no item'] .. JIYOUGU,
 		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
@@ -192,7 +92,7 @@ local O = X.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
 			_L('Use %s when score reaches', ZUISHENG),
 		}),
 		xSchema = X.Schema.Number,
-		xDefaultValue = 1280,
+		xDefaultValue = 640,
 	},
 	bPauseNoZuisheng = { -- 缺少醉生时停砸
 		ePathType = X.PATH_TYPE.ROLE,
@@ -230,23 +130,11 @@ local D = {
 	dwDoodadID = 0, -- 自动拾取过滤的交互物件ID
 	aUseItemPS = { -- 设置界面的物品使用条件
 		{ szName = XIAOJINCHUI, szID = 'Xiaojinchui' },
-		{ szName = XINGYUNXIANGNANG, szID = 'XingyunXiangnang' },
-		{ szName = XINGYUNJINNANG, szID = 'XingyunJinnang' },
-		{ szName = RUYIXIANGNANG, szID = 'RuyiXiangnang' },
-		{ szName = RUYIJINNANG, szID = 'RuyiJinnang' },
-		{ szName = JIYOUGU, szID = 'Jiyougu' },
 		{ szName = ZUISHENG, szID = 'Zuisheng' },
 	},
 	aUseItemOrder = { -- 状态转移函数中物品与BUFF判断逻辑
 		{
-			{ szName = JIYOUGU, szID = 'Jiyougu', dwBuffID = 1660, nBuffLevel = 3 },
-			{ szName = RUYIXIANGNANG, szID = 'RuyiXiangnang', dwBuffID = 1660, nBuffLevel = 2 },
-			{ szName = XINGYUNXIANGNANG, szID = 'XingyunXiangnang', dwBuffID = 1660, nBuffLevel = 1 },
-		},
-		{
 			{ szName = ZUISHENG, szID = 'Zuisheng', dwBuffID = 1661, nBuffLevel = 3 },
-			{ szName = RUYIJINNANG, szID = 'RuyiJinnang', dwBuffID = 1661, nBuffLevel = 2 },
-			{ szName = XINGYUNJINNANG, szID = 'XingyunJinnang', dwBuffID = 1661, nBuffLevel = 1 },
 		},
 	},
 }
