@@ -104,6 +104,68 @@ jobs:
           echo "should_tag=true" >> $GITHUB_OUTPUT
           echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
 
+      - name: Detect project info
+        if: steps.check_tag.outputs.should_tag == 'true'
+        id: project_info
+        run: |
+          # 从文件系统检测项目命名空间（英文）
+          BASE_DIR=$(ls -d *_\!Base 2>/dev/null | head -1)
+          if [ -z "$BASE_DIR" ]; then
+            echo "::error::未找到 *_!Base 目录"
+            exit 1
+          fi
+          PROJECT_NS="${BASE_DIR%_\!Base}"
+          echo "? 检测到项目命名空间: $PROJECT_NS"
+
+          # 从 package.ini 读取项目名称（中文）
+          if [ -f "package.ini" ]; then
+            # package.ini 是 GBK 编码，转换为 UTF-8 后提取 name
+            PROJECT_NAME=$(iconv -f GBK -t UTF-8 package.ini 2>/dev/null | grep -E "^name=" | sed 's/name=//' | sed 's/插件集$//' || true)
+            echo "? 检测到项目名称: $PROJECT_NAME"
+          fi
+          if [ -z "$PROJECT_NAME" ]; then
+            PROJECT_NAME="$PROJECT_NS"
+            echo "?? 未找到 package.ini，使用命名空间作为项目名称"
+          fi
+
+          echo "namespace=$PROJECT_NS" >> $GITHUB_OUTPUT
+          echo "name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog for version
+        if: steps.check_tag.outputs.should_tag == 'true'
+        id: extract_changelog
+        shell: bash
+        run: |
+          VERSION="${{ steps.find_release.outputs.version }}"
+          PROJECT_NAME="${{ steps.project_info.outputs.name }}"
+
+          echo "Extracting changelog for ${PROJECT_NAME}插件集 v${VERSION}"
+
+          # 从 CHANGELOG.md 提取对应版本的更新日志
+          # 匹配 ## XXX插件集 vX.X.X 到下一个 ## XXX插件集 vX.X.X 之间的内容
+          CHANGELOG_CONTENT=$(awk -v ver="$VERSION" -v name="$PROJECT_NAME" '
+            BEGIN { found=0; content="" }
+            /^## / {
+              if (found) exit
+              if ($0 ~ name"插件集 v"ver) { found=1; next }
+            }
+            found && /^[*]/ { content = content $0 "\n" }
+            END { print content }
+          ' CHANGELOG.md)
+
+          if [ -z "$CHANGELOG_CONTENT" ]; then
+            echo "Warning: No changelog content found for version $VERSION"
+            CHANGELOG_CONTENT=""
+          fi
+
+          # 保存到临时文件以避免 shell 转义问题
+          echo "Release v${VERSION}" > /tmp/tag_message.txt
+          echo "" >> /tmp/tag_message.txt
+          echo "$CHANGELOG_CONTENT" >> /tmp/tag_message.txt
+
+          echo "Tag message content:"
+          cat /tmp/tag_message.txt
+
       - name: Create and push tag
         if: steps.check_tag.outputs.should_tag == 'true'
         shell: bash
@@ -119,6 +181,7 @@ jobs:
           COMMIT="${{ steps.find_release.outputs.commit }}"
           TAG_NAME="${{ steps.check_tag.outputs.tag }}"
 
-          git tag -a "$TAG_NAME" "$COMMIT" -m "Release $TAG_NAME"
+          # 使用文件内容作为 tag message，包含完整的 changelog
+          git tag -a "$TAG_NAME" "$COMMIT" -F /tmp/tag_message.txt
 
           git push origin "$TAG_NAME"
