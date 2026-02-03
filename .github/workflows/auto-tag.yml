@@ -1,0 +1,124 @@
+name: Auto Tag
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Find release commit in push range
+        id: find_release
+        shell: bash
+        run: |
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            RANGE="$AFTER"
+          else
+            RANGE="$BEFORE..$AFTER"
+          fi
+
+          echo "Scanning commits in range: $RANGE"
+
+          MATCH_COMMIT=""
+          MATCH_VERSION=""
+
+          # 遍历范围内的所有 commit（包括 merge commit 带入的 parent commits）
+          while IFS='|' read -r hash msg; do
+            # 优先匹配直接的 release commit: "release: X.X.X"
+            if [[ "$msg" =~ ^release:\s*([0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+)?) ]]; then
+              MATCH_COMMIT="$hash"
+              MATCH_VERSION="${BASH_REMATCH[1]}"
+              echo "Found direct release commit: $hash ($msg)"
+              break
+            fi
+          done < <(git log --format='%H|%s' "$RANGE")
+
+          # 如果没找到直接的 release commit，检查是否有 merge commit 合并了 release 分支
+          if [ -z "$MATCH_COMMIT" ]; then
+            while IFS='|' read -r hash msg; do
+              if [[ "$msg" =~ Merge.*release/v([0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+)?) ]]; then
+                VERSION="${BASH_REMATCH[1]}"
+                echo "Found merge commit for release/v$VERSION: $hash"
+                # 查找 merge commit 的第二个 parent（被合并的分支）中的 release commit
+                MERGE_PARENT=$(git log --format='%H' -1 "$hash^2" 2>/dev/null || true)
+                if [ -n "$MERGE_PARENT" ]; then
+                  # 在被合并的分支中查找真正的 release commit
+                  RELEASE_COMMIT=$(git log --format='%H|%s' "$MERGE_PARENT" -20 | grep -E '^\w+\|release:\s*'"$VERSION" | head -1 | cut -d'|' -f1)
+                  if [ -n "$RELEASE_COMMIT" ]; then
+                    MATCH_COMMIT="$RELEASE_COMMIT"
+                    MATCH_VERSION="$VERSION"
+                    echo "Found actual release commit in merged branch: $RELEASE_COMMIT"
+                    break
+                  fi
+                fi
+              fi
+            done < <(git log --format='%H|%s' "$RANGE")
+          fi
+
+          if [ -z "$MATCH_COMMIT" ]; then
+            echo "No release commit found in push range."
+            echo "matched=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Final release commit: $MATCH_COMMIT (version $MATCH_VERSION)"
+          echo "matched=true" >> $GITHUB_OUTPUT
+          echo "commit=$MATCH_COMMIT" >> $GITHUB_OUTPUT
+          echo "version=$MATCH_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check existing tag on commit
+        if: steps.find_release.outputs.matched == 'true'
+        id: check_tag
+        shell: bash
+        run: |
+          COMMIT="${{ steps.find_release.outputs.commit }}"
+          VERSION="${{ steps.find_release.outputs.version }}"
+          TAG_NAME="v$VERSION"
+
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Tag $TAG_NAME already exists. Skipping."
+            echo "should_tag=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          TAGS_ON_COMMIT=$(git tag --points-at "$COMMIT")
+          if [ -n "$TAGS_ON_COMMIT" ]; then
+            echo "Commit already has tags: $TAGS_ON_COMMIT"
+            echo "should_tag=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "should_tag=true" >> $GITHUB_OUTPUT
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        if: steps.check_tag.outputs.should_tag == 'true'
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.PAT_TOKEN }}" ]; then
+            echo "Missing PAT_TOKEN secret. Cannot push tag to trigger workflows."
+            exit 1
+          fi
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          COMMIT="${{ steps.find_release.outputs.commit }}"
+          TAG_NAME="${{ steps.check_tag.outputs.tag }}"
+
+          git tag -a "$TAG_NAME" "$COMMIT" -m "Release $TAG_NAME"
+
+          git push origin "$TAG_NAME"

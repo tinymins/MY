@@ -17,6 +17,10 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -46,6 +50,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -72,11 +77,38 @@ jobs:
           git checkout master
           git reset --hard origin/master
 
+      - name: Detect project info
+        id: project_info
+        run: |
+          # 从文件系统检测项目命名空间（英文）
+          BASE_DIR=$(ls -d *_\!Base 2>/dev/null | head -1)
+          if [ -z "$BASE_DIR" ]; then
+            echo "::error::未找到 *_!Base 目录"
+            exit 1
+          fi
+          PROJECT_NS="${BASE_DIR%_\!Base}"
+          echo "📁 检测到项目命名空间: $PROJECT_NS"
+
+          # 从 package.ini 读取项目名称（中文）
+          if [ -f "package.ini" ]; then
+            # package.ini 是 GBK 编码，转换为 UTF-8 后提取 name
+            PROJECT_NAME=$(iconv -f GBK -t UTF-8 package.ini | grep -E "^name=" | sed 's/name=//' | sed 's/插件集$//')
+            echo "📦 检测到项目名称: $PROJECT_NAME"
+          else
+            PROJECT_NAME="$PROJECT_NS"
+            echo "⚠️ 未找到 package.ini，使用命名空间作为项目名称"
+          fi
+
+          echo "namespace=$PROJECT_NS" >> $GITHUB_OUTPUT
+          echo "name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+
       - name: Update version, changelog and AssertVersion
         id: update_changelog
         run: |
           VERSION_TYPE="${{ github.event.inputs.version_type }}"
           CHANGELOG="${{ github.event.inputs.changelog }}"
+          PROJECT_NS="${{ steps.project_info.outputs.namespace }}"
+          PROJECT_NAME="${{ steps.project_info.outputs.name }}"
 
           echo "🔄 开始更新版本信息..."
 
@@ -84,7 +116,7 @@ jobs:
           python3 \!src-dist/changelog.py --version-type "$VERSION_TYPE" --changelog "$CHANGELOG"
 
           # 从 Base.lua 读取更新后的版本号
-          NEW_VERSION=$(grep "_VERSION_.*'.*'" MY_!Base/src/lib/Base.lua | sed -E "s/.*'(.*)'.*/\1/")
+          NEW_VERSION=$(grep "_VERSION_.*'.*'" "${PROJECT_NS}_!Base/src/lib/Base.lua" | sed -E "s/.*'(.*)'.*/\1/")
 
           echo "📦 新版本号: $NEW_VERSION"
 
@@ -104,7 +136,7 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
           # 读取生成的更新日志内容（从 CHANGELOG.md 中提取最新条目）
-          PROCESSED_CHANGELOG=$(sed -n '/^## 茗伊插件集 v'"$NEW_VERSION"'/,/^## 茗伊插件集 v[0-9]/{ /^## 茗伊插件集 v[0-9]/!p; /^## 茗伊插件集 v'"$NEW_VERSION"'/p }' CHANGELOG.md | sed '/^$/d')
+          PROCESSED_CHANGELOG=$(sed -n '/^## '"${PROJECT_NAME}"'插件集 v'"$NEW_VERSION"'/,/^## '"${PROJECT_NAME}"'插件集 v[0-9]/{ /^## '"${PROJECT_NAME}"'插件集 v[0-9]/!p; /^## '"${PROJECT_NAME}"'插件集 v'"$NEW_VERSION"'/p }' CHANGELOG.md | sed '/^$/d')
 
           # 设置步骤输出
           {

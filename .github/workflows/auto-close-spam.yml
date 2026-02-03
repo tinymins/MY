@@ -1,4 +1,4 @@
-name: Close Spam Issues
+name: Auto Close Spam
 
 on:
   issues:

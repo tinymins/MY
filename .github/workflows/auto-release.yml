@@ -1,0 +1,101 @@
+name: Auto Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install pip dependencies
+        run: |
+          pip3 install semver luadata
+
+      - name: Install apt dependencies
+        run: |
+          sudo rm -f /var/lib/man-db/auto-update
+          sudo apt install --no-install-recommends lua5.1 p7zip-full
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Write secret to file
+        run: |
+          cat > secret.jx3dat << 'EOF'
+          ${{ secrets.SECRET_JX3DAT }}
+          EOF
+
+      - name: Run Build Command
+        run: |
+          python3 \!src-dist/ci.py
+
+      - name: Get tag from ref
+        id: get_tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [ -z "$TAG" ]; then
+            echo "Error: Could not determine tag from ref"
+            exit 1
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Using tag: $TAG"
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          TAG="${{ steps.get_tag.outputs.tag }}"
+
+          # 获取tag的完整注释信息
+          TAG_MESSAGE=$(git tag -l --format='%(contents)' "$TAG")
+
+          if [ -z "$TAG_MESSAGE" ]; then
+            echo "Error: No tag message found for $TAG"
+            echo "Please create tag with proper release notes"
+            exit 1
+          fi
+
+          echo "Found tag message for $TAG"
+          # 提取从 "Release vX.X.X" 开始的所有内容作为release notes
+          RELEASE_NOTES=$(echo "$TAG_MESSAGE" | sed -n '/^Release v/,$p')
+
+          if [ -z "$RELEASE_NOTES" ]; then
+            # 如果没有找到 "Release v" 开头的内容，使用整个tag消息
+            RELEASE_NOTES="$TAG_MESSAGE"
+          fi
+
+          # 设置release notes（只使用tag内容）
+          {
+            echo "release_notes<<EOF"
+            echo "$RELEASE_NOTES"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          name: Release ${{ steps.get_tag.outputs.tag }}
+          body: ${{ steps.release_notes.outputs.release_notes }}
+          draft: false
+          prerelease: false
+          files: |
+            !src-dist/dist/*.7z
