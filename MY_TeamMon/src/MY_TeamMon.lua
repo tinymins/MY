@@ -121,6 +121,8 @@ end
 -- 核心优化变量
 local MY_TEAM_MON_CORE_PLAYERID = 0
 local MY_TEAM_MON_CORE_NAME     = 0
+local MY_TEAM_MON_MEMBER_CACHE  = {}
+local MY_TEAM_MON_MEMBER_ID_MAP = {}
 
 local MY_TEAM_MON_MAX_INTERVAL  = 300
 local MY_TEAM_MON_MAX_CACHE     = 3000 -- 最大的cache数量 主要是UI的问题
@@ -510,6 +512,11 @@ local function ParseHPCountdown(szString)
 	return X.Clone(CACHE.HP_CD_STR[szString][1]), CACHE.HP_CD_STR[szString][2]
 end
 
+-- 判断是否为队友ID
+local function IsTeamMemberID(dwID)
+    return dwID and MY_TEAM_MON_MEMBER_ID_MAP and MY_TEAM_MON_MEMBER_ID_MAP[dwID]
+end
+
 function D.OnFrameCreate()
 	this:RegisterEvent('MY_TEAM_MON_LOADING_END')
 	this:RegisterEvent('MY_TEAM_MON_CREATE_CACHE')
@@ -693,6 +700,8 @@ function D.OnEvent(szEvent)
 		D.FireCrossMapEvent('before')
 		D.CreateData(szEvent)
 		X.DelayCall('MY_TeamMon__FireCrossMapEvent__after', D.FireCrossMapEvent, 'after')
+	elseif szEvent == 'PARTY_ADD_MEMBER' or szEvent == 'PARTY_DELETE_MEMBER' or szEvent == 'PARTY_DISBAND' then
+		D.OnTeamEvent(szEvent)
 	end
 end
 
@@ -1064,7 +1073,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
-	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and X.IsPlayer(dwSkillSrcID) and dwSkillSrcID ~= MY_TEAM_MON_CORE_PLAYERID and not X.IsTeammate(dwSkillSrcID) then
+	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and X.IsPlayer(dwSkillSrcID) and dwSkillSrcID ~= MY_TEAM_MON_CORE_PLAYERID and not IsTeamMemberID(dwSkillSrcID) then
 		return
 	end
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
@@ -1731,27 +1740,21 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			if bInParty and content:find('{$team}', nil, true) then
 				if v.bReg then
-					-- 正则模式（带{$team}）：逆向排除，先遍历成员名，替换为空，若替换成功，说明命中，再将正则规则{$team}替换为空，匹配剩余的内容，如此只用一次正则，节约性能
+					-- 正则模式（带{$team}）：逆向排除，先遍历成员名，替换为{$team}，不替换为空防止破坏位置约束，若替换成功，说明命中，再正则匹配剩余的内容，如此只用一次正则，节约性能
 					local nHitMemberID, szHitMemberName, szProcessedContent
-					local tMembers = {}
-					-- 按名字长度降序排序，避免名字包含关系导致误判替换
-					for _, vv in ipairs(team.GetTeamMemberList()) do
-						tMembers[#tMembers + 1] = { dwID = vv, szName = team.GetClientTeamMemberName(vv) }
-					end
-					table.sort(tMembers, function(a, b) return #a.szName > #b.szName end)
-					-- 替换正则规则{$team}为空，并获取{$team}数量，决定后续成员名替换为空次数
-					local szPattern, nTeamCount = content:gsub('{$team}', '')
-					for _, member in ipairs(tMembers) do
-						local szReplaced = string.gsub(szContent, member.szName, '', nTeamCount)
-						if #szReplaced < #szContent then
+					-- 获取正则{$team}数量，决定后续成员名替换为{$team}次数
+					local _, nTeamCount = content:gsub('{$team}', '{$team}')
+					for _, member in ipairs(MY_TEAM_MON_MEMBER_CACHE) do
+						local szHitContent, nHitCount = string.gsub(szContent, member.szName, '{$team}', nTeamCount)
+						if nHitCount > 0 then
 							nHitMemberID = member.dwID
 							szHitMemberName = member.szName
-							szProcessedContent = szReplaced
+							szProcessedContent = szHitContent
 							break
 						end
 					end
 					if nHitMemberID and szHitMemberName then
-						local res = {string.find(szProcessedContent, szPattern)}
+						local res = {string.find(szProcessedContent, content)}
 						if res[1] then
 							table.remove(res, 1)
 							table.remove(res, 1)
@@ -2038,6 +2041,23 @@ function D.FireCrossMapEvent(szWhen)
 				D.OnCallMessage(szEvent, szContent)
 			end
 			MAP_ID = dwMapID
+		end
+	end
+end
+
+-- 团队成员事件 刷新团队成员排序缓存
+function D.OnTeamEvent(szEvent)
+	MY_TEAM_MON_MEMBER_CACHE  = {}
+	MY_TEAM_MON_MEMBER_ID_MAP = {}
+	local me = X.GetClientPlayer()
+	if me.IsInParty() then
+		local team = GetClientTeam()
+		if team then
+			for _, vv in ipairs(team.GetTeamMemberList()) do
+				MY_TEAM_MON_MEMBER_CACHE[#MY_TEAM_MON_MEMBER_CACHE + 1] = { dwID = vv, szName = team.GetClientTeamMemberName(vv) }
+				MY_TEAM_MON_MEMBER_ID_MAP[vv] = true
+			end
+			table.sort(MY_TEAM_MON_MEMBER_CACHE, function(a, b) return #a.szName > #b.szName end)
 		end
 	end
 end
