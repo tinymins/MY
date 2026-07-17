@@ -2047,18 +2047,32 @@ end
 
 -- 团队成员事件 刷新团队成员排序缓存
 function D.OnTeamEvent(szEvent)
+	local me = X.GetClientPlayer()
+	if not me then 
+		return 
+	end
 	MY_TEAM_MON_MEMBER_CACHE  = {}
 	MY_TEAM_MON_MEMBER_ID_MAP = {}
-	local me = X.GetClientPlayer()
 	if me.IsInParty() then
 		local team = GetClientTeam()
 		if team then
 			for _, vv in ipairs(team.GetTeamMemberList()) do
-				MY_TEAM_MON_MEMBER_CACHE[#MY_TEAM_MON_MEMBER_CACHE + 1] = { dwID = vv, szName = team.GetClientTeamMemberName(vv) }
-				MY_TEAM_MON_MEMBER_ID_MAP[vv] = true
+				local tMemberData = { 
+                    dwID = vv, 
+                    szName = team.GetClientTeamMemberName(vv) 
+                }
+				MY_TEAM_MON_MEMBER_ID_MAP[vv] = tMemberData
+				table.insert(MY_TEAM_MON_MEMBER_CACHE, tMemberData)
 			end
 			table.sort(MY_TEAM_MON_MEMBER_CACHE, function(a, b) return #a.szName > #b.szName end)
 		end
+	else
+		local tMemberData = { 
+            dwID = MY_TEAM_MON_CORE_PLAYERID, 
+            szName = MY_TEAM_MON_CORE_NAME 
+        }
+		MY_TEAM_MON_MEMBER_ID_MAP[MY_TEAM_MON_CORE_PLAYERID] = tMemberData
+		table.insert(MY_TEAM_MON_MEMBER_CACHE, tMemberData)
 	end
 end
 
