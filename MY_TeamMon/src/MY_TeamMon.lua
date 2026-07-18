@@ -405,10 +405,12 @@ local function ParseCountdown(szCountdown)
 				local nTime = tonumber(aParams[1])
 				local szContent = aParams[2]
 				local szVoice
+				local nIcon, nFrame
 				local szParam, bUnknownParam, bParamRecognized
 				for i = 3, #aParams do
 					szParam = aParams[i]
 					bParamRecognized = false
+					-- 解析语音
 					if not szVoice and not bParamRecognized then
 						if szParam:sub(1, 3) == 'VO:'
 						or szParam:sub(1, 3) == 'VC:' then
@@ -416,15 +418,31 @@ local function ParseCountdown(szCountdown)
 							bParamRecognized = true
 						end
 					end
+					-- 解析图标
+					if not nIcon and not bParamRecognized then
+						if szParam:sub(1, 6) == 'nIcon:' then
+							nIcon = tonumber(szParam:sub(7))
+							bParamRecognized = true
+						end
+					end
+					-- 解析背景色
+					if not nFrame and not bParamRecognized then
+						if szParam:sub(1, 7) == 'nFrame:' then
+							nFrame = tonumber(szParam:sub(8))
+							bParamRecognized = true
+						end
+					end
 					if not bParamRecognized then
 						bUnknownParam = true
 					end
 				end
-				if nTime and szContent and nTime and szContent ~= '' and not bUnknownParam then
+				if nTime and szContent and szContent ~= '' and not bUnknownParam then
 					table.insert(aCountdown, {
 						nTime = nTime,
 						szContent = szContent,
 						szVoice = szVoice,
+						nIcon = nIcon,
+						nFrame = nFrame,
 					})
 					bPartError = false
 				end
@@ -464,10 +482,12 @@ local function ParseHPCountdown(szString)
 				local szContent = aParams[2]
 				local nTime
 				local szVoice
+				local nIcon, nFrame
 				local szParam, bUnknownParam, bParamRecognized
 				for i = 3, #aParams do
 					szParam = aParams[i]
 					bParamRecognized = false
+					-- 解析语音
 					if not szVoice and not bParamRecognized then
 						if szParam:sub(1, 3) == 'VO:'
 						or szParam:sub(1, 3) == 'VC:' then
@@ -478,6 +498,20 @@ local function ParseHPCountdown(szString)
 					if not nTime and not bParamRecognized and i == 3 then
 						if tonumber(szParam) then
 							nTime = tonumber(szParam)
+							bParamRecognized = true
+						end
+					end
+					-- 解析图标
+					if not nIcon and not bParamRecognized then
+						if szParam:sub(1, 6) == 'nIcon:' then
+							nIcon = tonumber(szParam:sub(7))
+							bParamRecognized = true
+						end
+					end
+					-- 解析背景色
+					if not nFrame and not bParamRecognized then
+						if szParam:sub(1, 7) == 'nFrame:' then
+							nFrame = tonumber(szParam:sub(8))
 							bParamRecognized = true
 						end
 					end
@@ -492,6 +526,8 @@ local function ParseHPCountdown(szString)
 						szContent = szContent,
 						nTime = nTime,
 						szVoice = szVoice,
+						nIcon = nIcon,
+						nFrame = nFrame,
 					})
 					bPartError = false
 				end

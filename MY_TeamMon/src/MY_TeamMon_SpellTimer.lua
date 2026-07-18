@@ -112,6 +112,9 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver, aBack
 		tTime = {
 			nTime = tParam.nTime,
 			szContent = tParam.szContent,
+			nIcon = tParam.nIcon,
+			nFrame = tParam.nFrame,
+			szVoice = tParam.szVoice,
 		}
 	elseif X.IsString(tParam.nTime) then
 		local aCountdown = ParseCountdown(tParam.nTime, szSender, szReceiver, aBackreferences)
@@ -152,13 +155,76 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver, aBack
 		end
 	elseif tTime.nTime == -2 then
 		ST_TIME_EXPIRE[nType][szKey] = nTime + (tParam.nRefresh or 0) * 1000 - 3
+	elseif tTime.nTime == -3 then
+		-- 修改计时条属性
+		local ui = ST_CACHE[nType][szKey]
+		if ui and ui:IsValid() then
+			if tParam.nRefresh then
+				ST_TIME_EXPIRE[nType][szKey] = nTime + tParam.nRefresh * 1000 - 3
+			end
+			local tRefs = ui.tBackreferences or {}
+			if tParam.nNewTime and X.IsString(tParam.nNewTime) then
+ 				local aCountdown = ParseCountdown(tParam.nNewTime, tRefs.szSender, tRefs.szReceiver, tRefs.aBackreferences)
+				if aCountdown then
+					ui.countdown = aCountdown
+					ui.nCreate = nTime
+					ui.nLeft = nTime
+					tTime = aCountdown[1]
+					tParam.nRefresh = tParam.nRefresh or aCountdown[#aCountdown].nTime - 3
+					ST_TIME_EXPIRE[nType][szKey] = nTime + (tParam.nRefresh or 0) * 1000
+					ui.obj:SetInfo(tTime, tTime.nIcon or tParam.nIcon)
+				end
+
+			else
+				if tParam.nNewTime and X.IsNumber(tParam.nNewTime) then
+					ui.countdown = tParam.nNewTime  -- 改成数字，OnFrameBreathe 走单段逻辑
+					ui.nCreate = nTime
+					ui.nLeft = nTime
+				end
+				local szNewContent = (tTime.szContent ~= '' and tTime.szContent)
+				if szNewContent then
+					szNewContent = FilterCustomText(szNewContent, tRefs.szSender, tRefs.szReceiver, tRefs.aBackreferences)
+				end
+				ui.obj:SetInfo({
+					nTime = tParam.nNewTime,
+					szContent = szNewContent,
+					nIcon = tTime.nIcon,
+					nFrame = tTime.nFrame,
+					szVoice = tTime.szVoice,
+				}, tParam.nIcon)
+			end
+		else
+			if MY_TeamMon.bPushVoiceAlarm and tTime.szVoice then
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tTime.szVoice)
+			end
+		end
+	elseif tTime.nTime == -4 then
+		-- 冻结计时条
+		local ui = ST_CACHE[nType][szKey]
+		if ui and ui:IsValid() then
+			ui.bPaused = true
+			ui.nPauseTime = nTime
+		end
+	elseif tTime.nTime == -5 then
+		-- 恢复计时条
+		local ui = ST_CACHE[nType][szKey]
+		if ui and ui:IsValid() and ui.bPaused then
+			local nPauseDuration = nTime - ui.nPauseTime
+			ui.nCreate = ui.nCreate + nPauseDuration  -- 顺延创建时间
+			ui.nLeft = ui.nLeft + nPauseDuration      -- 顺延当前段起点
+			if ST_TIME_EXPIRE[nType][szKey] then
+				ST_TIME_EXPIRE[nType][szKey] = ST_TIME_EXPIRE[nType][szKey] + nPauseDuration
+			end
+			ui.bPaused = false
+		end
 	else
 		local nExpire = ST_TIME_EXPIRE[nType][szKey]
 		if nExpire and nExpire > nTime then
 			return
 		end
+		local tBackreferences = {szSender = szSender, szReceiver = szReceiver, aBackreferences = aBackreferences}
 		ST_TIME_EXPIRE[nType][szKey] = nTime + (tParam.nRefresh or 0) * 1000
-		ST:ctor(nType, szKey, tParam):SetInfo(tTime, tParam.nIcon or 13):Switch(false)
+		ST:ctor(nType, szKey, tParam, tBackreferences):SetInfo(tTime, tTime.nIcon or tParam.nIcon or 13):Switch(false)
 	end
 end
 
@@ -173,6 +239,7 @@ function D.OnFrameCreate()
 	D.hItem = this:CreateItemData(ST_INI_FILE, 'Handle_Item')
 	D.UpdateAnchor(this)
 	D.handle = this:Lookup('', 'Handle_List')
+	D.handle:SetIgnoreInvisibleChild(true)  -- 排版时跳过隐藏的子组件
 end
 
 function D.OnEvent(szEvent)
@@ -242,7 +309,7 @@ function D.OnFrameBreathe()
 	local nNow = GetTime()
 	for k, v in pairs(ST_CACHE) do
 		for kk, vv in pairs(v) do
-			if vv:IsValid() then
+			if vv:IsValid() and not vv.bPaused then
 				if type(vv.countdown) == 'number' then
 					local nLeft  = vv.countdown - ((nNow - vv.nLeft) / 1000)
 					if nLeft >= 0 then
@@ -282,7 +349,7 @@ function D.UpdateAnchor(frame)
 end
 
 -- 构造函数
-function ST:ctor(nType, szKey, tParam)
+function ST:ctor(nType, szKey, tParam, tBackreferences)
 	if not ST_CACHE[nType] then
 		return
 	end
@@ -300,6 +367,7 @@ function ST:ctor(nType, szKey, tParam)
 		oo.ui.nRefresh  = tParam.nRefresh or 1
 		oo.ui.bTalk     = tParam.bTalk
 		oo.ui.nFrame    = tParam.nFrame
+		oo.ui.tBackreferences = tBackreferences or oo.ui.tBackreferences
 	else -- 没有ui的情况下 创建
 		oo = {}
 		setmetatable(oo, self)
@@ -312,6 +380,7 @@ function ST:ctor(nType, szKey, tParam)
 		oo.ui.bTalk          = tParam.bTalk
 		oo.ui.nFrame         = tParam.nFrame
 		oo.ui.bHold          = tParam.bHold
+		oo.ui.tBackreferences = tBackreferences
 		-- 杂项
 		oo.ui.nAlpha         = 30
 		-- ui
@@ -349,10 +418,36 @@ function ST:SetInfo(tTime, nIcon)
 		)
 		self.ui:SetUserData(math.floor(tTime.nTime))
 	end
-	if nIcon then
+	-- 修改倒计时条图标
+	if nIcon or tTime.nIcon then
 		local box = self.ui:Lookup('Box')
 		box:SetObject(UI_OBJECT_NOT_NEED_KNOWN)
-		box:SetObjectIcon(nIcon)
+		box:SetObjectIcon(tTime.nIcon or nIcon)
+	end
+	-- 修改倒计时条背景色，设置背景框与显隐，-2隐藏背景、阴影、特效，-3隐藏背景、时间、阴影、特效，-4全隐藏
+	local nFrame = tTime.nFrame or self.ui.nFrame
+	if nFrame == -2 then
+		self.ui:Show()
+		self.ui.img:Hide()
+		self.ui.sha:Hide()
+		self.ui.sfx:Hide()
+	elseif nFrame == -3 then
+		self.ui:Show()
+		self.ui.img:Hide()
+		self.ui.sha:Hide()
+		self.ui.sfx:Hide()
+		self.ui.time:Hide()
+	elseif nFrame == -4 then
+		self.ui:Hide()
+	else
+		self.ui:Show()
+		self.ui.img:Show()
+		self.ui.time:Show()
+		self.ui.sha:Show()
+		self.ui.sfx:Show()
+		if nFrame then
+			self.ui.img:SetFrame(nFrame)
+		end
 	end
 	if MY_TeamMon.bPushVoiceAlarm and tTime.szVoice then
 		FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tTime.szVoice)
