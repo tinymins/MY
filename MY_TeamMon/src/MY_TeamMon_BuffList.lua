@@ -130,6 +130,8 @@ function D.OnEvent(szEvent)
 		D.UpdateAnchor(this)
 	elseif szEvent == 'ON_ENTER_CUSTOM_UI_MODE' or szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, _L['Buff list'])
+	elseif szEvent == 'LOADING_END' then
+		D.handle:Clear()
 	end
 end
 function D.OnItemMouseEnter()

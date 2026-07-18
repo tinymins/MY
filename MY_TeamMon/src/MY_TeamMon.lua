@@ -2077,6 +2077,16 @@ function D.FireCrossMapEvent(szWhen)
 				D.OnCallMessage(szEvent, szContent)
 			end
 			MAP_ID = dwMapID
+			
+			-- 组队模式下过图后系统没有推送BUFF刷新事件，这里手动补发一下，以后修复了再删除
+			local me = X.GetClientPlayer()
+			if me then
+				if me.IsInParty() then
+					for _, tBuff in X.ipairs_c(X.GetBuffList(me)) do
+						D.OnBuff(me.dwID, false, tBuff.bCanCancel, tBuff.dwID, tBuff.nStackNum, tBuff.nLevel, tBuff.dwSkillSrcID)
+					end
+				end
+			end
 		end
 	end
 end
