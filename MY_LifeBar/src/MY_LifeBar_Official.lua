@@ -289,11 +289,21 @@ local settings = {
 MY_LifeBar_Official = X.CreateModule(settings)
 end
 
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
 X.RegisterEvent({'PLAYER_ENTER_SCENE', 'NPC_ENTER_SCENE'}, 'MY_LifeBar_Official', function()
 	local dwID = arg0
 	X.DelayCall(function() ApplyCaption(dwID) end)
 	X.DelayCall(200, function() ApplyCaption(dwID) end)
 	X.DelayCall(500, function() ApplyCaption(dwID) end)
+end)
+X.RegisterEvent('LOADING_END', 'MY_LifeBar_Official', function()
+    for dwID, _ in pairs(COUNTDOWN_CACHE) do
+        ResetCaption(dwID)
+    end
+    COUNTDOWN_CACHE = {}
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
