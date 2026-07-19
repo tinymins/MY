@@ -735,6 +735,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'LOADING_END' or szEvent == 'MY_TEAM_MON_CREATE_CACHE' or szEvent == 'MY_TEAM_MON_LOADING_END' then
 		D.FireCrossMapEvent('before')
 		D.CreateData(szEvent)
+		D.OnTeamEvent(szEvent)
 		X.DelayCall('MY_TeamMon__FireCrossMapEvent__after', D.FireCrossMapEvent, 'after')
 	elseif szEvent == 'PARTY_ADD_MEMBER' or szEvent == 'PARTY_DELETE_MEMBER' or szEvent == 'PARTY_DISBAND' then
 		D.OnTeamEvent(szEvent)
