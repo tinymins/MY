@@ -281,12 +281,21 @@ local function SetSTAction(ui, nLeft, nPer)
 	local me = X.GetClientPlayer()
 	local obj = ui.obj
 	if nLeft < 5 then
-		local nTimeLeft = nLeft * 1000 % 1000
-		local nAlpha = 255 * nTimeLeft / 1000
-		if math.floor(nLeft / 1) % 2 == 1 then
-			nAlpha = 255 - nAlpha
+		if ui.bHoldFrame then
+			if ui.nAlpha < ST_UI_ALPHA then
+				ui.nAlpha = math.min(ST_UI_ALPHA, ui.nAlpha + 15)
+				obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer):SetAlpha(ui.nAlpha)
+			else
+				obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer)
+			end
+		else
+			local nTimeLeft = nLeft * 1000 % 1000
+			local nAlpha = 255 * nTimeLeft / 1000
+			if math.floor(nLeft / 1) % 2 == 1 then
+				nAlpha = 255 - nAlpha
+			end
+			obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer):Switch(true):SetAlpha(100 + nAlpha)
 		end
-		obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer):Switch(true):SetAlpha(100 + nAlpha)
 		if ui.bTalk and me.IsInParty() then
 			if not ui.szTalk or ui.szTalk ~= math.floor(nLeft) then
 				ui.szTalk = math.floor(nLeft)
@@ -367,6 +376,8 @@ function ST:ctor(nType, szKey, tParam, tBackreferences)
 		oo.ui.nRefresh  = tParam.nRefresh or 1
 		oo.ui.bTalk     = tParam.bTalk
 		oo.ui.nFrame    = tParam.nFrame
+		oo.ui.bHold     = tParam.bHold
+		oo.ui.bHoldFrame = tParam.bHoldFrame
 		oo.ui.tBackreferences = tBackreferences or oo.ui.tBackreferences
 	else -- 没有ui的情况下 创建
 		oo = {}
@@ -380,6 +391,7 @@ function ST:ctor(nType, szKey, tParam, tBackreferences)
 		oo.ui.bTalk          = tParam.bTalk
 		oo.ui.nFrame         = tParam.nFrame
 		oo.ui.bHold          = tParam.bHold
+		oo.ui.bHoldFrame     = tParam.bHoldFrame
 		oo.ui.tBackreferences = tBackreferences
 		-- 杂项
 		oo.ui.nAlpha         = 30
