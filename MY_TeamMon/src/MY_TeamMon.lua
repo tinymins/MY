@@ -1074,10 +1074,14 @@ function D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 					nIcon     = v.nIcon or data.nIcon or 340,
 					nFrame    = v.nFrame,
 					szContent = FilterCustomText(v.szName or data.szName, szSender, szReceiver, aBackreferences),
+					szRawName = v.szName or data.szName,
 					nTime     = v.nTime,
 					nRefresh  = v.nRefresh,
 					bTalk     = v.bTeamChannel,
 					bHold     = v.bHold,
+					szVoice   = v.szVoice,
+					nNewtime   = v.nNewtime,
+					bHoldFrame = v.bHoldFrame,
 				}
 				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 			end

@@ -112,9 +112,11 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver, aBack
 		tTime = {
 			nTime = tParam.nTime,
 			szContent = tParam.szContent,
+			szRawName = tParam.szRawName,
 			nIcon = tParam.nIcon,
 			nFrame = tParam.nFrame,
 			szVoice = tParam.szVoice,
+			bHoldFrame = tParam.bHoldFrame,
 		}
 	elseif X.IsString(tParam.nTime) then
 		local aCountdown = ParseCountdown(tParam.nTime, szSender, szReceiver, aBackreferences)
@@ -162,9 +164,9 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver, aBack
 			if tParam.nRefresh then
 				ST_TIME_EXPIRE[nType][szKey] = nTime + tParam.nRefresh * 1000 - 3
 			end
-			local tRefs = ui.tBackreferences or {}
+			local tRefs = ui.tBackreferences or aBackreferences or {}
 			if tParam.nNewTime and X.IsString(tParam.nNewTime) then
- 				local aCountdown = ParseCountdown(tParam.nNewTime, tRefs.szSender, tRefs.szReceiver, tRefs.aBackreferences)
+ 				local aCountdown = ParseCountdown(tParam.nNewTime, tRefs.szSender or szSender, tRefs.szReceiver or szReceiver, tRefs.aBackreferences or aBackreferences)
 				if aCountdown then
 					ui.countdown = aCountdown
 					ui.nCreate = nTime
@@ -175,23 +177,17 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver, aBack
 					ui.obj:SetInfo(tTime, tTime.nIcon or tParam.nIcon)
 				end
 
-			else
-				if tParam.nNewTime and X.IsNumber(tParam.nNewTime) then
-					ui.countdown = tParam.nNewTime  -- 改成数字，OnFrameBreathe 走单段逻辑
-					ui.nCreate = nTime
-					ui.nLeft = nTime
-				end
-				local szNewContent = (tTime.szContent ~= '' and tTime.szContent)
+			elseif tParam.nNewTime and X.IsNumber(tParam.nNewTime) and tParam.nNewTime > 0 then
+				ui.countdown = tParam.nNewTime  -- 改成数字，OnFrameBreathe 走单段逻辑
+				ui.nCreate = nTime
+				ui.nLeft = nTime
+				local szNewContent = (tParam.szRawName ~= '' and tParam.szRawName)
 				if szNewContent then
-					szNewContent = FilterCustomText(szNewContent, tRefs.szSender, tRefs.szReceiver, tRefs.aBackreferences)
+					szNewContent = FilterCustomText(szNewContent, tRefs.szSender or szSender, tRefs.szReceiver or szReceiver, tRefs.aBackreferences or aBackreferences)
 				end
-				ui.obj:SetInfo({
-					nTime = tParam.nNewTime,
-					szContent = szNewContent,
-					nIcon = tTime.nIcon,
-					nFrame = tTime.nFrame,
-					szVoice = tTime.szVoice,
-				}, tParam.nIcon)
+				tTime.nTime = tParam.nNewTime
+				tTime.szContent = szNewContent
+				ui.obj:SetInfo(tTime, tParam.nIcon)
 			end
 		else
 			if MY_TeamMon.bPushVoiceAlarm and tTime.szVoice then
