@@ -195,6 +195,11 @@ function D.OnSkillNotify(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	end
 end
 
+local SYS_MSG_SKILL_EVENTS = {
+	'SYS_MSG_UI_OME_SKILL_HIT_LOG',
+	'SYS_MSG_UI_OME_SKILL_EFFECT_LOG',
+}
+
 function D.OnEnableChange()
 	local bEnable = D.bReady and O.bEnable
 	local h = X.UI.GetShadowHandle('MY_ForceGuding')
@@ -202,11 +207,11 @@ function D.OnEnableChange()
 	if bEnable then
 		h:AppendItemFromString('<shadow>name="Shadow_Label"</shadow>')
 		D.pLabel = h:Lookup('Shadow_Label')
-		X.RegisterEvent('SYS_MSG', 'MY_ForceGuding', function()
-			if arg0 == 'UI_OME_SKILL_HIT_LOG' then
-				D.OnSkillCast(arg1, arg4, arg5, arg0)
-			elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-				D.OnSkillCast(arg1, arg5, arg6, arg0)
+		X.RegisterEvent(SYS_MSG_SKILL_EVENTS, 'MY_ForceGuding', function(szEvent)
+			if szEvent == 'SYS_MSG_UI_OME_SKILL_HIT_LOG' then
+				D.OnSkillCast(arg0, arg3, arg4, szEvent)
+			elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' then
+				D.OnSkillCast(arg0, arg4, arg5, szEvent)
 			end
 		end)
 		X.RegisterEvent('DO_SKILL_CAST', 'MY_ForceGuding', function(event)
@@ -260,7 +265,7 @@ function D.OnEnableChange()
 			end
 		end)
 	else
-		X.RegisterEvent('SYS_MSG', 'MY_ForceGuding', false)
+		X.RegisterEvent(SYS_MSG_SKILL_EVENTS, 'MY_ForceGuding', false)
 		X.RegisterEvent('DO_SKILL_CAST', 'MY_ForceGuding', false)
 		X.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_ForceGuding', false)
 		X.RegisterBgMsg('MY_GUDING_NOTIFY', 'MY_ForceGuding', false)

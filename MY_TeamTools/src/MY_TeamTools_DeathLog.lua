@@ -194,13 +194,17 @@ X.RegisterEvent('LOADING_END', function()
 	PLAYER_ID  = X.GetClientPlayerID()
 end)
 
-X.RegisterEvent('SYS_MSG', function()
-	if arg0 == 'UI_OME_DEATH_NOTIFY' then -- 死亡记录
+X.RegisterEvent({
+	'SYS_MSG',
+	'SYS_MSG_UI_OME_SKILL_EFFECT_LOG',
+	'SYS_MSG_UI_OME_COMMON_HEALTH_LOG',
+}, function(szEvent)
+	if szEvent == 'SYS_MSG' and arg0 == 'UI_OME_DEATH_NOTIFY' then -- 死亡记录
 		OnDeath(arg1, arg2)
-	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then -- 技能记录
-		OnSkillEffectLog(arg1, arg2, arg4, arg5, arg6, arg7, arg8, arg9)
-	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
-		OnCommonHealthLog(arg1, arg2)
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' then -- 技能记录
+		OnSkillEffectLog(arg0, arg1, arg3, arg4, arg5, arg6, arg7, arg8)
+	elseif szEvent == 'SYS_MSG_UI_OME_COMMON_HEALTH_LOG' then
+		OnCommonHealthLog(arg0, arg1)
 	end
 end)
 

@@ -526,91 +526,102 @@ function D.OnTargetInformationUpdate(dwType, dwID)
 end
 
 -- 系统日志监控（数据源）
-X.RegisterEvent('SYS_MSG', function()
+X.RegisterEvent({
+	'SYS_MSG',
+	'SYS_MSG_UI_OME_SKILL_CAST_LOG',
+	'SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG',
+	'SYS_MSG_UI_OME_SKILL_EFFECT_LOG',
+	'SYS_MSG_UI_OME_SKILL_BLOCK_LOG',
+	'SYS_MSG_UI_OME_SKILL_SHIELD_LOG',
+	'SYS_MSG_UI_OME_SKILL_MISS_LOG',
+	'SYS_MSG_UI_OME_SKILL_HIT_LOG',
+	'SYS_MSG_UI_OME_SKILL_DODGE_LOG',
+	'SYS_MSG_UI_OME_COMMON_HEALTH_LOG',
+}, function(szEvent)
 	if not LOG_ENABLE then
 		return
 	end
-	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
+	if szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_LOG' then
 		-- 技能施放日志；
-		-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
-		-- D.OnSkillCast(arg1, arg2, arg3)
-		if D.WillRecID(arg1) then
-			D.OnTargetUpdate(arg1)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_LOG, { arg1, arg2, arg3 })
+		-- (arg0)dwCaster：技能施放者 (arg1)dwSkillID：技能ID (arg2)dwLevel：技能等级
+		-- D.OnSkillCast(arg0, arg1, arg2)
+		if D.WillRecID(arg0) then
+			D.OnTargetUpdate(arg0)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_LOG, { arg0, arg1, arg2 })
 		end
-	elseif arg0 == 'UI_OME_SKILL_CAST_RESPOND_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG' then
 		-- 技能施放结果日志；
-		-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID
-		-- (arg3)dwLevel：技能等级 (arg4)nRespond：见枚举型[[SKILL_RESULT_CODE]]
-		-- D.OnSkillCastRespond(arg1, arg2, arg3, arg4)
-		if D.WillRecID(arg1) then
-			D.OnTargetUpdate(arg1)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG, { arg1, arg2, arg3, arg4 })
+		-- (arg0)dwCaster：技能施放者 (arg1)dwSkillID：技能ID
+		-- (arg2)dwLevel：技能等级 (arg3)nRespond：见枚举型[[SKILL_RESULT_CODE]]
+		-- D.OnSkillCastRespond(arg0, arg1, arg2, arg3)
+		if D.WillRecID(arg0) then
+			D.OnTargetUpdate(arg0)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG, { arg0, arg1, arg2, arg3 })
 		end
-	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' then
 		-- if not X.IsInArenaMap() then
 		-- 技能最终产生的效果（生命值的变化）；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
-		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
-		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标 (arg2)bReact：是否为反击 (arg3)nType：Effect类型 (arg4)dwID:Effect的ID
+		-- (arg5)dwLevel：Effect的等级 (arg6)bCriticalStrike：是否会心 (arg7)nCount：tResultCount数据表中元素个数 (arg8)tResultCount：数值集合
+		if D.WillRecID(arg0) or D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg0)
 			D.OnTargetUpdate(arg1)
-			D.OnTargetUpdate(arg2)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_EFFECT_LOG, { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 })
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_EFFECT_LOG, { arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 })
 		end
-	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_BLOCK_LOG' then
 		-- 格挡日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)nType：Effect的类型
-		-- (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级 (arg6)nDamageType：伤害类型，见枚举型[[SKILL_RESULT_TYPE]]
-		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标 (arg2)nType：Effect的类型
+		-- (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级 (arg5)nDamageType：伤害类型，见枚举型[[SKILL_RESULT_TYPE]]
+		if D.WillRecID(arg0) or D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg0)
 			D.OnTargetUpdate(arg1)
-			D.OnTargetUpdate(arg2)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_BLOCK_LOG, { arg1, arg2, arg3, arg4, arg5, arg6 })
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_BLOCK_LOG, { arg0, arg1, arg2, arg3, arg4, arg5 })
 		end
-	elseif arg0 == 'UI_OME_SKILL_SHIELD_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_SHIELD_LOG' then
 		-- 技能被屏蔽日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		if D.WillRecID(arg0) or D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg0)
 			D.OnTargetUpdate(arg1)
-			D.OnTargetUpdate(arg2)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_SHIELD_LOG, { arg1, arg2, arg3, arg4, arg5 })
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_SHIELD_LOG, { arg0, arg1, arg2, arg3, arg4 })
 		end
-	elseif arg0 == 'UI_OME_SKILL_MISS_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_MISS_LOG' then
 		-- 技能未命中目标日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		if D.WillRecID(arg0) or D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg0)
 			D.OnTargetUpdate(arg1)
-			D.OnTargetUpdate(arg2)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_MISS_LOG, { arg1, arg2, arg3, arg4, arg5 })
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_MISS_LOG, { arg0, arg1, arg2, arg3, arg4 })
 		end
-	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_HIT_LOG' then
 		-- 技能命中目标日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		if D.WillRecID(arg0) or D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg0)
 			D.OnTargetUpdate(arg1)
-			D.OnTargetUpdate(arg2)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_HIT_LOG, { arg1, arg2, arg3, arg4, arg5 })
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_HIT_LOG, { arg0, arg1, arg2, arg3, arg4 })
 		end
-	elseif arg0 == 'UI_OME_SKILL_DODGE_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_DODGE_LOG' then
 		-- 技能被闪避日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		if D.WillRecID(arg1) or D.WillRecID(arg2) then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		if D.WillRecID(arg0) or D.WillRecID(arg1) then
+			D.OnTargetUpdate(arg0)
 			D.OnTargetUpdate(arg1)
-			D.OnTargetUpdate(arg2)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_DODGE_LOG, { arg1, arg2, arg3, arg4, arg5 })
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_DODGE_LOG, { arg0, arg1, arg2, arg3, arg4 })
 		end
-	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_COMMON_HEALTH_LOG' then
 		-- 普通治疗日志；
-		-- (arg1)dwCharacterID：承疗玩家ID (arg2)nDeltaLife：增加血量值
-		-- D.OnCommonHealth(arg1, arg2)
-		if D.WillRecID(arg1) then
-			D.OnTargetUpdate(arg1)
-			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_COMMON_HEALTH_LOG, { arg1, arg2 })
+		-- (arg0)dwCharacterID：承疗玩家ID (arg1)nDeltaLife：增加血量值
+		-- D.OnCommonHealth(arg0, arg1)
+		if D.WillRecID(arg0) then
+			D.OnTargetUpdate(arg0)
+			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_COMMON_HEALTH_LOG, { arg0, arg1 })
 		end
-	elseif arg0 == 'UI_OME_DEATH_NOTIFY' then
+	elseif szEvent == 'SYS_MSG' and arg0 == 'UI_OME_DEATH_NOTIFY' then
 		-- 死亡日志；
 		-- (arg1)dwCharacterID：死亡目标ID (arg2)dwKiller：击杀者ID
 		if D.WillRecID(arg1) or D.WillRecID(arg2) then

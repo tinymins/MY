@@ -537,6 +537,7 @@ function D.OnFrameCreate()
 	end
 	this:ShowWhenUIHide()
 	this:RegisterEvent('SYS_MSG')
+	this:RegisterEvent('SYS_MSG_UI_OME_SKILL_EFFECT_LOG')
 	this:RegisterEvent('FIGHT_HINT')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('LOADING_END')
@@ -606,7 +607,7 @@ function D.OnEvent(szEvent)
 			D.OnCommonHealth(arg0, arg1)
 		end
 	elseif szEvent == 'SKILL_EFFECT_TEXT' then
-		-- 贯体治疗有效值 SKILL_EFFECT_TEXT 无法显示，于是让所有有效治疗走 SYS_MSG -> UI_OME_SKILL_EFFECT_LOG 通道
+		-- 贯体治疗有效值 SKILL_EFFECT_TEXT 无法显示，于是让所有有效治疗走 SYS_MSG_UI_OME_SKILL_EFFECT_LOG 通道
 		if arg3 == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
 			return
 		end
@@ -636,16 +637,16 @@ function D.OnEvent(szEvent)
 			if not X.IsPlayer(arg1) then
 				COMBAT_TEXT_LEAVE[arg1] = true
 			end
-		elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-			-- 技能最终产生的效果（生命值的变化）；
-			-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nEffectType：Effect类型 (arg5)dwID:Effect的ID
-			-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
-			-- 贯体治疗有效值 SKILL_EFFECT_TEXT 无法显示，于是让所有有效治疗走 SYS_MSG -> UI_OME_SKILL_EFFECT_LOG 通道
-			if arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] then
-				D.OnSkillText(arg1, arg2, arg7, SKILL_RESULT_TYPE.EFFECTIVE_THERAPY, arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY], arg5, arg6, arg4)
-			end
-			-- dwCasterID, dwTargetID, bCriticalStrike, nEffectType, nValue, dwSkillID, dwSkillLevel, nEffectType
 		end
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' then
+		-- 技能最终产生的效果（生命值的变化）；
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标 (arg2)bReact：是否为反击 (arg3)nEffectType：Effect类型 (arg4)dwID:Effect的ID
+		-- (arg5)dwLevel：Effect的等级 (arg6)bCriticalStrike：是否会心 (arg7)nCount：tResultCount数据表中元素个数 (arg8)tResultCount：数值集合
+		-- 贯体治疗有效值 SKILL_EFFECT_TEXT 无法显示，于是让所有有效治疗走 SYS_MSG_UI_OME_SKILL_EFFECT_LOG 通道
+		if arg8[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] then
+			D.OnSkillText(arg0, arg1, arg6, SKILL_RESULT_TYPE.EFFECTIVE_THERAPY, arg8[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY], arg4, arg5, arg3)
+		end
+		-- dwCasterID, dwTargetID, bCriticalStrike, nEffectType, nValue, dwSkillID, dwSkillLevel, nEffectType
 	elseif szEvent == 'LOADING_END' then
 		this:Show()
 		D.FreeQueue()

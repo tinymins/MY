@@ -80,18 +80,18 @@ X.RegisterEvent('MY_FIGHT_HINT', function()
 		D.dwTherapy = 0
 	end
 end)
-X.RegisterEvent('SYS_MSG', function()
-	if arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
+X.RegisterEvent('SYS_MSG_UI_OME_SKILL_EFFECT_LOG', function(szEvent)
+	if szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' then
 		-- 技能最终产生的效果（生命值的变化）；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
-		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResult：数值集合
-		local KCaster = D.GetTargetHandle(arg1)
-		if KCaster and not X.IsPlayer(arg1) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标 (arg2)bReact：是否为反击 (arg3)nType：Effect类型 (arg4)dwID:Effect的ID
+		-- (arg5)dwLevel：Effect的等级 (arg6)bCriticalStrike：是否会心 (arg7)nCount：tResultCount数据表中元素个数 (arg8)tResult：数值集合
+		local KCaster = D.GetTargetHandle(arg0)
+		if KCaster and not X.IsPlayer(arg0) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
 			KCaster = D.GetTargetHandle(KCaster.dwEmployer)
 		end
 		if KCaster and KCaster.dwID == X.GetClientPlayerID() then
-			D.dwDamage = D.dwDamage + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0)
-			D.dwTherapy = D.dwTherapy + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0)
+			D.dwDamage = D.dwDamage + (arg8[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0)
+			D.dwTherapy = D.dwTherapy + (arg8[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0)
 		end
 	end
 end)
