@@ -1457,45 +1457,55 @@ end
 
 -- 系统日志监控（数据源）
 do local aAbsorbInfo, nLFC
-X.RegisterEvent('SYS_MSG', function()
+X.RegisterEvent({
+	'SYS_MSG_UI_OME_SKILL_CAST_LOG',
+	'SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG',
+	'SYS_MSG_UI_OME_SKILL_EFFECT_LOG',
+	'SYS_MSG_UI_OME_SKILL_BLOCK_LOG',
+	'SYS_MSG_UI_OME_SKILL_SHIELD_LOG',
+	'SYS_MSG_UI_OME_SKILL_MISS_LOG',
+	'SYS_MSG_UI_OME_SKILL_HIT_LOG',
+	'SYS_MSG_UI_OME_SKILL_DODGE_LOG',
+	'SYS_MSG_UI_OME_COMMON_HEALTH_LOG',
+}, function(szEvent)
 	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
-	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
+	if szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_LOG' then
 		-- 技能施放日志；
-		-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
-		-- D.OnSkillCast(arg1, arg2, arg3)
-	elseif arg0 == 'UI_OME_SKILL_CAST_RESPOND_LOG' then
+		-- (arg0)dwCaster：技能施放者 (arg1)dwSkillID：技能ID (arg2)dwLevel：技能等级
+		-- D.OnSkillCast(arg0, arg1, arg2)
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG' then
 		-- 技能施放结果日志；
-		-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID
-		-- (arg3)dwLevel：技能等级 (arg4)nRespond：见枚举型[[SKILL_RESULT_CODE]]
-		-- D.OnSkillCastRespond(arg1, arg2, arg3, arg4)
-	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
+		-- (arg0)dwCaster：技能施放者 (arg1)dwSkillID：技能ID
+		-- (arg2)dwLevel：技能等级 (arg3)nRespond：见枚举型[[SKILL_RESULT_CODE]]
+		-- D.OnSkillCastRespond(arg0, arg1, arg2, arg3)
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' then
 		-- if not X.IsInArenaMap() then
 		-- 技能最终产生的效果（生命值的变化）；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
-		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
-		-- D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-		if arg7 and arg7 ~= 0 then -- bCriticalStrike
-			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
-		elseif arg9[SKILL_RESULT_TYPE.INSIGHT_DAMAGE] then -- 识破
-			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.INSIGHT, arg8, arg9)
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标 (arg2)bReact：是否为反击 (arg3)nType：Effect类型 (arg4)dwID:Effect的ID
+		-- (arg5)dwLevel：Effect的等级 (arg6)bCriticalStrike：是否会心 (arg7)nCount：tResultCount数据表中元素个数 (arg8)tResultCount：数值集合
+		-- D.OnSkillEffect(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+		if arg6 and arg6 ~= 0 then -- bCriticalStrike
+			D.OnSkillEffect(arg0, arg1, arg3, arg4, arg5, SKILL_RESULT.CRITICAL, arg7, arg8)
+		elseif arg8[SKILL_RESULT_TYPE.INSIGHT_DAMAGE] then -- 识破
+			D.OnSkillEffect(arg0, arg1, arg3, arg4, arg5, SKILL_RESULT.INSIGHT, arg7, arg8)
 		else
-			D.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
+			D.OnSkillEffect(arg0, arg1, arg3, arg4, arg5, SKILL_RESULT.HIT, arg7, arg8)
 		end
 		-- 盾化解伤害补偿至盾提供者的治疗量
-		if arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
-			aAbsorbInfo = ABSORB_CACHE[arg2]
+		if arg8[SKILL_RESULT_TYPE.ABSORB_DAMAGE] then
+			aAbsorbInfo = ABSORB_CACHE[arg1]
 			nLFC = GetLogicFrameCount()
 			if aAbsorbInfo then
 				for _, tAbsorbInfo in ipairs(aAbsorbInfo) do
 					if tAbsorbInfo.nEndFrame >= nLFC then
 						D.OnSkillEffect(
-							tAbsorbInfo.dwSrcID, arg2,
+							tAbsorbInfo.dwSrcID, arg1,
 							tAbsorbInfo.nEffectType, tAbsorbInfo.dwEffectID, tAbsorbInfo.dwEffectLevel,
 							SKILL_RESULT.ABSORB, 1, {
-								[SKILL_RESULT_TYPE.THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
-								[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg9[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+								[SKILL_RESULT_TYPE.THERAPY] = arg8[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
+								[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = arg8[SKILL_RESULT_TYPE.ABSORB_DAMAGE],
 							})
 						break
 					end
@@ -1503,35 +1513,35 @@ X.RegisterEvent('SYS_MSG', function()
 			end
 		end
 		-- end
-	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_BLOCK_LOG' then
 		-- 格挡日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)nType：Effect的类型
-		-- (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级 (arg6)nDamageType：伤害类型，见枚举型[[SKILL_RESULT_TYPE]]
-		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.BLOCK, nil, {})
-	elseif arg0 == 'UI_OME_SKILL_SHIELD_LOG' then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标 (arg2)nType：Effect的类型
+		-- (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级 (arg5)nDamageType：伤害类型，见枚举型[[SKILL_RESULT_TYPE]]
+		D.OnSkillEffect(arg0, arg1, arg2, arg3, arg4, SKILL_RESULT.BLOCK, nil, {})
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_SHIELD_LOG' then
 		-- 技能被屏蔽日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.SHIELD, nil, {})
-	elseif arg0 == 'UI_OME_SKILL_MISS_LOG' then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		D.OnSkillEffect(arg0, arg1, arg2, arg3, arg4, SKILL_RESULT.SHIELD, nil, {})
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_MISS_LOG' then
 		-- 技能未命中目标日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.MISS, nil, {})
-	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		D.OnSkillEffect(arg0, arg1, arg2, arg3, arg4, SKILL_RESULT.MISS, nil, {})
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_HIT_LOG' then
 		-- 技能命中目标日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		-- D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.HIT, nil, {})
-	elseif arg0 == 'UI_OME_SKILL_DODGE_LOG' then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		-- D.OnSkillEffect(arg0, arg1, arg2, arg3, arg4, SKILL_RESULT.HIT, nil, {})
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_DODGE_LOG' then
 		-- 技能被闪避日志；
-		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
-		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
-		D.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.DODGE, nil, {})
-	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
+		-- (arg0)dwCaster：施放者 (arg1)dwTarget：目标
+		-- (arg2)nType：Effect的类型 (arg3)dwID：Effect的ID (arg4)dwLevel：Effect的等级
+		D.OnSkillEffect(arg0, arg1, arg2, arg3, arg4, SKILL_RESULT.DODGE, nil, {})
+	elseif szEvent == 'SYS_MSG_UI_OME_COMMON_HEALTH_LOG' then
 		-- 普通治疗日志；
-		-- (arg1)dwCharacterID：承疗玩家ID (arg2)nDeltaLife：增加血量值
-		-- D.OnCommonHealth(arg1, arg2)
+		-- (arg0)dwCharacterID：承疗玩家ID (arg1)nDeltaLife：增加血量值
+		-- D.OnCommonHealth(arg0, arg1)
 	end
 end)
 end

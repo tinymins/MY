@@ -158,6 +158,13 @@ local MY_TEAM_MON_EVENTS = {
 
 	'BUFF_UPDATE',
 	'SYS_MSG',
+	'SYS_MSG_UI_OME_SKILL_CAST_LOG',
+	'SYS_MSG_UI_OME_SKILL_BLOCK_LOG',
+	'SYS_MSG_UI_OME_SKILL_SHIELD_LOG',
+	'SYS_MSG_UI_OME_SKILL_MISS_LOG',
+	'SYS_MSG_UI_OME_SKILL_DODGE_LOG',
+	'SYS_MSG_UI_OME_SKILL_HIT_LOG',
+	'SYS_MSG_UI_OME_SKILL_EFFECT_LOG',
 	'DO_SKILL_CAST',
 
 	'PLAYER_SAY',
@@ -636,16 +643,16 @@ function D.OnEvent(szEvent)
 			if not X.IsPlayer(arg1) then
 				D.OnDeath(arg1, arg2)
 			end
-		elseif arg0 == 'UI_OME_SKILL_CAST_LOG' then
-			D.OnSkillCast(arg1, arg2, arg3, arg0)
-		elseif (arg0 == 'UI_OME_SKILL_BLOCK_LOG'
-		or arg0 == 'UI_OME_SKILL_SHIELD_LOG' or arg0 == 'UI_OME_SKILL_MISS_LOG'
-		or arg0 == 'UI_OME_SKILL_DODGE_LOG'	or arg0 == 'UI_OME_SKILL_HIT_LOG')
-		and arg3 == SKILL_EFFECT_TYPE.SKILL then
-			D.OnSkillCast(arg1, arg4, arg5, arg0)
-		elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' and arg4 == SKILL_EFFECT_TYPE.SKILL then
-			D.OnSkillCast(arg1, arg5, arg6, arg0)
 		end
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_LOG' then
+		D.OnSkillCast(arg0, arg1, arg2, szEvent)
+	elseif (szEvent == 'SYS_MSG_UI_OME_SKILL_BLOCK_LOG'
+		or szEvent == 'SYS_MSG_UI_OME_SKILL_SHIELD_LOG' or szEvent == 'SYS_MSG_UI_OME_SKILL_MISS_LOG'
+		or szEvent == 'SYS_MSG_UI_OME_SKILL_DODGE_LOG' or szEvent == 'SYS_MSG_UI_OME_SKILL_HIT_LOG')
+		and arg2 == SKILL_EFFECT_TYPE.SKILL then
+		D.OnSkillCast(arg0, arg3, arg4, szEvent)
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' and arg3 == SKILL_EFFECT_TYPE.SKILL then
+		D.OnSkillCast(arg0, arg4, arg5, szEvent)
 	elseif szEvent == 'DO_SKILL_CAST' then
 		D.OnSkillCast(arg0, arg1, arg2, szEvent)
 	elseif szEvent == 'PARTY_SET_MARK' then
@@ -1250,7 +1257,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		return
 	end
 	if dwCastID == 13165 then -- ÄÚ¹¦ÇÐ»»
-		if szEvent == 'UI_OME_SKILL_CAST_LOG' then
+		if szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_LOG' then
 			FireUIEvent('MY_KUNGFU_SWITCH', dwCaster)
 		end
 	end
@@ -1298,7 +1305,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			nIcon = data.nIcon
 		end
 		local cfg, nClass
-		if szEvent == 'UI_OME_SKILL_CAST_LOG' then
+		if szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_LOG' then
 			cfg, nClass = data[MY_TEAM_MON_TYPE.SKILL_BEGIN], MY_TEAM_MON_TYPE.SKILL_BEGIN
 		else
 			cfg, nClass = data[MY_TEAM_MON_TYPE.SKILL_END], MY_TEAM_MON_TYPE.SKILL_END

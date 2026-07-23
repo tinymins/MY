@@ -236,25 +236,29 @@ do
 local function OnSkill(dwID, nLevel)
 	SKILL_EXTRA[dwID] = dwID
 end
-local function OnSysMsg(event)
-	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
-		if arg1 ~= X.GetClientPlayerID() then
+local function OnSysMsg(szEvent)
+	if szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_LOG' then
+		if arg0 ~= X.GetClientPlayerID() then
 			return
 		end
-		OnSkill(arg2, arg3)
-	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
-		if arg1 ~= X.GetClientPlayerID() then
+		OnSkill(arg1, arg2)
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_HIT_LOG' then
+		if arg0 ~= X.GetClientPlayerID() then
+			return
+		end
+		OnSkill(arg3, arg4)
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' then
+		if arg3 ~= SKILL_EFFECT_TYPE.SKILL or arg0 ~= X.GetClientPlayerID() then
 			return
 		end
 		OnSkill(arg4, arg5)
-	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-		if arg4 ~= SKILL_EFFECT_TYPE.SKILL or arg1 ~= X.GetClientPlayerID() then
-			return
-		end
-		OnSkill(arg5, arg6)
 	end
 end
-X.RegisterEvent('SYS_MSG', 'MY_TargetMonData__SKILL', OnSysMsg)
+X.RegisterEvent({
+	'SYS_MSG_UI_OME_SKILL_CAST_LOG',
+	'SYS_MSG_UI_OME_SKILL_HIT_LOG',
+	'SYS_MSG_UI_OME_SKILL_EFFECT_LOG',
+}, 'MY_TargetMonData__SKILL', OnSysMsg)
 end
 
 -- 更新BUFF数据 更新监控条

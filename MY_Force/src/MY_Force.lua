@@ -154,11 +154,11 @@ end
 function D.OnFeedHorseChange()
 	local bFeedHorse = O.bFeedHorse
 	if bFeedHorse then
-		X.RegisterEvent('SYS_MSG', 'MY_Force__FeedHorse', function()
+		X.RegisterEvent('SYS_MSG_UI_OME_SKILL_CAST_LOG', 'MY_Force__FeedHorse', function()
 			local me = X.GetClientPlayer()
 			-- ¶ÁÌõ¼¼ÄÜ
-			if arg0 == 'UI_OME_SKILL_CAST_LOG' and O.bFeedHorse and arg1 == me.dwID
-			and (arg2 == 433 or arg2 == 53 or Table_GetSkillName(arg2, 1) == Table_GetSkillName(53, 1)) then -- on prepare Æï³Ë
+			if O.bFeedHorse and arg0 == me.dwID
+			and (arg1 == 433 or arg1 == 53 or Table_GetSkillName(arg1, 1) == Table_GetSkillName(53, 1)) then -- on prepare Æï³Ë
 				local it = me.GetEquippedHorse()
 				if it then
 					local nFullLevel = it.GetHorseFullLevel()
@@ -173,7 +173,7 @@ function D.OnFeedHorseChange()
 			end
 		end)
 	else
-		X.RegisterEvent('SYS_MSG', 'MY_Force__FeedHorse', false)
+		X.RegisterEvent('SYS_MSG_UI_OME_SKILL_CAST_LOG', 'MY_Force__FeedHorse', false)
 	end
 end
 

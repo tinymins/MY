@@ -703,7 +703,8 @@ function D.OnFrameCreate()
 	-- arg0 回应状态 arg1 dwID arg2 同意=1 反对=0
 	this:RegisterEvent('TEAM_VOTE_RESPOND')
 	this:RegisterEvent('TEAM_INCOMEMONEY_CHANGE_NOTIFY')
-	this:RegisterEvent('SYS_MSG')
+	this:RegisterEvent('SYS_MSG_UI_OME_SKILL_CAST_LOG')
+	this:RegisterEvent('SYS_MSG_UI_OME_SKILL_EFFECT_LOG')
 	this:RegisterEvent('MY_RAID_REC_BUFF')
 	this:RegisterEvent('GKP_RECORD_TOTAL')
 	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
@@ -773,17 +774,15 @@ end
 function D.OnEvent(szEvent)
 	if szEvent == 'RENDER_FRAME_UPDATE' then
 		MY_CataclysmParty:CallDrawHPMP(true)
-	elseif szEvent == 'SYS_MSG' then
-		if arg0 == 'UI_OME_SKILL_CAST_LOG' and arg2 == 13165 then
-			MY_CataclysmParty:KungFuSwitch(arg1)
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_CAST_LOG' then
+		if arg1 == 13165 then
+			MY_CataclysmParty:KungFuSwitch(arg0)
 		end
-		if CFG.bShowEffect then
-			if arg0 == 'UI_OME_SKILL_EFFECT_LOG'
-			and arg5 == 6252
-			and arg9[SKILL_RESULT_TYPE.THERAPY]
-			and (arg1 == X.GetControlPlayerID() or UI_GetPlayerMountKungfuID() ~= 10176) then
-				MY_CataclysmParty:CallEffect(arg2, 500)
-			end
+	elseif szEvent == 'SYS_MSG_UI_OME_SKILL_EFFECT_LOG' and CFG.bShowEffect then
+		if arg4 == 6252
+		and arg8[SKILL_RESULT_TYPE.THERAPY]
+		and (arg0 == X.GetControlPlayerID() or UI_GetPlayerMountKungfuID() ~= 10176) then
+			MY_CataclysmParty:CallEffect(arg1, 500)
 		end
 	elseif szEvent == 'PARTY_SYNC_MEMBER_DATA' then
 		MY_CataclysmParty:CallRefreshImages(arg1, true, true, nil, true)
