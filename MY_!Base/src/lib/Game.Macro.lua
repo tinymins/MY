@@ -51,6 +51,9 @@ function X.IsMacroValid(szMacro)
 			-- 拆分 /动作指令 [条件] 动作指令参数
 			local szAction, szCondition, szActionData = szLine:match('^/([a-zA-Z_]+)%s*%[([^%]]+)%]%s*(.-)%s*$')
 			if not szAction then
+				szAction, szCondition, szActionData = szLine:match('^/([a-zA-Z_]+)%s+([^%s]+)%s+([^%s]+)%s*$')
+			end
+			if not szAction then
 				szAction, szActionData = szLine:match('^/([a-zA-Z_]+)%s+(.-)%s*$')
 				szCondition = ''
 			end
