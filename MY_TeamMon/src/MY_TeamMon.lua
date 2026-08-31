@@ -764,12 +764,13 @@ end
 
 -- 更新当前地图使用条件
 function D.UpdateShieldStatus()
+	local me = X.GetClientPlayer()
 	local bShieldedTotal = false
 	local bShieldedOtherPlayer = false
 	local bShieldedEnterLeaveScene = false
 	if X.IsRestricted('MY_TeamMon.MapRestriction') then
 		-- 地图限制判断
-		if X.IsInPubgMap() or X.GetMapID() == MY_TEAM_MON_GOOSE_DUCK_MAP_ID then
+		if X.IsInPubgMap() or (me and me.GetMapID() == MY_TEAM_MON_GOOSE_DUCK_MAP_ID) then
 			bShieldedTotal = true
 		end
 		if not X.IsInDungeonMap() then
