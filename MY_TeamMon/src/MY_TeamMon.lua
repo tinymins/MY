@@ -123,6 +123,7 @@ local MY_TEAM_MON_CORE_PLAYERID = 0
 local MY_TEAM_MON_CORE_NAME     = 0
 
 local MY_TEAM_MON_MAX_INTERVAL  = 300
+local MY_TEAM_MON_GOOSE_DUCK_MAP_ID = 807
 local MY_TEAM_MON_MAX_CACHE     = 3000 -- 最大的cache数量 主要是UI的问题
 local MY_TEAM_MON_DEL_CACHE     = 1000 -- 每次清理的数量 然后会做一次gc
 local MY_TEAM_MON_INI_FILE      = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon.ini'
@@ -768,7 +769,7 @@ function D.UpdateShieldStatus()
 	local bShieldedEnterLeaveScene = false
 	if X.IsRestricted('MY_TeamMon.MapRestriction') then
 		-- 地图限制判断
-		if X.IsInPubgMap() then
+		if X.IsInPubgMap() or X.GetMapID() == MY_TEAM_MON_GOOSE_DUCK_MAP_ID then
 			bShieldedTotal = true
 		end
 		if not X.IsInDungeonMap() then
