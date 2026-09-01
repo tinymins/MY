@@ -35,6 +35,9 @@ local VIEW_LIST_CACHE = {}
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
 local MY_TARGET_MON_DATA_MAX_LIMIT = 2000
+local MATCH_DISABLED_MAP = {
+	[807] = true, -- 鹅鸭大乐园
+} -- 禁止娱乐竞赛类地图监控
 
 do
 local function FilterDatasets(aDataset, dwMapID, dwKungfuID)
@@ -125,9 +128,13 @@ function D.GetDatasetList()
 		if not me then
 			return {}
 		end
+        local dwMapID = me.GetMapID() or 0
+		-- 竞赛地图禁用监控功能
+        if MATCH_DISABLED_MAP[dwMapID] then
+            return {}
+        end
 		local aConfig = {}
 		if not (X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()) then
-			local dwMapID = me.GetMapID() or 0
 			local dwKungfuID = me.GetKungfuMountID() or 0
 			for i, dataset in ipairs(FilterDatasets(MY_TargetMonConfig.GetDatasetList(), dwMapID, dwKungfuID)) do
 				aConfig[i] = setmetatable(
