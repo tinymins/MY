@@ -877,7 +877,11 @@ X.BreatheCall('MY_LifeBar_ScreenArrow', D.OnBreathe)
 X.RegisterEvent('FIGHT_HINT', 'MY_LifeBar_ScreenArrow', D.RegisterFight)
 X.RegisterEvent('LOGIN_GAME', 'MY_LifeBar_ScreenArrow', D.Init)
 X.RegisterEvent('UI_SCALED' , 'MY_LifeBar_ScreenArrow', SetUIScale)
-
+X.RegisterEvent('LOADING_END', 'MY_LifeBar_ScreenArrow', function()
+    CACHE[TARGET.NPC] = {}
+    CACHE[TARGET.PLAYER] = {}
+    CACHE[TARGET.DOODAD] = {}
+end)
 X.RegisterUserSettingsInit('MY_LifeBar_ScreenArrow', function()
 	D.bReady = true
 end)

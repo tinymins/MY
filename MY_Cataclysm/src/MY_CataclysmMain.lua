@@ -48,11 +48,15 @@ local function InsertBuffListCache(aBuffList, szVia, nViaPriority)
 			for iid, aList in pairs(BUFF_LIST) do
 				if iid == id or (tab.szName and type(iid) == 'number' and Table_GetBuffName(iid, 1) == tab.szName) then
 					for i, p in X.ipairs_r(aList) do
-						if (not tab.nLevel or p.nLevel == tab.nLevel)
-						and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
-						and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
-						and (not tab.bOnlyMe or p.bOnlyMe == tab.bOnlyMe)
-						and (not tab.bOnlyMine or p.bOnlyMine == tab.bOnlyMine) then
+						if (not tab.nLevel or tab.nLevel == p.nLevel)
+						and (not tab.szStackOp or tab.szStackOp == p.szStackOp)
+						and (not tab.nStackNum or tab.nStackNum == p.nStackNum)
+						and (not tab.nPriority or tab.nPriority == p.nPriority)
+						and (not tab.bOnlyMe == not p.bOnlyMe)
+						and (not tab.bOnlyMine == not p.bOnlyMine) 
+						and (not tab.bCaution == not p.bCaution)
+						and (not tab.bAttention == not p.bAttention)
+						and (not tab.bScreenHead == not p.bScreenHead) then
 							table.remove(aList, i)
 						end
 					end
@@ -111,6 +115,8 @@ local function UpdateTeamMonData()
 							v.nLevel = data.nLevel
 						end
 						v.nIcon = data.nIcon
+						v.szDisplay = v.szDisplay or data.szDisplay
+						v.szDisplay = v.szDisplay and X.RenderTemplateString(v.szDisplay, nil, -1, false, false)
 						table.insert(aBuff, v)
 					end
 				end

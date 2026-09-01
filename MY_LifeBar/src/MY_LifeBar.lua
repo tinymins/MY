@@ -206,6 +206,7 @@ X.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_LifeBar', onPartySetMark)
 
 local function onLoadingEnd()
 	OVERWRITE_TITLE_EFFECT = {}
+	COUNTDOWN_CACHE = {}  -- 清除缓存，防止不同地图分配相同ID，造成染色污染
 end
 X.RegisterEvent('LOADING_END', onLoadingEnd)
 end

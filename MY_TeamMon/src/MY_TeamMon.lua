@@ -121,6 +121,8 @@ end
 -- 核心优化变量
 local MY_TEAM_MON_CORE_PLAYERID = 0
 local MY_TEAM_MON_CORE_NAME     = 0
+local MY_TEAM_MON_MEMBER_CACHE  = {}
+local MY_TEAM_MON_MEMBER_ID_MAP = {}
 
 local MY_TEAM_MON_MAX_INTERVAL  = 300
 local MY_TEAM_MON_GOOSE_DUCK_MAP_ID = 807
@@ -411,10 +413,12 @@ local function ParseCountdown(szCountdown)
 				local nTime = tonumber(aParams[1])
 				local szContent = aParams[2]
 				local szVoice
+				local nIcon, nFrame
 				local szParam, bUnknownParam, bParamRecognized
 				for i = 3, #aParams do
 					szParam = aParams[i]
 					bParamRecognized = false
+					-- 解析语音
 					if not szVoice and not bParamRecognized then
 						if szParam:sub(1, 3) == 'VO:'
 						or szParam:sub(1, 3) == 'VC:' then
@@ -422,15 +426,31 @@ local function ParseCountdown(szCountdown)
 							bParamRecognized = true
 						end
 					end
+					-- 解析图标
+					if not nIcon and not bParamRecognized then
+						if szParam:sub(1, 6) == 'nIcon:' then
+							nIcon = tonumber(szParam:sub(7))
+							bParamRecognized = true
+						end
+					end
+					-- 解析背景色
+					if not nFrame and not bParamRecognized then
+						if szParam:sub(1, 7) == 'nFrame:' then
+							nFrame = tonumber(szParam:sub(8))
+							bParamRecognized = true
+						end
+					end
 					if not bParamRecognized then
 						bUnknownParam = true
 					end
 				end
-				if nTime and szContent and nTime and szContent ~= '' and not bUnknownParam then
+				if nTime and szContent and szContent ~= '' and not bUnknownParam then
 					table.insert(aCountdown, {
 						nTime = nTime,
 						szContent = szContent,
 						szVoice = szVoice,
+						nIcon = nIcon,
+						nFrame = nFrame,
 					})
 					bPartError = false
 				end
@@ -470,10 +490,12 @@ local function ParseHPCountdown(szString)
 				local szContent = aParams[2]
 				local nTime
 				local szVoice
+				local nIcon, nFrame
 				local szParam, bUnknownParam, bParamRecognized
 				for i = 3, #aParams do
 					szParam = aParams[i]
 					bParamRecognized = false
+					-- 解析语音
 					if not szVoice and not bParamRecognized then
 						if szParam:sub(1, 3) == 'VO:'
 						or szParam:sub(1, 3) == 'VC:' then
@@ -484,6 +506,20 @@ local function ParseHPCountdown(szString)
 					if not nTime and not bParamRecognized and i == 3 then
 						if tonumber(szParam) then
 							nTime = tonumber(szParam)
+							bParamRecognized = true
+						end
+					end
+					-- 解析图标
+					if not nIcon and not bParamRecognized then
+						if szParam:sub(1, 6) == 'nIcon:' then
+							nIcon = tonumber(szParam:sub(7))
+							bParamRecognized = true
+						end
+					end
+					-- 解析背景色
+					if not nFrame and not bParamRecognized then
+						if szParam:sub(1, 7) == 'nFrame:' then
+							nFrame = tonumber(szParam:sub(8))
 							bParamRecognized = true
 						end
 					end
@@ -498,6 +534,8 @@ local function ParseHPCountdown(szString)
 						szContent = szContent,
 						nTime = nTime,
 						szVoice = szVoice,
+						nIcon = nIcon,
+						nFrame = nFrame,
 					})
 					bPartError = false
 				end
@@ -516,6 +554,11 @@ local function ParseHPCountdown(szString)
 		CACHE.HP_CD_STR[szString] = {aHPCountdown, bError}
 	end
 	return X.Clone(CACHE.HP_CD_STR[szString][1]), CACHE.HP_CD_STR[szString][2]
+end
+
+-- 判断是否为队友ID
+local function IsTeamMemberID(dwID)
+    return dwID and MY_TEAM_MON_MEMBER_ID_MAP and MY_TEAM_MON_MEMBER_ID_MAP[dwID]
 end
 
 function D.OnFrameCreate()
@@ -700,7 +743,10 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'LOADING_END' or szEvent == 'MY_TEAM_MON_CREATE_CACHE' or szEvent == 'MY_TEAM_MON_LOADING_END' then
 		D.FireCrossMapEvent('before')
 		D.CreateData(szEvent)
+		D.OnTeamEvent(szEvent)
 		X.DelayCall('MY_TeamMon__FireCrossMapEvent__after', D.FireCrossMapEvent, 'after')
+	elseif szEvent == 'PARTY_ADD_MEMBER' or szEvent == 'PARTY_DELETE_MEMBER' or szEvent == 'PARTY_DISBAND' then
+		D.OnTeamEvent(szEvent)
 	end
 end
 
@@ -877,7 +923,7 @@ function D.CreateData(szEvent)
 				if v.szContent then
 					if v.szContent:find('{$me}') or v.szContent:find('{$team}') or v.bSearch or v.bReg then -- 具有通配符和搜索标记的数据不作 HIT 高速匹配策略考虑
 						table.insert(cache.OTHER, v)
-					elseif not cache.HIT[v.szContent] then -- 按照数据优先级顺序（地图＞地图组＞通用），同级按照下标先后顺序，只取第一个匹配结果
+					elseif not (cache.HIT[v.szContent] and cache.HIT[v.szContent][v.szTarget or 'sys']) then -- 按照数据优先级顺序（地图＞地图组＞通用），同级按照下标先后顺序，只取第一个匹配结果
 						cache.HIT[v.szContent] = cache.HIT[v.szContent] or {}
 						cache.HIT[v.szContent][v.szTarget or 'sys'] = v
 					end
@@ -1037,10 +1083,14 @@ function D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 					nIcon     = v.nIcon or data.nIcon or 340,
 					nFrame    = v.nFrame,
 					szContent = FilterCustomText(v.szName or data.szName, szSender, szReceiver, aBackreferences),
+					szRawName = v.szName or data.szName,
 					nTime     = v.nTime,
 					nRefresh  = v.nRefresh,
 					bTalk     = v.bTeamChannel,
 					bHold     = v.bHold,
+					szVoice   = v.szVoice,
+					nNewtime   = v.nNewtime,
+					bHoldFrame = v.bHoldFrame,
 				}
 				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver, aBackreferences)
 			end
@@ -1073,7 +1123,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
-	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and X.IsPlayer(dwSkillSrcID) and dwSkillSrcID ~= MY_TEAM_MON_CORE_PLAYERID then
+	if MY_TEAM_MON_SHIELDED_OTHER_PLAYER and X.IsPlayer(dwSkillSrcID) and dwSkillSrcID ~= MY_TEAM_MON_CORE_PLAYERID and not IsTeamMemberID(dwSkillSrcID) then
 		return
 	end
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
@@ -1739,17 +1789,45 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				dwReceiverID, szReceiver = nil
 			end
 			if bInParty and content:find('{$team}', nil, true) then
-				local c = content
-				for _, vv in ipairs(team.GetTeamMemberList()) do
-					if string.find(szContent, c:gsub('{$team}', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
-						data = v
-						dwReceiverID = vv
-						szReceiver = team.GetClientTeamMemberName(vv)
+				if v.bReg then
+					-- 正则模式（带{$team}）：逆向排除，先遍历成员名，替换为{$team}，不替换为空防止破坏位置约束，若替换成功，说明命中，再正则匹配剩余的内容，如此只用一次正则，节约性能
+					local nHitMemberID, szHitMemberName, szProcessedContent
+					-- 获取正则{$team}数量，决定后续成员名替换为{$team}次数
+					local _, nTeamCount = content:gsub('{$team}', '{$team}')
+					for _, member in ipairs(MY_TEAM_MON_MEMBER_CACHE) do
+						local szHitContent, nHitCount = string.gsub(szContent, member.szName, '{$team}', nTeamCount)
+						if nHitCount > 0 then
+							nHitMemberID = member.dwID
+							szHitMemberName = member.szName
+							szProcessedContent = szHitContent
+							break
+						end
+					end
+					if nHitMemberID and szHitMemberName then
+						local res = {string.find(szProcessedContent, content)}
+						if res[1] then
+							table.remove(res, 1)
+							table.remove(res, 1)
+							data = v
+							aBackreferences = res
+							dwReceiverID = nHitMemberID
+							szReceiver = szHitMemberName
+							break
+						end
+					end
+				else
+					local c = content
+					for _, vv in ipairs(team.GetTeamMemberList()) do
+						if string.find(szContent, c:gsub('{$team}', team.GetClientTeamMemberName(vv)), nil, true) and (v.szTarget == szNpcName or v.szTarget == '%') then -- hit
+							data = v
+							dwReceiverID = vv
+							szReceiver = team.GetClientTeamMemberName(vv)
+							break
+						end
+					end
+					if dwReceiverID and szReceiver then
 						break
 					end
-				end
-				if dwReceiverID and szReceiver then
-					break
 				end
 			elseif v.szTarget == szNpcName or v.szTarget == '%' then
 				if v.bReg then
@@ -2013,8 +2091,52 @@ function D.FireCrossMapEvent(szWhen)
 				D.OnCallMessage(szEvent, szContent)
 			end
 			MAP_ID = dwMapID
+			
+			-- 组队模式下过图后系统没有推送BUFF刷新事件，这里手动补发一下，以后修复了再删除
+			local me = X.GetClientPlayer()
+			if me then
+				if me.IsInParty() then
+					for _, tBuff in X.ipairs_c(X.GetBuffList(me)) do
+						D.OnBuff(me.dwID, false, tBuff.bCanCancel, tBuff.dwID, tBuff.nStackNum, tBuff.nLevel, tBuff.dwSkillSrcID)
+					end
+				end
+			end
 		end
 	end
+end
+
+-- 团队成员事件 刷新团队成员排序缓存
+function D.OnTeamEvent(szEvent)
+	local me = X.GetClientPlayer()
+	if not me then
+		return
+	end
+	local tMemberID = {}
+	local tMemberList = {}
+	if me.IsInParty() then
+		local team = GetClientTeam()
+		if team then
+			for _, vv in ipairs(team.GetTeamMemberList()) do
+				local tMemberData = {
+                    dwID = vv,
+                    szName = team.GetClientTeamMemberName(vv)
+                }
+				tMemberID[vv] = tMemberData
+				table.insert(tMemberList, tMemberData)
+			end
+			table.sort(tMemberList, function(a, b) return #a.szName > #b.szName end)
+		end
+	end
+	if #tMemberList == 0 then
+        local tMemberData = {
+            dwID = MY_TEAM_MON_CORE_PLAYERID,
+            szName = MY_TEAM_MON_CORE_NAME
+        }
+        tMemberID[MY_TEAM_MON_CORE_PLAYERID] = tMemberData
+        table.insert(tMemberList, tMemberData)
+    end
+	MY_TEAM_MON_MEMBER_CACHE  = tMemberList
+	MY_TEAM_MON_MEMBER_ID_MAP = tMemberID
 end
 
 -- RegisterMsgMonitor
