@@ -56,6 +56,16 @@ function D.AdjustScaleRatio(frame, hList)
 		hInfoList:FormatAllItemPos()
 		-- 字体大小
 		X.UI(hItem):Find('.Text'):FontScale(frame.fScaleY)
+		-- 重新居中罗盘指针
+        local hCompass = hItem:Lookup('Handle_L/Handle_Compass')
+		if hCompass then
+			local hPlayer = hItem:Lookup('Handle_L/Handle_Compass/Image_Player')
+			if hPlayer then
+				local cw, ch = hCompass:GetSize()
+				local pw, ph = hPlayer:GetSize()
+				hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetRelPos((cw - pw) / 2, (ch - ph) / 2)
+			end
+		end
 	end
 	local nW, nH = hTotal:Lookup('Image_Title'):GetSize()
 	hTotal:Lookup('Text_Title'):SetRelX(nH * 1.1)
