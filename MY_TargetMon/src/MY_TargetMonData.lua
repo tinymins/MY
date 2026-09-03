@@ -15,7 +15,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.10') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^29.0.14') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -131,7 +131,8 @@ function D.GetDatasetList()
         local dwMapID = me.GetMapID() or 0
 		-- 竞赛地图禁用监控功能
         if MATCH_DISABLED_MAP[dwMapID] then
-            return {}
+			CONFIG_CACHE = {}
+            return CONFIG_CACHE
         end
 		local aConfig = {}
 		if not (X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()) then
