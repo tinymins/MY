@@ -131,7 +131,8 @@ function D.GetDatasetList()
         local dwMapID = me.GetMapID() or 0
 		-- 竞赛地图禁用监控功能
         if MATCH_DISABLED_MAP[dwMapID] then
-            return {}
+			CONFIG_CACHE = {}
+            return CONFIG_CACHE
         end
 		local aConfig = {}
 		if not (X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()) then
