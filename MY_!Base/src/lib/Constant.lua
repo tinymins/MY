@@ -262,7 +262,7 @@ local CONSTANT = {
 	MENU_DIVIDER = X.FreezeTable({ bDevide = true }),
 	EMPTY_TABLE = X.FreezeTable({}),
 	XML_LINE_BREAKER = GetFormatText('\n'),
-	MAX_PLAYER_LEVEL = 50,
+	MAX_PLAYER_LEVEL = X.IsFunction(_G.GetMaxPlayerLevel) and GetMaxPlayerLevel() or 50,
 	UI_OBJECT = UI_OBJECT or X.FreezeTable({
 		NONE             = -1, -- 空Box
 		ITEM             = 0 , -- 身上有的物品。nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
@@ -1242,10 +1242,9 @@ local CONSTANT = {
 
 -- 更新最高玩家等级数据
 RegisterEvent('PLAYER_ENTER_SCENE', function()
-	CONSTANT.MAX_PLAYER_LEVEL = math.max(
-		CONSTANT.MAX_PLAYER_LEVEL,
-		X.GetClientPlayer().nMaxLevel
-	)
+	if X.IsFunction(_G.GetMaxPlayerLevel) then
+		CONSTANT.MAX_PLAYER_LEVEL = GetMaxPlayerLevel()
+	end
 end)
 
 X.CONSTANT = setmetatable({}, { __index = CONSTANT, __newindex = function() end })
