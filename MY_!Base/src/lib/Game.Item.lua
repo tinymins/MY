@@ -289,7 +289,7 @@ function X.IsBetterEquipment(kItem, dwPackage, dwBox)
 	if not equipedItem then
 		return false
 	end
-	if me.nLevel < me.nMaxLevel then
+	if me.nLevel < X.CONSTANT.MAX_PLAYER_LEVEL then
 		return kItem.nEquipScore > equipedItem.nEquipScore
 	end
 	return (kItem.nEquipScore > equipedItem.nEquipScore) or (kItem.nLevel > equipedItem.nLevel and kItem.nQuality >= equipedItem.nQuality)

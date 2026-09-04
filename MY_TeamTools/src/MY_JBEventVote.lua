@@ -370,7 +370,7 @@ end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
 	local me = X.GetClientPlayer()
-	if me and me.nMaxLevel == me.nLevel then
+	if me and me.nLevel == X.CONSTANT.MAX_PLAYER_LEVEL then
 		nX = nPaddingX
 		nY = nLFY
 		nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Dungeon Vote'], font = 27 }):Height() + 2
